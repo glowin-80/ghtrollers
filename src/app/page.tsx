@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import {
+  buildLeaderboard,
+  HOME_ACTIVE_MEMBERS_SELECT,
+  HOME_APPROVED_CATCHES_SELECT,
+} from "@/lib/home";
 import type {
   Catch,
-  LeaderboardEntry,
   LeaderboardFilter,
   Member,
   UploadImageResult,
@@ -37,7 +41,6 @@ export default function Home() {
   const [mapOpen, setMapOpen] = useState(false);
 
   const [approvedCatches, setApprovedCatches] = useState<Catch[]>([]);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [filter, setFilter] = useState<LeaderboardFilter>("bigfive");
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -50,6 +53,14 @@ export default function Home() {
 
   const hasActiveMembership = membershipStatus === "active";
 
+  const leaderboard = useMemo(() => {
+    return buildLeaderboard(approvedCatches, filter);
+  }, [approvedCatches, filter]);
+
+  const recentApprovedCatches = useMemo(() => {
+    return approvedCatches.slice(0, 5);
+  }, [approvedCatches]);
+
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -59,13 +70,69 @@ export default function Home() {
   }, [previewUrl]);
 
   useEffect(() => {
-    loadMembers();
-    loadApprovedCatches();
-    loadLeaderboard("bigfive");
+    let mounted = true;
+
+    async function loadInitialData() {
+      try {
+        const [membersResponse, catchesResponse] = await Promise.all([
+          supabase
+            .from("members")
+            .select(HOME_ACTIVE_MEMBERS_SELECT)
+            .eq("is_active", true)
+            .order("name", { ascending: true }),
+          supabase
+            .from("catches")
+            .select(HOME_APPROVED_CATCHES_SELECT)
+            .eq("status", "approved")
+            .order("created_at", { ascending: false }),
+        ]);
+
+        if (!mounted) return;
+
+        if (membersResponse.error) {
+          console.error(membersResponse.error);
+        } else {
+          setMembers(membersResponse.data || []);
+        }
+
+        if (catchesResponse.error) {
+          console.error(catchesResponse.error);
+        } else {
+          setApprovedCatches(catchesResponse.data || []);
+        }
+      } catch (error) {
+        if (!mounted) return;
+        console.error(error);
+      }
+    }
+
+    loadInitialData();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
     let mounted = true;
+
+    async function loadMembershipStatus(userId: string) {
+      const { data: memberData, error } = await supabase
+        .from("members")
+        .select("is_active")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (!mounted) return;
+
+      if (error) {
+        console.error(error);
+        setMembershipStatus("pending");
+        return;
+      }
+
+      setMembershipStatus(memberData?.is_active ? "active" : "pending");
+    }
 
     async function loadAuthState() {
       const {
@@ -81,22 +148,7 @@ export default function Home() {
       }
 
       setIsLoggedIn(true);
-
-      const { data: memberData, error } = await supabase
-        .from("members")
-        .select("is_active")
-        .eq("id", session.user.id)
-        .maybeSingle();
-
-      if (!mounted) return;
-
-      if (error) {
-        console.error(error);
-        setMembershipStatus("pending");
-        return;
-      }
-
-      setMembershipStatus(memberData?.is_active ? "active" : "pending");
+      await loadMembershipStatus(session.user.id);
     }
 
     loadAuthState();
@@ -111,20 +163,7 @@ export default function Home() {
       }
 
       setIsLoggedIn(true);
-
-      const { data: memberData, error } = await supabase
-        .from("members")
-        .select("is_active")
-        .eq("id", session.user.id)
-        .maybeSingle();
-
-      if (error) {
-        console.error(error);
-        setMembershipStatus("pending");
-        return;
-      }
-
-      setMembershipStatus(memberData?.is_active ? "active" : "pending");
+      await loadMembershipStatus(session.user.id);
     });
 
     return () => {
@@ -133,104 +172,7 @@ export default function Home() {
     };
   }, []);
 
-  async function loadMembers() {
-    const { data, error } = await supabase
-      .from("members")
-      .select("*")
-      .eq("is_active", true)
-      .order("name", { ascending: true });
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    setMembers(data || []);
-  }
-
-  async function loadApprovedCatches() {
-    const { data, error } = await supabase
-      .from("catches")
-      .select("*")
-      .eq("status", "approved")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    setApprovedCatches(data || []);
-  }
-
-  async function loadLeaderboard(type: LeaderboardFilter) {
-    const { data, error } = await supabase
-      .from("catches")
-      .select("*")
-      .eq("status", "approved");
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    if (!data || data.length === 0) {
-      setLeaderboard([]);
-      return;
-    }
-
-    if (type === "bigfive") {
-      const grouped: Record<string, number[]> = {};
-
-      data.forEach((c) => {
-        const score = c.fish_type === "Abborre" ? c.weight_g * 4 : c.weight_g;
-
-        if (!grouped[c.caught_for]) {
-          grouped[c.caught_for] = [];
-        }
-
-        grouped[c.caught_for].push(score);
-      });
-
-      const result = Object.entries(grouped)
-        .map(([name, scores]) => {
-          const topFive = scores.sort((a, b) => b - a).slice(0, 5);
-          const total = topFive.reduce((sum, value) => sum + value, 0);
-
-          return { name, total, detail: null };
-        })
-        .sort((a, b) => b.total - a.total);
-
-      setLeaderboard(result);
-      return;
-    }
-
-    let filtered = data;
-
-    if (type === "gädda") {
-      filtered = data.filter((c) => c.fish_type === "Gädda");
-    }
-
-    if (type === "abborre") {
-      filtered = data.filter((c) => c.fish_type === "Abborre");
-    }
-
-    if (type === "fina") {
-      filtered = data.filter((c) => c.fish_type === "Fina fisken");
-    }
-
-    const sorted = filtered
-      .sort((a, b) => b.weight_g - a.weight_g)
-      .map((c) => ({
-        name: c.caught_for,
-        total: c.weight_g,
-        detail: type === "fina" ? c.fine_fish_type || null : null,
-      }));
-
-    setLeaderboard(sorted);
-  }
-
-  async function compressImage(file: File): Promise<File> {
+  const compressImage = useCallback(async (file: File): Promise<File> => {
     const imageBitmap = await createImageBitmap(file);
 
     const maxWidth = 1200;
@@ -266,63 +208,72 @@ export default function Home() {
     return new File([blob], `${originalName}.jpg`, {
       type: "image/jpeg",
     });
-  }
+  }, []);
 
-  async function uploadImage(file: File): Promise<UploadImageResult> {
-    const originalSizeBytes = file.size;
-    const compressedFile = await compressImage(file);
-    const compressedSizeBytes = compressedFile.size;
+  const uploadImage = useCallback(
+    async (file: File): Promise<UploadImageResult> => {
+      const originalSizeBytes = file.size;
+      const compressedFile = await compressImage(file);
+      const compressedSizeBytes = compressedFile.size;
 
-    const fileName = `${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2)}.jpg`;
-    const filePath = `catches/${fileName}`;
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2)}.jpg`;
+      const filePath = `catches/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from("catch-images")
-      .upload(filePath, compressedFile, {
-        contentType: "image/jpeg",
-        upsert: false,
-      });
+      const { error: uploadError } = await supabase.storage
+        .from("catch-images")
+        .upload(filePath, compressedFile, {
+          contentType: "image/jpeg",
+          upsert: false,
+        });
 
-    if (uploadError) {
-      throw uploadError;
-    }
+      if (uploadError) {
+        throw uploadError;
+      }
 
-    const { data } = supabase.storage
-      .from("catch-images")
-      .getPublicUrl(filePath);
+      const { data } = supabase.storage
+        .from("catch-images")
+        .getPublicUrl(filePath);
 
-    return {
-      imageUrl: data.publicUrl,
-      originalSizeBytes,
-      compressedSizeBytes,
-    };
-  }
+      return {
+        imageUrl: data.publicUrl,
+        originalSizeBytes,
+        compressedSizeBytes,
+      };
+    },
+    [compressImage]
+  );
 
-  function handleFilterChange(value: LeaderboardFilter) {
+  const handleFilterChange = useCallback((value: LeaderboardFilter) => {
     setFilter(value);
-    loadLeaderboard(value);
-  }
+  }, []);
 
-  function handleCaughtForChange(value: string) {
-    setCaughtFor(value);
-    setRegisteredBy((prev) => (prev === "" || prev === caughtFor ? value : prev));
-  }
+  const handleCaughtForChange = useCallback((value: string) => {
+    setCaughtFor((prevCaughtFor) => {
+      setRegisteredBy((prevRegisteredBy) =>
+        prevRegisteredBy === "" || prevRegisteredBy === prevCaughtFor
+          ? value
+          : prevRegisteredBy
+      );
 
-  function handleFishTypeChange(value: string) {
+      return value;
+    });
+  }, []);
+
+  const handleFishTypeChange = useCallback((value: string) => {
     setFishType(value);
 
     if (value !== "Fina fisken") {
       setFineFishType("");
     }
-  }
+  }, []);
 
-  function handleImageChange(file: File | null) {
+  const handleImageChange = useCallback((file: File | null) => {
     setImageFile(file);
-  }
+  }, []);
 
-  async function handleGetGps() {
+  const handleGetGps = useCallback(async () => {
     if (!hasActiveMembership) {
       return;
     }
@@ -356,121 +307,157 @@ export default function Home() {
         maximumAge: 0,
       }
     );
-  }
+  }, [hasActiveMembership, locationName]);
 
-  function handleMapSelect(lat: number, lng: number) {
-    if (!hasActiveMembership) {
-      return;
-    }
+  const handleMapSelect = useCallback(
+    (lat: number, lng: number) => {
+      if (!hasActiveMembership) {
+        return;
+      }
 
-    setLatitude(lat);
-    setLongitude(lng);
+      setLatitude(lat);
+      setLongitude(lng);
 
-    if (!locationName.trim()) {
-      setLocationName(`Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
-    }
+      if (!locationName.trim()) {
+        setLocationName(`Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+      }
 
+      setMapOpen(false);
+    },
+    [hasActiveMembership, locationName]
+  );
+
+  const handleOpenMap = useCallback(() => {
+    setMapOpen(true);
+  }, []);
+
+  const handleCloseMap = useCallback(() => {
     setMapOpen(false);
-  }
+  }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  const handleImageClick = useCallback((url: string) => {
+    setSelectedImage(url);
+  }, []);
 
-    if (!isLoggedIn) {
-      alert("Du behöver vara inloggad för att registrera en fångst.");
-      window.location.href = "/login";
-      return;
-    }
+  const handleCloseSelectedImage = useCallback(() => {
+    setSelectedImage(null);
+  }, []);
 
-    if (!hasActiveMembership) {
-      alert(
-        "Ditt medlemskap är under granskning, så snart vi fiskat klart kikar vi på din ansökan."
-      );
-      return;
-    }
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (
-      !caughtFor.trim() ||
-      !registeredBy.trim() ||
-      !fishType.trim() ||
-      !weight.trim() ||
-      !catchDate
-    ) {
-      alert("Fyll i alla obligatoriska fält.");
-      return;
-    }
-
-    if (fishType === "Fina fisken" && !fineFishType.trim()) {
-      alert("Fyll i art på fina fisken.");
-      return;
-    }
-
-    if (!imageFile) {
-      alert("Välj en bild.");
-      return;
-    }
-
-    if (!locationName.trim()) {
-      const shouldContinue = window.confirm(
-        "Du har inte angett plats, säker att du vill fortsätta?"
-      );
-
-      if (!shouldContinue) {
+      if (!isLoggedIn) {
+        alert("Du behöver vara inloggad för att registrera en fångst.");
+        window.location.href = "/login";
         return;
       }
-    }
 
-    setLoading(true);
+      if (!hasActiveMembership) {
+        alert(
+          "Ditt medlemskap är under granskning, så snart vi fiskat klart kikar vi på din ansökan."
+        );
+        return;
+      }
 
-    try {
-      const uploadResult = await uploadImage(imageFile);
+      if (
+        !caughtFor.trim() ||
+        !registeredBy.trim() ||
+        !fishType.trim() ||
+        !weight.trim() ||
+        !catchDate
+      ) {
+        alert("Fyll i alla obligatoriska fält.");
+        return;
+      }
 
-      const { error } = await supabase.from("catches").insert([
-        {
-          caught_for: caughtFor.trim(),
-          registered_by: registeredBy.trim(),
-          fish_type: fishType,
-          fine_fish_type:
-            fishType === "Fina fisken" ? fineFishType.trim() : null,
-          weight_g: Number(weight),
-          catch_date: catchDate,
-          location_name: locationName.trim() || null,
-          image_url: uploadResult.imageUrl,
-          latitude,
-          longitude,
-          original_image_size_bytes: uploadResult.originalSizeBytes,
-          compressed_image_size_bytes: uploadResult.compressedSizeBytes,
-          status: "pending",
-        },
-      ]);
+      if (fishType === "Fina fisken" && !fineFishType.trim()) {
+        alert("Fyll i art på fina fisken.");
+        return;
+      }
 
-      if (error) {
+      if (!imageFile) {
+        alert("Välj en bild.");
+        return;
+      }
+
+      if (!locationName.trim()) {
+        const shouldContinue = window.confirm(
+          "Du har inte angett plats, säker att du vill fortsätta?"
+        );
+
+        if (!shouldContinue) {
+          return;
+        }
+      }
+
+      setLoading(true);
+
+      try {
+        const uploadResult = await uploadImage(imageFile);
+
+        const { error } = await supabase.from("catches").insert([
+          {
+            caught_for: caughtFor.trim(),
+            registered_by: registeredBy.trim(),
+            fish_type: fishType,
+            fine_fish_type:
+              fishType === "Fina fisken" ? fineFishType.trim() : null,
+            weight_g: Number(weight),
+            catch_date: catchDate,
+            location_name: locationName.trim() || null,
+            image_url: uploadResult.imageUrl,
+            latitude,
+            longitude,
+            original_image_size_bytes: uploadResult.originalSizeBytes,
+            compressed_image_size_bytes: uploadResult.compressedSizeBytes,
+            status: "pending",
+          },
+        ]);
+
+        if (error) {
+          console.error(error);
+          alert("Fel vid sparning.");
+          setLoading(false);
+          return;
+        }
+
+        setCaughtFor("");
+        setRegisteredBy("");
+        setFishType("");
+        setFineFishType("");
+        setWeight("");
+        setCatchDate("");
+        setLocationName("");
+        setImageFile(null);
+        setLatitude(null);
+        setLongitude(null);
+        setFileInputKey((prev) => prev + 1);
+
+        alert("Fångsten skickades in och väntar på godkännande.");
+      } catch (error) {
         console.error(error);
-        alert("Fel vid sparning.");
-        setLoading(false);
-        return;
+        alert("Fel vid bilduppladdning.");
       }
 
-      setCaughtFor("");
-      setRegisteredBy("");
-      setFishType("");
-      setFineFishType("");
-      setWeight("");
-      setCatchDate("");
-      setLocationName("");
-      setImageFile(null);
-      setLatitude(null);
-      setLongitude(null);
-      setFileInputKey((prev) => prev + 1);
-
-      alert("Fångsten skickades in och väntar på godkännande.");
-    } catch (error) {
-      console.error(error);
-      alert("Fel vid bilduppladdning.");
-    }
-
-    setLoading(false);
-  }
+      setLoading(false);
+    },
+    [
+      isLoggedIn,
+      hasActiveMembership,
+      caughtFor,
+      registeredBy,
+      fishType,
+      fineFishType,
+      weight,
+      catchDate,
+      imageFile,
+      locationName,
+      uploadImage,
+      latitude,
+      longitude,
+    ]
+  );
 
   return (
     <main className="px-4 pb-10 pt-4">
@@ -514,8 +501,8 @@ export default function Home() {
             onCatchDateChange={setCatchDate}
             onLocationNameChange={setLocationName}
             onGetGps={handleGetGps}
-            onOpenMap={() => setMapOpen(true)}
-            onCloseMap={() => setMapOpen(false)}
+            onOpenMap={handleOpenMap}
+            onCloseMap={handleCloseMap}
             onMapSelect={handleMapSelect}
             onImageChange={handleImageChange}
           />
@@ -525,8 +512,8 @@ export default function Home() {
 
         <div id="approved-section" className="scroll-mt-[360px]">
           <RecentApprovedSection
-            catches={approvedCatches.slice(0, 5)}
-            onImageClick={(url) => setSelectedImage(url)}
+            catches={recentApprovedCatches}
+            onImageClick={handleImageClick}
           />
         </div>
 
@@ -543,12 +530,13 @@ export default function Home() {
         {selectedImage && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-            onClick={() => setSelectedImage(null)}
+            onClick={handleCloseSelectedImage}
           >
             <img
               src={selectedImage}
               alt="Förstorad fångstbild"
               className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
+              decoding="async"
             />
           </div>
         )}

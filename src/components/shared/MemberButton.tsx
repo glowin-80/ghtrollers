@@ -1,12 +1,13 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
 
 type MemberButtonProps = {
   profileImage?: string | null;
 };
 
-export default function MemberButton({ profileImage }: MemberButtonProps) {
+function MemberButtonComponent({ profileImage }: MemberButtonProps) {
   return (
     <Link href="/min-sida">
       <div className="flex cursor-pointer items-center gap-2 rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] px-4 py-2 shadow-md transition hover:scale-[1.03]">
@@ -16,6 +17,7 @@ export default function MemberButton({ profileImage }: MemberButtonProps) {
               src={profileImage}
               alt="Profilbild"
               className="h-full w-full object-cover"
+              decoding="async"
             />
           ) : (
             <span className="text-sm text-[#d6c28a]">👤</span>
@@ -29,3 +31,7 @@ export default function MemberButton({ profileImage }: MemberButtonProps) {
     </Link>
   );
 }
+
+const MemberButton = memo(MemberButtonComponent);
+
+export default MemberButton;

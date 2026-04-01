@@ -2,7 +2,7 @@
 
 import MemberButton from "@/components/shared/MemberButton";
 import { useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type NavItem = {
@@ -46,6 +46,7 @@ const sectionItems: NavItem[] = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [active, setActive] = useState("leaderboard");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -169,7 +170,7 @@ export default function Header() {
     }
 
     if (item.type === "action") {
-      window.location.href = isLoggedIn ? "/min-sida" : "/login";
+      router.push(isLoggedIn ? "/min-sida" : "/login");
     }
   }
 

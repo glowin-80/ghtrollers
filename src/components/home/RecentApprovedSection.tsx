@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import type { Catch } from "@/types/home";
 
 type RecentApprovedSectionProps = {
@@ -15,7 +16,7 @@ function getCatchLabel(item: Catch) {
   return item.fish_type;
 }
 
-export default function RecentApprovedSection({
+function RecentApprovedSectionComponent({
   catches,
   onImageClick,
 }: RecentApprovedSectionProps) {
@@ -40,6 +41,8 @@ export default function RecentApprovedSection({
                   alt={`${item.caught_for} fångst`}
                   onClick={() => onImageClick(item.image_url!)}
                   className="h-52 w-full cursor-pointer object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               )}
 
@@ -60,3 +63,7 @@ export default function RecentApprovedSection({
     </section>
   );
 }
+
+const RecentApprovedSection = memo(RecentApprovedSectionComponent);
+
+export default RecentApprovedSection;

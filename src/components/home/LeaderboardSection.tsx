@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import type { LeaderboardEntry, LeaderboardFilter, Member } from "@/types/home";
 
 type LeaderboardSectionProps = {
@@ -35,11 +36,6 @@ function getHeadline(filter: LeaderboardFilter) {
   return "Fina fisken - Topp 3";
 }
 
-function getMemberImage(members: Member[], name: string) {
-  const match = members.find((member) => member.name === name);
-  return match?.profile_image_url || null;
-}
-
 function getInitials(name: string) {
   return name
     .split(" ")
@@ -63,17 +59,24 @@ function getRunnerUpStyles(index: number) {
   };
 }
 
-export default function LeaderboardSection({
+function LeaderboardSectionComponent({
   leaderboard,
   members,
   filter,
   onFilterChange,
 }: LeaderboardSectionProps) {
-  const topThree = leaderboard.slice(0, 3);
+  const topThree = useMemo(() => leaderboard.slice(0, 3), [leaderboard]);
   const winner = topThree[0];
   const runnersUp = topThree.slice(1, 3);
 
-  const winnerImage = winner ? getMemberImage(members, winner.name) : null;
+  const memberImageMap = useMemo(() => {
+    return members.reduce<Record<string, string | null>>((acc, member) => {
+      acc[member.name] = member.profile_image_url || null;
+      return acc;
+    }, {});
+  }, [members]);
+
+  const winnerImage = winner ? memberImageMap[winner.name] || null : null;
 
   return (
     <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
@@ -83,26 +86,26 @@ export default function LeaderboardSection({
       </div>
 
       <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
-  {filters.map((item) => {
-    const isActive = filter === item.value;
+        {filters.map((item) => {
+          const isActive = filter === item.value;
 
-    return (
-      <button
-        key={item.value}
-        type="button"
-        onClick={() => onFilterChange(item.value)}
-        className={[
-          "shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition sm:px-5 sm:py-3 sm:text-sm",
-          isActive
-            ? "bg-[#1d2f7a] text-white shadow-[0_8px_18px_rgba(29,47,122,0.25)]"
-            : "bg-[#eef2f3] text-[#374151] hover:bg-[#e3e8ea]",
-        ].join(" ")}
-      >
-        {item.label}
-      </button>
-    );
-  })}
-</div>
+          return (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => onFilterChange(item.value)}
+              className={[
+                "shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition sm:px-5 sm:py-3 sm:text-sm",
+                isActive
+                  ? "bg-[#1d2f7a] text-white shadow-[0_8px_18px_rgba(29,47,122,0.25)]"
+                  : "bg-[#eef2f3] text-[#374151] hover:bg-[#e3e8ea]",
+              ].join(" ")}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
 
       <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-4 shadow-inner">
         <h3 className="mb-5 text-[22px] font-bold text-[#1f2937]">
@@ -146,6 +149,7 @@ export default function LeaderboardSection({
                                 src={winnerImage}
                                 alt={winner.name}
                                 className="h-full w-full object-cover"
+                                decoding="async"
                               />
                             ) : (
                               <span className="text-lg font-bold text-[#5b6470]">
@@ -185,7 +189,7 @@ export default function LeaderboardSection({
               <div className="grid gap-4 md:grid-cols-2">
                 {runnersUp.map((entry, index) => {
                   const actualIndex = index + 1;
-                  const imageUrl = getMemberImage(members, entry.name);
+                  const imageUrl = memberImageMap[entry.name] || null;
                   const styles = getRunnerUpStyles(actualIndex);
 
                   return (
@@ -205,6 +209,8 @@ export default function LeaderboardSection({
                               src={imageUrl}
                               alt={entry.name}
                               className="h-full w-full object-cover"
+                              loading="lazy"
+                              decoding="async"
                             />
                           ) : (
                             <span className="text-sm font-bold text-[#5b6470]">
@@ -246,3 +252,7 @@ export default function LeaderboardSection({
     </section>
   );
 }
+
+const LeaderboardSection = memo(LeaderboardSectionComponent);
+
+export default LeaderboardSection;

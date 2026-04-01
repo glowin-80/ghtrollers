@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { MemberProfile } from "@/types/member-page";
 import ProfileImageUploader from "@/components/member/ProfileImageUploader";
 
@@ -29,6 +30,8 @@ export default function ProfileCard({
                   src={member.profile_image_url}
                   alt="Profilbild"
                   className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <span className="text-3xl text-[#e5d3a3]">👤</span>
@@ -56,12 +59,12 @@ export default function ProfileCard({
           </div>
 
           <div className="flex items-center gap-3">
-            <a
+            <Link
               href="/"
               className="rounded-full border border-[#d8d2c7] bg-white px-4 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
             >
               Till startsidan
-            </a>
+            </Link>
 
             {onLogout ? (
               <button

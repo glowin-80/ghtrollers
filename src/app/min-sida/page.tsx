@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { calculateMemberStats } from "@/lib/member-page";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
@@ -11,21 +12,70 @@ import AdminToolsCard from "@/components/member/AdminToolsCard";
 import PendingApprovalCard from "@/components/member/PendingApprovalCard";
 
 export default function MinSidaPage() {
-  const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(true);
+
+  const [pageLoading, setPageLoading] = useState(true);
+  const [catchesLoading, setCatchesLoading] = useState(false);
+
   const [member, setMember] = useState<MemberProfile | null>(null);
   const [catches, setCatches] = useState<MemberCatch[]>([]);
+
   const [error, setError] = useState<string | null>(null);
+  const [catchesError, setCatchesError] = useState<string | null>(null);
 
   const stats = useMemo(() => calculateMemberStats(catches), [catches]);
 
   useEffect(() => {
-    loadPage();
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
-  async function loadPage() {
+  const loadMemberCatches = useCallback(async (memberName: string) => {
     try {
-      setLoading(true);
-      setError(null);
+      if (mountedRef.current) {
+        setCatchesLoading(true);
+        setCatchesError(null);
+      }
+
+      const { data: catchesData, error: catchesError } = await supabase
+        .from("catches")
+        .select(
+          "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, status, created_at"
+        )
+        .or(`caught_for.eq.${memberName},registered_by.eq.${memberName}`)
+        .order("catch_date", { ascending: false });
+
+      if (catchesError) {
+        throw catchesError;
+      }
+
+      if (!mountedRef.current) return;
+
+      setCatches(catchesData || []);
+    } catch (err) {
+      console.error(err);
+
+      if (!mountedRef.current) return;
+
+      setCatches([]);
+      setCatchesError("Kunde inte ladda dina fångster just nu.");
+    } finally {
+      if (mountedRef.current) {
+        setCatchesLoading(false);
+      }
+    }
+  }, []);
+
+  const loadPage = useCallback(async () => {
+    try {
+      if (mountedRef.current) {
+        setPageLoading(true);
+        setError(null);
+        setCatchesError(null);
+      }
 
       const {
         data: { session },
@@ -37,9 +87,11 @@ export default function MinSidaPage() {
       }
 
       if (!session?.user) {
+        if (!mountedRef.current) return;
+
         setMember(null);
         setCatches([]);
-        setLoading(false);
+        setPageLoading(false);
         return;
       }
 
@@ -69,36 +121,30 @@ export default function MinSidaPage() {
             profile_image_url: null,
           };
 
+      if (!mountedRef.current) return;
+
       setMember(resolvedMember);
+      setPageLoading(false);
 
       if (!resolvedMember.is_active) {
         setCatches([]);
-        setLoading(false);
         return;
       }
 
-      const memberName = resolvedMember.name || "";
-
-      const { data: catchesData, error: catchesError } = await supabase
-        .from("catches")
-        .select(
-          "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, status, created_at"
-        )
-        .or(`caught_for.eq.${memberName},registered_by.eq.${memberName}`)
-        .order("catch_date", { ascending: false });
-
-      if (catchesError) {
-        throw catchesError;
-      }
-
-      setCatches(catchesData || []);
+      await loadMemberCatches(resolvedMember.name || "");
     } catch (err) {
       console.error(err);
+
+      if (!mountedRef.current) return;
+
       setError("Kunde inte ladda medlemssidan.");
-    } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
-  }
+  }, [loadMemberCatches]);
+
+  useEffect(() => {
+    loadPage();
+  }, [loadPage]);
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -115,7 +161,7 @@ export default function MinSidaPage() {
     });
   }
 
-  if (loading) {
+  if (pageLoading) {
     return (
       <main className="px-4 pb-10 pt-6">
         <div className="mx-auto max-w-6xl">
@@ -150,19 +196,19 @@ export default function MinSidaPage() {
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3">
-              <a
+              <Link
                 href="/"
                 className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
               >
                 Till startsidan
-              </a>
+              </Link>
 
-              <a
+              <Link
                 href="/login"
                 className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
               >
                 Logga in
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -197,9 +243,35 @@ export default function MinSidaPage() {
 
         {member.is_admin ? <AdminToolsCard /> : null}
 
-        <StatsGrid stats={stats} />
+        {catchesLoading ? (
+          <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+            Laddar dina fångster...
+          </section>
+        ) : null}
 
-        <MyCatchesSection catches={catches} />
+        {catchesError ? (
+          <section className="rounded-[28px] border border-amber-200 bg-white/95 p-6 text-[#7a4b00] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+            <div className="font-semibold">{catchesError}</div>
+            <p className="mt-2 text-sm text-[#8a5a00]">
+              Resten av sidan fungerar, men fångstdelen kunde inte hämtas just nu.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => loadMemberCatches(member.name || "")}
+              className="mt-4 rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
+            >
+              Försök igen
+            </button>
+          </section>
+        ) : null}
+
+        {!catchesLoading && !catchesError ? (
+          <>
+            <StatsGrid stats={stats} />
+            <MyCatchesSection catches={catches} />
+          </>
+        ) : null}
       </div>
     </main>
   );
