@@ -6,6 +6,7 @@ import MapPicker from "@/components/MapPicker";
 
 type UploadCatchSectionProps = {
   isLoggedIn: boolean;
+  hasActiveMembership: boolean;
   members: Member[];
   caughtFor: string;
   registeredBy: string;
@@ -38,6 +39,7 @@ type UploadCatchSectionProps = {
 
 export default function UploadCatchSection({
   isLoggedIn,
+  hasActiveMembership,
   members,
   caughtFor,
   registeredBy,
@@ -67,6 +69,8 @@ export default function UploadCatchSection({
   onMapSelect,
   onImageChange,
 }: UploadCatchSectionProps) {
+  const shouldLock = !isLoggedIn || !hasActiveMembership;
+
   return (
     <section className="relative rounded-[28px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
       {!isLoggedIn ? (
@@ -76,7 +80,15 @@ export default function UploadCatchSection({
         />
       ) : null}
 
-      <div className={!isLoggedIn ? "pointer-events-none select-none blur-[5px]" : ""}>
+      {isLoggedIn && !hasActiveMembership ? (
+        <MembersOnlyOverlay
+          title="Medlemskapet granskas"
+          description="Ditt medlemskap är under granskning, så snart vi fiskat klart kikar vi på din ansökan."
+          hideLoginButton
+        />
+      ) : null}
+
+      <div className={shouldLock ? "pointer-events-none select-none blur-[5px]" : ""}>
         <h2 className="mb-4 text-2xl font-bold text-[#1f2937]">📸 Ladda upp fångst</h2>
 
         <form onSubmit={onSubmit} className="space-y-4">

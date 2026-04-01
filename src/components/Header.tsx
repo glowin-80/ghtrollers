@@ -164,7 +164,7 @@ export default function Header() {
   return (
     <>
       <header className="w-full">
-        <div className="relative h-[280px] w-full overflow-hidden sm:h-[320px] md:h-[380px]">
+        <div className="relative h-[140px] w-full overflow-hidden sm:h-[320px] md:h-[380px]">
           <img
             src="/header.png"
             alt="Gäddhäng Trollers"

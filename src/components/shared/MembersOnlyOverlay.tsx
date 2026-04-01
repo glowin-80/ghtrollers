@@ -2,12 +2,14 @@ type MembersOnlyOverlayProps = {
   title: string;
   description: string;
   loginHref?: string;
+  hideLoginButton?: boolean;
 };
 
 export default function MembersOnlyOverlay({
   title,
   description,
   loginHref = "/login",
+  hideLoginButton = false,
 }: MembersOnlyOverlayProps) {
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center rounded-[28px] bg-[#f6f1e8]/70 px-6 text-center backdrop-blur-[2px]">
@@ -23,12 +25,14 @@ export default function MembersOnlyOverlay({
             Till startsidan
           </a>
 
-          <a
-            href={loginHref}
-            className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
-          >
-            Logga in
-          </a>
+          {!hideLoginButton ? (
+            <a
+              href={loginHref}
+              className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
+            >
+              Logga in
+            </a>
+          ) : null}
         </div>
       </div>
     </div>

@@ -82,27 +82,27 @@ export default function LeaderboardSection({
         <h2 className="text-2xl font-bold text-[#1f2937]">Leaderboard</h2>
       </div>
 
-      <div className="mb-5 flex flex-wrap gap-3">
-        {filters.map((item) => {
-          const isActive = filter === item.value;
+      <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
+  {filters.map((item) => {
+    const isActive = filter === item.value;
 
-          return (
-            <button
-              key={item.value}
-              type="button"
-              onClick={() => onFilterChange(item.value)}
-              className={[
-                "rounded-full px-5 py-3 text-sm font-semibold transition",
-                isActive
-                  ? "bg-[#1d2f7a] text-white shadow-[0_8px_18px_rgba(29,47,122,0.25)]"
-                  : "bg-[#eef2f3] text-[#374151] hover:bg-[#e3e8ea]",
-              ].join(" ")}
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </div>
+    return (
+      <button
+        key={item.value}
+        type="button"
+        onClick={() => onFilterChange(item.value)}
+        className={[
+          "shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition sm:px-5 sm:py-3 sm:text-sm",
+          isActive
+            ? "bg-[#1d2f7a] text-white shadow-[0_8px_18px_rgba(29,47,122,0.25)]"
+            : "bg-[#eef2f3] text-[#374151] hover:bg-[#e3e8ea]",
+        ].join(" ")}
+      >
+        {item.label}
+      </button>
+    );
+  })}
+</div>
 
       <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-4 shadow-inner">
         <h3 className="mb-5 text-[22px] font-bold text-[#1f2937]">

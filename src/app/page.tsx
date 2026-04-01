@@ -14,9 +14,13 @@ import UploadCatchSection from "@/components/home/UploadCatchSection";
 import RecentApprovedSection from "@/components/home/RecentApprovedSection";
 import MapPreviewSection from "@/components/home/MapPreviewSection";
 
+type MembershipStatus = "guest" | "pending" | "active";
+
 export default function Home() {
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [membershipStatus, setMembershipStatus] =
+    useState<MembershipStatus>("guest");
 
   const [caughtFor, setCaughtFor] = useState("");
   const [registeredBy, setRegisteredBy] = useState("");
@@ -44,6 +48,8 @@ export default function Home() {
     return URL.createObjectURL(imageFile);
   }, [imageFile]);
 
+  const hasActiveMembership = membershipStatus === "active";
+
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -67,15 +73,58 @@ export default function Home() {
       } = await supabase.auth.getSession();
 
       if (!mounted) return;
-      setIsLoggedIn(!!session);
+
+      if (!session?.user) {
+        setIsLoggedIn(false);
+        setMembershipStatus("guest");
+        return;
+      }
+
+      setIsLoggedIn(true);
+
+      const { data: memberData, error } = await supabase
+        .from("members")
+        .select("is_active")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (!mounted) return;
+
+      if (error) {
+        console.error(error);
+        setMembershipStatus("pending");
+        return;
+      }
+
+      setMembershipStatus(memberData?.is_active ? "active" : "pending");
     }
 
     loadAuthState();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session);
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!session?.user) {
+        setIsLoggedIn(false);
+        setMembershipStatus("guest");
+        return;
+      }
+
+      setIsLoggedIn(true);
+
+      const { data: memberData, error } = await supabase
+        .from("members")
+        .select("is_active")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error(error);
+        setMembershipStatus("pending");
+        return;
+      }
+
+      setMembershipStatus(memberData?.is_active ? "active" : "pending");
     });
 
     return () => {
@@ -115,72 +164,71 @@ export default function Home() {
   }
 
   async function loadLeaderboard(type: LeaderboardFilter) {
-  const { data, error } = await supabase
-    .from("catches")
-    .select("*")
-    .eq("status", "approved");
+    const { data, error } = await supabase
+      .from("catches")
+      .select("*")
+      .eq("status", "approved");
 
-  if (error) {
-    console.error(error);
-    return;
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      setLeaderboard([]);
+      return;
+    }
+
+    if (type === "bigfive") {
+      const grouped: Record<string, number[]> = {};
+
+      data.forEach((c) => {
+        const score = c.fish_type === "Abborre" ? c.weight_g * 4 : c.weight_g;
+
+        if (!grouped[c.caught_for]) {
+          grouped[c.caught_for] = [];
+        }
+
+        grouped[c.caught_for].push(score);
+      });
+
+      const result = Object.entries(grouped)
+        .map(([name, scores]) => {
+          const topFive = scores.sort((a, b) => b - a).slice(0, 5);
+          const total = topFive.reduce((sum, value) => sum + value, 0);
+
+          return { name, total, detail: null };
+        })
+        .sort((a, b) => b.total - a.total);
+
+      setLeaderboard(result);
+      return;
+    }
+
+    let filtered = data;
+
+    if (type === "gädda") {
+      filtered = data.filter((c) => c.fish_type === "Gädda");
+    }
+
+    if (type === "abborre") {
+      filtered = data.filter((c) => c.fish_type === "Abborre");
+    }
+
+    if (type === "fina") {
+      filtered = data.filter((c) => c.fish_type === "Fina fisken");
+    }
+
+    const sorted = filtered
+      .sort((a, b) => b.weight_g - a.weight_g)
+      .map((c) => ({
+        name: c.caught_for,
+        total: c.weight_g,
+        detail: type === "fina" ? c.fine_fish_type || null : null,
+      }));
+
+    setLeaderboard(sorted);
   }
-
-  if (!data || data.length === 0) {
-    setLeaderboard([]);
-    return;
-  }
-
-  if (type === "bigfive") {
-    const grouped: Record<string, number[]> = {};
-
-    data.forEach((c) => {
-      const score = c.fish_type === "Abborre" ? c.weight_g * 4 : c.weight_g;
-
-      if (!grouped[c.caught_for]) {
-        grouped[c.caught_for] = [];
-      }
-
-      grouped[c.caught_for].push(score);
-    });
-
-    const result = Object.entries(grouped)
-      .map(([name, scores]) => {
-        const topFive = scores.sort((a, b) => b - a).slice(0, 5);
-        const total = topFive.reduce((sum, value) => sum + value, 0);
-
-        return { name, total, detail: null };
-      })
-      .sort((a, b) => b.total - a.total);
-
-    setLeaderboard(result);
-    return;
-  }
-
-  let filtered = data;
-
-  if (type === "gädda") {
-    filtered = data.filter((c) => c.fish_type === "Gädda");
-  }
-
-  if (type === "abborre") {
-    filtered = data.filter((c) => c.fish_type === "Abborre");
-  }
-
-  if (type === "fina") {
-    filtered = data.filter((c) => c.fish_type === "Fina fisken");
-  }
-
-  const sorted = filtered
-    .sort((a, b) => b.weight_g - a.weight_g)
-    .map((c) => ({
-      name: c.caught_for,
-      total: c.weight_g,
-      detail: type === "fina" ? c.fine_fish_type || null : null,
-    }));
-
-  setLeaderboard(sorted);
-}
-
 
   async function compressImage(file: File): Promise<File> {
     const imageBitmap = await createImageBitmap(file);
@@ -259,9 +307,7 @@ export default function Home() {
 
   function handleCaughtForChange(value: string) {
     setCaughtFor(value);
-    setRegisteredBy((prev) =>
-      prev === "" || prev === caughtFor ? value : prev
-    );
+    setRegisteredBy((prev) => (prev === "" || prev === caughtFor ? value : prev));
   }
 
   function handleFishTypeChange(value: string) {
@@ -277,6 +323,10 @@ export default function Home() {
   }
 
   async function handleGetGps() {
+    if (!hasActiveMembership) {
+      return;
+    }
+
     if (!navigator.geolocation) {
       alert("GPS stöds inte i den här enheten/webbläsaren.");
       return;
@@ -309,6 +359,10 @@ export default function Home() {
   }
 
   function handleMapSelect(lat: number, lng: number) {
+    if (!hasActiveMembership) {
+      return;
+    }
+
     setLatitude(lat);
     setLongitude(lng);
 
@@ -325,6 +379,13 @@ export default function Home() {
     if (!isLoggedIn) {
       alert("Du behöver vara inloggad för att registrera en fångst.");
       window.location.href = "/login";
+      return;
+    }
+
+    if (!hasActiveMembership) {
+      alert(
+        "Ditt medlemskap är under granskning, så snart vi fiskat klart kikar vi på din ansökan."
+      );
       return;
     }
 
@@ -415,12 +476,12 @@ export default function Home() {
     <main className="px-4 pb-10 pt-4">
       <div className="mx-auto max-w-xl">
         <div id="leaderboard-section" className="scroll-mt-[360px]">
-<LeaderboardSection
-  leaderboard={leaderboard}
-  members={members}
-  filter={filter}
-  onFilterChange={handleFilterChange}
-/>
+          <LeaderboardSection
+            leaderboard={leaderboard}
+            members={members}
+            filter={filter}
+            onFilterChange={handleFilterChange}
+          />
         </div>
 
         <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-black/15 to-transparent" />
@@ -428,6 +489,7 @@ export default function Home() {
         <div id="upload-section" className="scroll-mt-[360px]">
           <UploadCatchSection
             isLoggedIn={isLoggedIn}
+            hasActiveMembership={hasActiveMembership}
             members={members}
             caughtFor={caughtFor}
             registeredBy={registeredBy}
@@ -471,7 +533,11 @@ export default function Home() {
         <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-black/15 to-transparent" />
 
         <div id="map-section" className="scroll-mt-[360px]">
-          <MapPreviewSection isLoggedIn={isLoggedIn} catches={approvedCatches} />
+          <MapPreviewSection
+            isLoggedIn={isLoggedIn}
+            hasActiveMembership={hasActiveMembership}
+            catches={approvedCatches}
+          />
         </div>
 
         {selectedImage && (

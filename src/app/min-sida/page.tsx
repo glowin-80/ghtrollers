@@ -8,12 +8,12 @@ import ProfileCard from "@/components/member/ProfileCard";
 import StatsGrid from "@/components/member/StatsGrid";
 import MyCatchesSection from "@/components/member/MyCatchesSection";
 import AdminToolsCard from "@/components/member/AdminToolsCard";
+import PendingApprovalCard from "@/components/member/PendingApprovalCard";
 
 export default function MinSidaPage() {
   const [loading, setLoading] = useState(true);
   const [member, setMember] = useState<MemberProfile | null>(null);
   const [catches, setCatches] = useState<MemberCatch[]>([]);
-  const [pendingCount, setPendingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const stats = useMemo(() => calculateMemberStats(catches), [catches]);
@@ -33,15 +33,12 @@ export default function MinSidaPage() {
       } = await supabase.auth.getSession();
 
       if (sessionError) {
-        console.error(sessionError);
-        setLoading(false);
-        return;
+        throw sessionError;
       }
 
       if (!session?.user) {
         setMember(null);
         setCatches([]);
-        setPendingCount(0);
         setLoading(false);
         return;
       }
@@ -51,7 +48,7 @@ export default function MinSidaPage() {
       const { data: memberData, error: memberError } = await supabase
         .from("members")
         .select("id, name, email, is_admin, is_active, profile_image_url")
-        .eq("email", user.email)
+        .eq("id", user.id)
         .maybeSingle();
 
       if (memberError) {
@@ -68,20 +65,26 @@ export default function MinSidaPage() {
               "Medlem",
             email: user.email,
             is_admin: false,
-            is_active: true,
+            is_active: false,
             profile_image_url: null,
           };
 
       setMember(resolvedMember);
+
+      if (!resolvedMember.is_active) {
+        setCatches([]);
+        setLoading(false);
+        return;
+      }
+
+      const memberName = resolvedMember.name || "";
 
       const { data: catchesData, error: catchesError } = await supabase
         .from("catches")
         .select(
           "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, status, created_at"
         )
-        .or(
-          `caught_for.eq.${resolvedMember.name},registered_by.eq.${resolvedMember.name}`
-        )
+        .or(`caught_for.eq.${memberName},registered_by.eq.${memberName}`)
         .order("catch_date", { ascending: false });
 
       if (catchesError) {
@@ -89,21 +92,6 @@ export default function MinSidaPage() {
       }
 
       setCatches(catchesData || []);
-
-      if (resolvedMember.is_admin) {
-        const { count, error: pendingError } = await supabase
-          .from("catches")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "pending");
-
-        if (pendingError) {
-          throw pendingError;
-        }
-
-        setPendingCount(count || 0);
-      } else {
-        setPendingCount(0);
-      }
     } catch (err) {
       console.error(err);
       setError("Kunde inte ladda medlemssidan.");
@@ -172,24 +160,36 @@ export default function MinSidaPage() {
     );
   }
 
+  if (!member.is_active) {
+    return (
+      <main className="px-4 pb-10 pt-6">
+        <div className="mx-auto max-w-6xl space-y-6">
+          <ProfileCard
+            member={member}
+            catchCount={0}
+            onLogout={handleLogout}
+          />
+          <PendingApprovalCard />
+        </div>
+      </main>
+    );
+  }
+
   return (
-  <main className="px-4 pb-10 pt-6">
-    <div className="mx-auto max-w-6xl space-y-6">
-      
-      <ProfileCard
-        member={member}
-        catchCount={catches.length}
-        onLogout={handleLogout}
-      />
+    <main className="px-4 pb-10 pt-6">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <ProfileCard
+          member={member}
+          catchCount={catches.length}
+          onLogout={handleLogout}
+        />
 
-      {member.is_admin ? (
-        <AdminToolsCard pendingCount={pendingCount} />
-      ) : null}
+        {member.is_admin ? <AdminToolsCard /> : null}
 
-      <StatsGrid stats={stats} />
+        <StatsGrid stats={stats} />
 
-      <MyCatchesSection catches={catches} />
-    </div>
-  </main>
-);
+        <MyCatchesSection catches={catches} />
+      </div>
+    </main>
+  );
 }
