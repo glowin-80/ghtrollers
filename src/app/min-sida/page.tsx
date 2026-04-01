@@ -105,6 +105,16 @@ export default function MinSidaPage() {
     window.location.href = "/";
   }
 
+  function handleProfileImageUploaded(imageUrl: string) {
+    setMember((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        profile_image_url: imageUrl,
+      };
+    });
+  }
+
   if (loading) {
     return (
       <main className="px-4 pb-10 pt-6">
@@ -182,6 +192,7 @@ export default function MinSidaPage() {
           member={member}
           catchCount={catches.length}
           onLogout={handleLogout}
+          onProfileImageUploaded={handleProfileImageUploaded}
         />
 
         {member.is_admin ? <AdminToolsCard /> : null}

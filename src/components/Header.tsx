@@ -109,9 +109,21 @@ export default function Header() {
       setProfileImage(memberData?.profile_image_url || null);
     });
 
+    function handleProfileImageUpdated(event: Event) {
+      const customEvent = event as CustomEvent<{ imageUrl?: string }>;
+      const imageUrl = customEvent.detail?.imageUrl || null;
+      setProfileImage(imageUrl);
+    }
+
+    window.addEventListener("profile-image-updated", handleProfileImageUpdated);
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      window.removeEventListener(
+        "profile-image-updated",
+        handleProfileImageUpdated
+      );
     };
   }, []);
 

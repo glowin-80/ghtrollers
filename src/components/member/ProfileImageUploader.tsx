@@ -76,15 +76,15 @@ export default function ProfileImageUploader({
 
       const compressedFile = await compressImage(file);
 
-const safeEmail = memberEmail.toLowerCase().replace(/[^a-z0-9]/g, "-");
-const filePath = `profiles/${safeEmail}.jpg`;
+      const safeEmail = memberEmail.toLowerCase().replace(/[^a-z0-9]/g, "-");
+      const filePath = `profiles/${safeEmail}.jpg`;
 
-const { error: uploadError } = await supabase.storage
-  .from("profile-images")
-  .upload(filePath, compressedFile, {
-    contentType: "image/jpeg",
-    upsert: true,
-  });
+      const { error: uploadError } = await supabase.storage
+        .from("profile-images")
+        .upload(filePath, compressedFile, {
+          contentType: "image/jpeg",
+          upsert: true,
+        });
 
       if (uploadError) {
         throw uploadError;
@@ -108,6 +108,12 @@ const { error: uploadError } = await supabase.storage
       }
 
       onUploaded(imageUrl);
+      window.dispatchEvent(
+        new CustomEvent("profile-image-updated", {
+          detail: { imageUrl },
+        })
+      );
+
       alert("Profilbild uppdaterad.");
     } catch (error) {
       console.error(error);

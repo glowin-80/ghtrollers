@@ -25,6 +25,8 @@ type PendingCatch = {
   image_url: string | null;
   status: string;
   created_at: string | null;
+  original_image_size_bytes: number | null;
+  compressed_image_size_bytes: number | null;
 };
 
 export default function AdminToolsCard() {
@@ -82,7 +84,7 @@ export default function AdminToolsCard() {
       const { data, error } = await supabase
         .from("catches")
         .select(
-          "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, status, created_at"
+          "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, status, created_at, original_image_size_bytes, compressed_image_size_bytes"
         )
         .eq("status", "pending")
         .order("created_at", { ascending: true });
@@ -114,7 +116,9 @@ export default function AdminToolsCard() {
         throw error;
       }
 
-      setPendingMembers((prev) => prev.filter((member) => member.id !== memberId));
+      setPendingMembers((prev) =>
+        prev.filter((member) => member.id !== memberId)
+      );
     } catch (err) {
       console.error(err);
       setError("Kunde inte godkänna medlemmen.");
@@ -137,7 +141,9 @@ export default function AdminToolsCard() {
         throw error;
       }
 
-      setPendingMembers((prev) => prev.filter((member) => member.id !== memberId));
+      setPendingMembers((prev) =>
+        prev.filter((member) => member.id !== memberId)
+      );
     } catch (err) {
       console.error(err);
       setError("Kunde inte göra medlemmen till admin.");
@@ -168,7 +174,9 @@ export default function AdminToolsCard() {
         throw error;
       }
 
-      setPendingMembers((prev) => prev.filter((member) => member.id !== memberId));
+      setPendingMembers((prev) =>
+        prev.filter((member) => member.id !== memberId)
+      );
     } catch (err) {
       console.error(err);
       setError(
@@ -233,12 +241,48 @@ export default function AdminToolsCard() {
     }
   }
 
+  function formatBytes(bytes: number | null) {
+    if (!bytes || bytes <= 0) {
+      return "Saknas";
+    }
+
+    if (bytes < 1024) {
+      return `${bytes} B`;
+    }
+
+    const kb = bytes / 1024;
+    if (kb < 1024) {
+      return `${kb.toFixed(0)} KB`;
+    }
+
+    const mb = kb / 1024;
+    return `${mb.toFixed(2)} MB`;
+  }
+
+  function getCompressionReduction(
+    originalBytes: number | null,
+    compressedBytes: number | null
+  ) {
+    if (!originalBytes || !compressedBytes || originalBytes <= 0) {
+      return null;
+    }
+
+    const reduction = ((originalBytes - compressedBytes) / originalBytes) * 100;
+
+    if (reduction < 0) {
+      return 0;
+    }
+
+    return Math.round(reduction);
+  }
+
   return (
     <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
       <h2 className="text-3xl font-bold text-[#1f2937]">🛠️ Adminverktyg</h2>
 
       <p className="mt-3 text-[#6b7280]">
-        Du är admin och kan hantera inkomna medlemsansökningar och väntande fångster.
+        Du är admin och kan hantera inkomna medlemsansökningar och väntande
+        fångster.
       </p>
 
       {error ? (
@@ -254,7 +298,8 @@ export default function AdminToolsCard() {
         </div>
 
         <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-3 text-sm text-[#374151]">
-          Väntande fångster: <span className="font-bold">{pendingCatchesCount}</span>
+          Väntande fångster:{" "}
+          <span className="font-bold">{pendingCatchesCount}</span>
         </div>
       </div>
 
@@ -369,6 +414,11 @@ export default function AdminToolsCard() {
                   ? `${item.fish_type} • ${item.fine_fish_type}`
                   : item.fish_type;
 
+              const reduction = getCompressionReduction(
+                item.original_image_size_bytes,
+                item.compressed_image_size_bytes
+              );
+
               return (
                 <div
                   key={item.id}
@@ -397,14 +447,31 @@ export default function AdminToolsCard() {
                           <span className="font-semibold">Art:</span> {fishLabel}
                         </div>
                         <div>
-                          <span className="font-semibold">Vikt:</span> {item.weight_g} g
+                          <span className="font-semibold">Vikt:</span>{" "}
+                          {item.weight_g} g
                         </div>
                         <div>
-                          <span className="font-semibold">Datum:</span> {item.catch_date}
+                          <span className="font-semibold">Datum:</span>{" "}
+                          {item.catch_date}
                         </div>
                         <div>
                           <span className="font-semibold">Plats:</span>{" "}
                           {item.location_name || "Ej angiven"}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 rounded-2xl border border-[#e5ded2] bg-[#faf8f4] px-4 py-3 text-sm text-[#4b5563]">
+                        <div>
+                          <span className="font-semibold">Före:</span>{" "}
+                          {formatBytes(item.original_image_size_bytes)}
+                        </div>
+                        <div>
+                          <span className="font-semibold">Efter:</span>{" "}
+                          {formatBytes(item.compressed_image_size_bytes)}
+                        </div>
+                        <div>
+                          <span className="font-semibold">Minskning:</span>{" "}
+                          {reduction !== null ? `${reduction}% mindre` : "Saknas"}
                         </div>
                       </div>
 
