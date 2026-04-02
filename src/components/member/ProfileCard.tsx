@@ -66,7 +66,7 @@ export default function ProfileCard({
               </div>
             </div>
 
-            <div className="shrink-0 pt-1">
+            <div className="shrink-0 -translate-y-1 pt-1">
               <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-sm font-medium text-[#5c4d3f] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
                 {member.is_admin ? "Admin" : "Medlem"}
               </span>
