@@ -1,8 +1,23 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import MembersOnlyOverlay from "@/components/shared/MembersOnlyOverlay";
 import type { Member } from "@/types/home";
 import MapPicker from "@/components/MapPicker";
+
+type GpsErrorKind =
+  | "permission-denied"
+  | "position-unavailable"
+  | "timeout"
+  | "unsupported"
+  | "unknown";
+
+type GpsErrorState = {
+  kind: GpsErrorKind;
+  message: string;
+};
+
+type MobileHelpPlatform = "iphone" | "android";
 
 type UploadCatchSectionProps = {
   isLoggedIn: boolean;
@@ -18,6 +33,7 @@ type UploadCatchSectionProps = {
   latitude: number | null;
   longitude: number | null;
   gpsLoading: boolean;
+  gpsError: GpsErrorState | null;
   mapOpen: boolean;
   previewUrl: string | null;
   fileInputKey: number;
@@ -37,6 +53,62 @@ type UploadCatchSectionProps = {
   onImageChange: (file: File | null) => void;
 };
 
+function formatCatchDate(dateString: string) {
+  if (!dateString) return null;
+
+  const [year, month, day] = dateString.split("-").map(Number);
+
+  if (!year || !month || !day) {
+    return dateString;
+  }
+
+  const date = new Date(year, month - 1, day);
+
+  return new Intl.DateTimeFormat("sv-SE", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+function detectMobileHelpPlatform(): MobileHelpPlatform {
+  if (typeof navigator === "undefined") {
+    return "iphone";
+  }
+
+  const userAgent = navigator.userAgent.toLowerCase();
+
+  if (userAgent.includes("android")) {
+    return "android";
+  }
+
+  return "iphone";
+}
+
+function PlatformToggleButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+        active
+          ? "bg-[#1f46d8] text-white shadow-sm"
+          : "bg-white text-[#374151] border border-[#d8d2c7] hover:bg-[#f9f7f3]"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function UploadCatchSection({
   isLoggedIn,
   hasActiveMembership,
@@ -51,6 +123,7 @@ export default function UploadCatchSection({
   latitude,
   longitude,
   gpsLoading,
+  gpsError,
   mapOpen,
   previewUrl,
   fileInputKey,
@@ -70,6 +143,44 @@ export default function UploadCatchSection({
   onImageChange,
 }: UploadCatchSectionProps) {
   const shouldLock = !isLoggedIn || !hasActiveMembership;
+  const formattedCatchDate = formatCatchDate(catchDate);
+
+  const [helpPlatform, setHelpPlatform] = useState<MobileHelpPlatform>("iphone");
+
+  useEffect(() => {
+    setHelpPlatform(detectMobileHelpPlatform());
+  }, []);
+
+  useEffect(() => {
+    if (gpsError?.kind === "permission-denied") {
+      setHelpPlatform(detectMobileHelpPlatform());
+    }
+  }, [gpsError]);
+
+  const permissionDeniedHelp = useMemo(() => {
+    if (helpPlatform === "android") {
+      return {
+        title: "Platsåtkomst är avstängd på Android",
+        steps: [
+          "Tryck på lås-/infoikonen vid adressfältet i Chrome eller din webbläsare.",
+          "Öppna Behörigheter eller Webbplatsinställningar.",
+          "Tillåt plats för sidan.",
+          "Gå tillbaka hit och tryck på Hämta GPS-position igen.",
+        ],
+      };
+    }
+
+    return {
+      title: "Platsåtkomst är avstängd på iPhone",
+      steps: [
+        "Öppna Inställningar på iPhone.",
+        "Gå till Integritet och säkerhet.",
+        "Tryck på Platstjänster.",
+        "Säkerställ att plats är påslaget och att Safari/webbplatser får använda plats.",
+        "Gå tillbaka hit och tryck på Hämta GPS-position igen.",
+      ],
+    };
+  }, [helpPlatform]);
 
   return (
     <section className="relative rounded-[28px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
@@ -153,13 +264,29 @@ export default function UploadCatchSection({
             required
           />
 
-          <input
-            type="date"
-            value={catchDate}
-            onChange={(e) => onCatchDateChange(e.target.value)}
-            className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
-            required
-          />
+          <div className="space-y-2">
+            <label
+              htmlFor="catch-date"
+              className="block text-sm font-semibold text-[#4b5563]"
+            >
+              Datum för fångst
+            </label>
+
+            <input
+              id="catch-date"
+              type="date"
+              value={catchDate}
+              onChange={(e) => onCatchDateChange(e.target.value)}
+              className="date-input w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+              required
+            />
+
+            <div className="min-h-[20px] text-sm text-[#6b7280]">
+              {formattedCatchDate
+                ? `Valt datum: ${formattedCatchDate}`
+                : "Tryck för att välja datum"}
+            </div>
+          </div>
 
           <input
             type="text"
@@ -187,6 +314,62 @@ export default function UploadCatchSection({
               🗺️ Importera plats från karta
             </button>
           </div>
+
+          {gpsError?.kind === "permission-denied" ? (
+            <div className="rounded-[24px] border border-[#f1c6c6] bg-[#fff4f4] p-4 text-[#7f1d1d]">
+              <div className="mb-3 text-base font-bold">{permissionDeniedHelp.title}</div>
+              <p className="mb-3 text-sm">
+                För att hämta GPS-position behöver du tillåta platsåtkomst i mobilen.
+              </p>
+
+              <div className="mb-4 flex flex-wrap gap-2">
+                <PlatformToggleButton
+                  active={helpPlatform === "iphone"}
+                  onClick={() => setHelpPlatform("iphone")}
+                >
+                  iPhone
+                </PlatformToggleButton>
+
+                <PlatformToggleButton
+                  active={helpPlatform === "android"}
+                  onClick={() => setHelpPlatform("android")}
+                >
+                  Android
+                </PlatformToggleButton>
+              </div>
+
+              <ol className="mb-4 list-decimal space-y-2 pl-5 text-sm">
+                {permissionDeniedHelp.steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={onGetGps}
+                  disabled={gpsLoading}
+                  className="rounded-2xl bg-[#1f46d8] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#264fe6] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {gpsLoading ? "Försöker igen..." : "Försök igen"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onOpenMap}
+                  className="rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
+                >
+                  Välj plats på karta i stället
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {gpsError && gpsError.kind !== "permission-denied" ? (
+            <div className="rounded-2xl border border-[#f1c6c6] bg-[#fff4f4] px-4 py-3 text-sm text-[#9b1c1c]">
+              {gpsError.message}
+            </div>
+          ) : null}
 
           <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-3 text-sm text-[#4b5563]">
             <div>Latitud: {latitude ?? "Saknas"}</div>
