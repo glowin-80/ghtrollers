@@ -47,53 +47,57 @@ export default function ProfileCard({
                 <span className="text-4xl text-[#e5d3a3]">👤</span>
               )}
             </div>
+
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-[#d8d2c7] bg-[#f2ede5] px-3 py-1 text-xs font-semibold text-[#5c4d3f] shadow-[0_6px_14px_rgba(0,0,0,0.08)] whitespace-nowrap">
+              {catchCount} fångster
+            </div>
           </div>
         </div>
 
         <div className="pl-[108px] sm:pl-[126px]">
-          <div className="text-[0.95rem] font-medium tracking-wide text-[#74685a]">
-            👋 Min sida
-          </div>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-[0.95rem] font-medium tracking-wide text-[#74685a]">
+                👋 Min sida
+              </div>
 
-          <h1 className="mt-1 text-[1.95rem] font-bold leading-[0.94] text-[#1f2937] sm:text-[2.15rem]">
-            {member.name}
-          </h1>
+              <h1 className="mt-1 text-[1.95rem] font-bold leading-[0.94] text-[#1f2937] sm:text-[2.15rem]">
+                {member.name}
+              </h1>
 
-          {member.email ? (
-            <div className="mt-2 overflow-hidden text-ellipsis whitespace-nowrap border-b border-[#d8d2c7] pb-2 text-[0.95rem] text-[#5d6572]">
-              {member.email}
-            </div>
-          ) : null}
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-sm font-medium text-[#5c4d3f] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
-              {member.is_admin ? "Admin" : "Medlem"}
-            </span>
-
-            <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-sm font-medium text-[#5c4d3f] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
-              {catchCount} fångster
-            </span>
-          </div>
-
-          <div className="mt-7 flex justify-center">
-            <div className="grid w-full max-w-[440px] grid-cols-2 gap-3">
-              <Link
-                href="/"
-                className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full border border-[#d8d2c7] bg-white px-5 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
-              >
-                Till startsidan
-              </Link>
-
-              {onLogout ? (
-                <button
-                  type="button"
-                  onClick={onLogout}
-                  className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full bg-[#324b2f] px-5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(50,75,47,0.22)] transition hover:bg-[#3e5d3b]"
-                >
-                  Logga ut
-                </button>
+              {member.email ? (
+                <div className="mt-2 overflow-hidden text-ellipsis whitespace-nowrap border-b border-[#d8d2c7] pb-2 text-[0.95rem] text-[#5d6572]">
+                  {member.email}
+                </div>
               ) : null}
             </div>
+
+            <div className="shrink-0 pt-1">
+              <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-sm font-medium text-[#5c4d3f] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+                {member.is_admin ? "Admin" : "Medlem"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <div className="grid w-full max-w-[420px] grid-cols-2 gap-3">
+            <Link
+              href="/"
+              className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full border border-[#d8d2c7] bg-white px-5 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
+            >
+              Till startsidan
+            </Link>
+
+            {onLogout ? (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full bg-[#324b2f] px-5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(50,75,47,0.22)] transition hover:bg-[#3e5d3b]"
+              >
+                Logga ut
+              </button>
+            ) : null}
           </div>
         </div>
 
