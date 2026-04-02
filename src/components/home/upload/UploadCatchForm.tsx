@@ -2,7 +2,11 @@
 
 import type { FormEvent } from "react";
 import type { Member } from "@/types/home";
-import type { GpsErrorState } from "@/components/home/upload/types";
+import type {
+  GpsErrorState,
+  UploadFeedbackMessage,
+} from "@/components/home/upload/types";
+import InlineMessage from "@/components/shared/InlineMessage";
 import CatchDateField from "@/components/home/upload/CatchDateField";
 import GpsPermissionHelp from "@/components/home/upload/GpsPermissionHelp";
 
@@ -19,6 +23,7 @@ type UploadCatchFormProps = {
   longitude: number | null;
   gpsLoading: boolean;
   gpsError: GpsErrorState | null;
+  formMessage: UploadFeedbackMessage | null;
   previewUrl: string | null;
   fileInputKey: number;
   loading: boolean;
@@ -33,6 +38,8 @@ type UploadCatchFormProps = {
   onGetGps: () => void;
   onOpenMap: () => void;
   onImageChange: (file: File | null) => void;
+  onDismissFormMessage: () => void;
+  onFormMessageAction: () => void;
 };
 
 export default function UploadCatchForm({
@@ -48,6 +55,7 @@ export default function UploadCatchForm({
   longitude,
   gpsLoading,
   gpsError,
+  formMessage,
   previewUrl,
   fileInputKey,
   loading,
@@ -62,9 +70,21 @@ export default function UploadCatchForm({
   onGetGps,
   onOpenMap,
   onImageChange,
+  onDismissFormMessage,
+  onFormMessageAction,
 }: UploadCatchFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {formMessage ? (
+        <InlineMessage
+          variant={formMessage.variant}
+          message={formMessage.message}
+          actionLabel={formMessage.actionLabel}
+          onAction={formMessage.actionLabel ? onFormMessageAction : undefined}
+          onDismiss={onDismissFormMessage}
+        />
+      ) : null}
+
       <select
         value={caughtFor}
         onChange={(e) => onCaughtForChange(e.target.value)}

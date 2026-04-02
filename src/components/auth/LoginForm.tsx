@@ -1,10 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import InlineMessage from "@/components/shared/InlineMessage";
 
 export default function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
@@ -43,7 +46,8 @@ export default function LoginForm() {
       return;
     }
 
-    window.location.href = "/min-sida";
+    router.push("/min-sida");
+    router.refresh();
   }
 
   return (
@@ -104,18 +108,20 @@ export default function LoginForm() {
         </div>
 
         {error ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
+          <InlineMessage
+            variant="error"
+            message={error}
+            onDismiss={() => setError(null)}
+          />
         ) : null}
 
         <div className="flex flex-wrap gap-3 pt-2">
-          <a
+          <Link
             href="/"
             className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
           >
             Till startsidan
-          </a>
+          </Link>
 
           <button
             type="submit"
@@ -127,19 +133,19 @@ export default function LoginForm() {
         </div>
 
         <div className="flex flex-wrap gap-x-4 gap-y-2 pt-2 text-sm">
-          <a
+          <Link
             href="/ansok-om-medlemskap"
             className="font-semibold text-[#324b2f] underline underline-offset-2"
           >
             Ansök om medlemskap
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/glomt-losenord"
             className="font-semibold text-[#324b2f] underline underline-offset-2"
           >
             Glömt lösenord?
-          </a>
+          </Link>
         </div>
       </form>
     </section>
