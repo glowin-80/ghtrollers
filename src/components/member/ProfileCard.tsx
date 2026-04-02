@@ -80,7 +80,7 @@ export default function ProfileCard({
           </div>
         </div>
 
-        <div className="mt-10 flex justify-center">
+        <div className="mt-7 flex justify-center">
           <div className="grid w-full max-w-[420px] grid-cols-2 gap-3">
             <Link
               href="/"
