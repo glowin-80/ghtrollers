@@ -19,6 +19,8 @@ export default function ProfileCard({
     return null;
   }
 
+  const memberTitle = "Fiskarn";
+
   return (
     <section className="relative overflow-visible rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_12px_36px_rgba(18,35,28,0.08)]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[170px] rounded-t-[30px] bg-[radial-gradient(circle_at_top_left,rgba(228,209,165,0.45),transparent_42%),linear-gradient(180deg,rgba(244,236,221,0.78)_0%,rgba(252,251,248,0)_100%)]" />
@@ -65,13 +67,9 @@ export default function ProfileCard({
                 {member.name}
               </h1>
 
-              {member.email ? (
-                <div className="mt-2 border-b border-[#d8d2c7] pb-2 text-[0.95rem] text-[#5d6572] sm:text-base">
-                  <span className="block break-all sm:break-normal">
-                    {member.email}
-                  </span>
-                </div>
-              ) : null}
+              <div className="mt-2 text-[1rem] font-medium text-[#74685a] sm:text-[1.05rem]">
+                {memberTitle}
+              </div>
             </div>
 
             <div className="shrink-0 pt-1">
