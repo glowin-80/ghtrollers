@@ -5,13 +5,13 @@ import { supabase } from "@/lib/supabase";
 import ProfileImageCropModal from "@/components/member/ProfileImageCropModal";
 
 type ProfileImageUploaderProps = {
-  memberEmail?: string | null;
+  memberId?: string | null;
   currentImageUrl?: string | null;
   onUploaded: (imageUrl: string) => void;
 };
 
 export default function ProfileImageUploader({
-  memberEmail,
+  memberId,
   currentImageUrl,
   onUploaded,
 }: ProfileImageUploaderProps) {
@@ -66,7 +66,7 @@ export default function ProfileImageUploader({
   }
 
   async function uploadProfileImage(file: File) {
-    if (!memberEmail) {
+    if (!memberId) {
       alert("Kunde inte koppla bilden till medlemmen.");
       return;
     }
@@ -75,9 +75,7 @@ export default function ProfileImageUploader({
       setUploading(true);
 
       const compressedFile = await compressImage(file);
-
-      const safeEmail = memberEmail.toLowerCase().replace(/[^a-z0-9]/g, "-");
-      const filePath = `profiles/${safeEmail}.jpg`;
+      const filePath = `profiles/${memberId}.jpg`;
 
       const { error: uploadError } = await supabase.storage
         .from("profile-images")
@@ -101,7 +99,7 @@ export default function ProfileImageUploader({
         .update({
           profile_image_url: imageUrl,
         })
-        .eq("email", memberEmail);
+        .eq("id", memberId);
 
       if (updateError) {
         throw updateError;
@@ -135,7 +133,7 @@ export default function ProfileImageUploader({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="rounded-full border border-[#d8d2c7] bg-white px-4 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3] disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full border border-[#d8d2c7] bg-white px-4 py-2.5 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {uploading
             ? "Laddar upp..."
