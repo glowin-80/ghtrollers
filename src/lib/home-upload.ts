@@ -1,0 +1,133 @@
+import { supabase } from "@/lib/supabase";
+import type { UploadImageResult } from "@/types/home";
+import type {
+  GpsErrorState,
+  MobileHelpPlatform,
+} from "@/components/home/upload/types";
+
+export function formatCatchDate(dateString: string) {
+  if (!dateString) return null;
+
+  const [year, month, day] = dateString.split("-").map(Number);
+
+  if (!year || !month || !day) {
+    return dateString;
+  }
+
+  const date = new Date(year, month - 1, day);
+
+  return new Intl.DateTimeFormat("sv-SE", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+export function detectMobileHelpPlatform(): MobileHelpPlatform {
+  if (typeof navigator === "undefined") {
+    return "iphone";
+  }
+
+  const userAgent = navigator.userAgent.toLowerCase();
+
+  if (userAgent.includes("android")) {
+    return "android";
+  }
+
+  return "iphone";
+}
+
+export function getGeolocationErrorState(
+  error: GeolocationPositionError
+): GpsErrorState {
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      return {
+        kind: "permission-denied",
+        message: "Platsåtkomst nekades.",
+      };
+    case error.POSITION_UNAVAILABLE:
+      return {
+        kind: "position-unavailable",
+        message:
+          "Kunde inte bestämma din position just nu. Försök igen om en liten stund.",
+      };
+    case error.TIMEOUT:
+      return {
+        kind: "timeout",
+        message: "Det tog för lång tid att hämta GPS-position. Försök igen.",
+      };
+    default:
+      return {
+        kind: "unknown",
+        message: "Kunde inte hämta GPS-position.",
+      };
+  }
+}
+
+export async function compressImage(file: File): Promise<File> {
+  const imageBitmap = await createImageBitmap(file);
+
+  const maxWidth = 1200;
+  const maxHeight = 1200;
+  const { width, height } = imageBitmap;
+
+  const scale = Math.min(maxWidth / width, maxHeight / height, 1);
+
+  const targetWidth = Math.round(width * scale);
+  const targetHeight = Math.round(height * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Kunde inte skapa canvas-kontext.");
+  }
+
+  ctx.drawImage(imageBitmap, 0, 0, targetWidth, targetHeight);
+
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, "image/jpeg", 0.78);
+  });
+
+  if (!blob) {
+    throw new Error("Kunde inte komprimera bilden.");
+  }
+
+  const originalName = file.name.replace(/\.[^/.]+$/, "");
+
+  return new File([blob], `${originalName}.jpg`, {
+    type: "image/jpeg",
+  });
+}
+
+export async function uploadCatchImage(file: File): Promise<UploadImageResult> {
+  const originalSizeBytes = file.size;
+  const compressedFile = await compressImage(file);
+  const compressedSizeBytes = compressedFile.size;
+
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+  const filePath = `catches/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("catch-images")
+    .upload(filePath, compressedFile, {
+      contentType: "image/jpeg",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw uploadError;
+  }
+
+  const { data } = supabase.storage.from("catch-images").getPublicUrl(filePath);
+
+  return {
+    imageUrl: data.publicUrl,
+    originalSizeBytes,
+    compressedSizeBytes,
+  };
+}

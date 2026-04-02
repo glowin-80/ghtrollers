@@ -1,0 +1,201 @@
+"use client";
+
+import type { FormEvent } from "react";
+import type { Member } from "@/types/home";
+import type { GpsErrorState } from "@/components/home/upload/types";
+import CatchDateField from "@/components/home/upload/CatchDateField";
+import GpsPermissionHelp from "@/components/home/upload/GpsPermissionHelp";
+
+type UploadCatchFormProps = {
+  members: Member[];
+  caughtFor: string;
+  registeredBy: string;
+  fishType: string;
+  fineFishType: string;
+  weight: string;
+  catchDate: string;
+  locationName: string;
+  latitude: number | null;
+  longitude: number | null;
+  gpsLoading: boolean;
+  gpsError: GpsErrorState | null;
+  previewUrl: string | null;
+  fileInputKey: number;
+  loading: boolean;
+  onSubmit: (e: FormEvent) => void;
+  onCaughtForChange: (value: string) => void;
+  onRegisteredByChange: (value: string) => void;
+  onFishTypeChange: (value: string) => void;
+  onFineFishTypeChange: (value: string) => void;
+  onWeightChange: (value: string) => void;
+  onCatchDateChange: (value: string) => void;
+  onLocationNameChange: (value: string) => void;
+  onGetGps: () => void;
+  onOpenMap: () => void;
+  onImageChange: (file: File | null) => void;
+};
+
+export default function UploadCatchForm({
+  members,
+  caughtFor,
+  registeredBy,
+  fishType,
+  fineFishType,
+  weight,
+  catchDate,
+  locationName,
+  latitude,
+  longitude,
+  gpsLoading,
+  gpsError,
+  previewUrl,
+  fileInputKey,
+  loading,
+  onSubmit,
+  onCaughtForChange,
+  onRegisteredByChange,
+  onFishTypeChange,
+  onFineFishTypeChange,
+  onWeightChange,
+  onCatchDateChange,
+  onLocationNameChange,
+  onGetGps,
+  onOpenMap,
+  onImageChange,
+}: UploadCatchFormProps) {
+  return (
+    <form onSubmit={onSubmit} className="space-y-4">
+      <select
+        value={caughtFor}
+        onChange={(e) => onCaughtForChange(e.target.value)}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+        required
+      >
+        <option value="">Välj vem som fångade fisken</option>
+        {members.map((member) => (
+          <option key={member.id} value={member.name}>
+            {member.name}
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={registeredBy}
+        onChange={(e) => onRegisteredByChange(e.target.value)}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+        required
+      >
+        <option value="">Välj vem som registrerar</option>
+        {members.map((member) => (
+          <option key={member.id} value={member.name}>
+            {member.name}
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={fishType}
+        onChange={(e) => onFishTypeChange(e.target.value)}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+        required
+      >
+        <option value="">Välj art</option>
+        <option value="Gädda">Gädda</option>
+        <option value="Abborre">Abborre</option>
+        <option value="Fina fisken">Fina fisken</option>
+      </select>
+
+      {fishType === "Fina fisken" ? (
+        <input
+          type="text"
+          value={fineFishType}
+          onChange={(e) => onFineFishTypeChange(e.target.value)}
+          placeholder="Art på fina fisken (t.ex. Gös)"
+          className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+          required
+        />
+      ) : null}
+
+      <input
+        type="number"
+        inputMode="numeric"
+        value={weight}
+        onChange={(e) => onWeightChange(e.target.value)}
+        placeholder="Vikt (gram)"
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+        required
+      />
+
+      <CatchDateField
+        catchDate={catchDate}
+        onCatchDateChange={onCatchDateChange}
+      />
+
+      <input
+        type="text"
+        value={locationName}
+        onChange={(e) => onLocationNameChange(e.target.value)}
+        placeholder="Plats (valfritt)"
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+      />
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={onGetGps}
+          disabled={gpsLoading}
+          className="rounded-2xl bg-[#1f46d8] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#264fe6] disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {gpsLoading ? "Hämtar GPS..." : "📍 Hämta GPS-position"}
+        </button>
+
+        <button
+          type="button"
+          onClick={onOpenMap}
+          className="rounded-2xl bg-[#1f46d8] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#264fe6]"
+        >
+          🗺️ Importera plats från karta
+        </button>
+      </div>
+
+      <GpsPermissionHelp
+        gpsError={gpsError}
+        gpsLoading={gpsLoading}
+        onRetry={onGetGps}
+        onOpenMap={onOpenMap}
+      />
+
+      <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-3 text-sm text-[#4b5563]">
+        <div>Latitud: {latitude ?? "Saknas"}</div>
+        <div>Longitud: {longitude ?? "Saknas"}</div>
+      </div>
+
+      <input
+        key={fileInputKey}
+        type="file"
+        accept="image/*"
+        onChange={(e) => onImageChange(e.target.files?.[0] || null)}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937]"
+        required
+      />
+
+      {previewUrl ? (
+        <div className="overflow-hidden rounded-2xl border border-[#d8d2c7] bg-white">
+          <img
+            src={previewUrl}
+            alt="Förhandsvisning"
+            className="h-auto max-h-[420px] w-full object-cover"
+          />
+        </div>
+      ) : null}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full rounded-2xl bg-[#53b846] px-4 py-4 text-base font-semibold text-white transition hover:bg-[#63c456] disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        {loading ? "Skickar..." : "Skicka fångst"}
+      </button>
+    </form>
+  );
+}

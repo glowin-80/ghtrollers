@@ -1,0 +1,79 @@
+"use client";
+
+import {
+  getPendingMemberDisplayName,
+  type PendingMember,
+} from "@/lib/admin-tools";
+
+type PendingMemberCardProps = {
+  member: PendingMember;
+  workingKey: string | null;
+  onApprove: (memberId: string) => void;
+  onMakeAdmin: (memberId: string) => void;
+  onReject: (memberId: string) => void;
+};
+
+export default function PendingMemberCard({
+  member,
+  workingKey,
+  onApprove,
+  onMakeAdmin,
+  onReject,
+}: PendingMemberCardProps) {
+  const displayName = getPendingMemberDisplayName(member);
+
+  return (
+    <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] p-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div className="text-lg font-bold text-[#1f2937]">{displayName}</div>
+
+          <div className="mt-1 text-sm text-[#6b7280]">
+            {member.email || "Ingen e-post sparad"}
+          </div>
+
+          <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full bg-[#ede7dc] px-3 py-1 text-[#5b4b3a]">
+              {member.category || "Ej vald"}
+            </span>
+
+            <span className="rounded-full bg-[#f3f4f6] px-3 py-1 text-[#4b5563]">
+              Väntar på granskning
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => onApprove(member.id)}
+            disabled={workingKey === `member-approve-${member.id}`}
+            className="rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3e5d3b] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {workingKey === `member-approve-${member.id}` ? "Jobbar..." : "Godkänn"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onMakeAdmin(member.id)}
+            disabled={workingKey === `member-admin-${member.id}`}
+            className="rounded-full border border-[#c8b28c] bg-[#fff7ea] px-4 py-2 text-sm font-semibold text-[#7a5b1e] transition hover:bg-[#fbeecf] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {workingKey === `member-admin-${member.id}`
+              ? "Jobbar..."
+              : "Gör admin"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onReject(member.id)}
+            disabled={workingKey === `member-reject-${member.id}`}
+            className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {workingKey === `member-reject-${member.id}` ? "Jobbar..." : "Neka"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
