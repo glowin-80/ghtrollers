@@ -37,3 +37,26 @@ img {
   display: block;
   max-width: 100%;
 }
+
+.date-input {
+  min-height: 54px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.date-input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.date-input:invalid {
+  color: #9ca3af;
+}
+
+.date-input:valid {
+  color: #1f2937;
+}

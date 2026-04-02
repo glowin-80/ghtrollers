@@ -20,6 +20,19 @@ import MapPreviewSection from "@/components/home/MapPreviewSection";
 
 type MembershipStatus = "guest" | "pending" | "active";
 
+function getGeolocationErrorMessage(error: GeolocationPositionError) {
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      return "Platsåtkomst nekades. Tillåt plats i Safari/iPhone och försök igen.";
+    case error.POSITION_UNAVAILABLE:
+      return "Kunde inte bestämma din position just nu. Försök igen om en liten stund.";
+    case error.TIMEOUT:
+      return "Det tog för lång tid att hämta GPS-position. Försök igen.";
+    default:
+      return "Kunde inte hämta GPS-position.";
+  }
+}
+
 export default function Home() {
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,6 +51,7 @@ export default function Home() {
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [gpsError, setGpsError] = useState("");
   const [mapOpen, setMapOpen] = useState(false);
 
   const [approvedCatches, setApprovedCatches] = useState<Catch[]>([]);
@@ -278,8 +292,10 @@ export default function Home() {
       return;
     }
 
+    setGpsError("");
+
     if (!navigator.geolocation) {
-      alert("GPS stöds inte i den här enheten/webbläsaren.");
+      setGpsError("GPS stöds inte i den här enheten/webbläsaren.");
       return;
     }
 
@@ -294,17 +310,18 @@ export default function Home() {
           setLocationName("GPS-hämtad plats");
         }
 
+        setGpsError("");
         setGpsLoading(false);
       },
       (error) => {
         console.error(error);
-        alert("Kunde inte hämta GPS-position.");
         setGpsLoading(false);
+        setGpsError(getGeolocationErrorMessage(error));
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+        timeout: 15000,
+        maximumAge: 30000,
       }
     );
   }, [hasActiveMembership, locationName]);
@@ -317,6 +334,7 @@ export default function Home() {
 
       setLatitude(lat);
       setLongitude(lng);
+      setGpsError("");
 
       if (!locationName.trim()) {
         setLocationName(`Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
@@ -432,6 +450,7 @@ export default function Home() {
         setImageFile(null);
         setLatitude(null);
         setLongitude(null);
+        setGpsError("");
         setFileInputKey((prev) => prev + 1);
 
         alert("Fångsten skickades in och väntar på godkännande.");
@@ -488,6 +507,7 @@ export default function Home() {
             latitude={latitude}
             longitude={longitude}
             gpsLoading={gpsLoading}
+            gpsError={gpsError}
             mapOpen={mapOpen}
             previewUrl={previewUrl}
             fileInputKey={fileInputKey}
