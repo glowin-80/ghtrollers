@@ -20,16 +20,41 @@ import MapPreviewSection from "@/components/home/MapPreviewSection";
 
 type MembershipStatus = "guest" | "pending" | "active";
 
-function getGeolocationErrorMessage(error: GeolocationPositionError) {
+type GpsErrorKind =
+  | "permission-denied"
+  | "position-unavailable"
+  | "timeout"
+  | "unsupported"
+  | "unknown";
+
+type GpsErrorState = {
+  kind: GpsErrorKind;
+  message: string;
+};
+
+function getGeolocationErrorState(error: GeolocationPositionError): GpsErrorState {
   switch (error.code) {
     case error.PERMISSION_DENIED:
-      return "Platsåtkomst nekades. Tillåt plats i Safari/iPhone och försök igen.";
+      return {
+        kind: "permission-denied",
+        message: "Platsåtkomst nekades.",
+      };
     case error.POSITION_UNAVAILABLE:
-      return "Kunde inte bestämma din position just nu. Försök igen om en liten stund.";
+      return {
+        kind: "position-unavailable",
+        message:
+          "Kunde inte bestämma din position just nu. Försök igen om en liten stund.",
+      };
     case error.TIMEOUT:
-      return "Det tog för lång tid att hämta GPS-position. Försök igen.";
+      return {
+        kind: "timeout",
+        message: "Det tog för lång tid att hämta GPS-position. Försök igen.",
+      };
     default:
-      return "Kunde inte hämta GPS-position.";
+      return {
+        kind: "unknown",
+        message: "Kunde inte hämta GPS-position.",
+      };
   }
 }
 
@@ -51,7 +76,7 @@ export default function Home() {
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
-  const [gpsError, setGpsError] = useState("");
+  const [gpsError, setGpsError] = useState<GpsErrorState | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
 
   const [approvedCatches, setApprovedCatches] = useState<Catch[]>([]);
@@ -292,10 +317,13 @@ export default function Home() {
       return;
     }
 
-    setGpsError("");
+    setGpsError(null);
 
     if (!navigator.geolocation) {
-      setGpsError("GPS stöds inte i den här enheten/webbläsaren.");
+      setGpsError({
+        kind: "unsupported",
+        message: "GPS stöds inte i den här enheten/webbläsaren.",
+      });
       return;
     }
 
@@ -310,13 +338,13 @@ export default function Home() {
           setLocationName("GPS-hämtad plats");
         }
 
-        setGpsError("");
+        setGpsError(null);
         setGpsLoading(false);
       },
       (error) => {
         console.error(error);
         setGpsLoading(false);
-        setGpsError(getGeolocationErrorMessage(error));
+        setGpsError(getGeolocationErrorState(error));
       },
       {
         enableHighAccuracy: true,
@@ -334,7 +362,7 @@ export default function Home() {
 
       setLatitude(lat);
       setLongitude(lng);
-      setGpsError("");
+      setGpsError(null);
 
       if (!locationName.trim()) {
         setLocationName(`Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
@@ -346,6 +374,7 @@ export default function Home() {
   );
 
   const handleOpenMap = useCallback(() => {
+    setGpsError(null);
     setMapOpen(true);
   }, []);
 
@@ -450,7 +479,7 @@ export default function Home() {
         setImageFile(null);
         setLatitude(null);
         setLongitude(null);
-        setGpsError("");
+        setGpsError(null);
         setFileInputKey((prev) => prev + 1);
 
         alert("Fångsten skickades in och väntar på godkännande.");
