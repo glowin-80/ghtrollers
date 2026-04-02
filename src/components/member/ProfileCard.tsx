@@ -48,7 +48,7 @@ export default function ProfileCard({
               )}
             </div>
 
-            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-[#d8d2c7] bg-[#f2ede5] px-3 py-1 text-xs font-semibold text-[#5c4d3f] shadow-[0_6px_14px_rgba(0,0,0,0.08)] whitespace-nowrap">
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-[#d8d2c7] bg-[#f2ede5] px-3 py-1 text-xs font-semibold text-[#5c4d3f] shadow-[0_6px_14px_rgba(0,0,0,0.08)]">
               {catchCount} fångster
             </div>
           </div>
@@ -66,8 +66,10 @@ export default function ProfileCard({
               </h1>
 
               {member.email ? (
-                <div className="mt-2 overflow-hidden text-ellipsis whitespace-nowrap border-b border-[#d8d2c7] pb-2 text-[0.95rem] text-[#5d6572]">
-                  {member.email}
+                <div className="mt-2 border-b border-[#d8d2c7] pb-2 text-[0.95rem] text-[#5d6572] sm:text-base">
+                  <span className="block break-all sm:break-normal">
+                    {member.email}
+                  </span>
                 </div>
               ) : null}
             </div>
