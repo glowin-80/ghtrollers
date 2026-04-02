@@ -20,8 +20,8 @@ export default function ProfileCard({
   }
 
   return (
-    <section className="relative overflow-visible rounded-[28px] border border-[#d8d2c7] bg-white/95 px-5 pb-4 pt-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
-      <div className="absolute -left-2 top-4 z-10 flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-[3px] border-[#ccb98d] bg-gradient-to-br from-[#31492d] to-[#1f2b1d] shadow-[0_14px_28px_rgba(0,0,0,0.18)] sm:-left-3 sm:top-3 sm:h-32 sm:w-32">
+    <section className="relative overflow-visible rounded-[28px] border border-[#d8d2c7] bg-white/95 px-5 pb-4 pt-8 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:px-6 sm:pt-9">
+      <div className="absolute -left-3 -top-5 z-10 flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-[3px] border-[#ccb98d] bg-gradient-to-br from-[#31492d] to-[#1f2b1d] shadow-[0_14px_28px_rgba(0,0,0,0.18)] sm:-left-4 sm:-top-6 sm:h-32 sm:w-32">
         {member.profile_image_url ? (
           <img
             src={member.profile_image_url}
@@ -35,17 +35,17 @@ export default function ProfileCard({
         )}
       </div>
 
-      <div className="pl-[118px] sm:pl-[132px]">
+      <div className="pl-[108px] sm:pl-[122px]">
         <div className="text-xs font-medium tracking-wide text-[#6f6253]">
           👋 Min sida
         </div>
 
-        <h1 className="mt-1 break-words text-[2.1rem] font-bold leading-[0.95] text-[#1f2937] sm:text-[2.35rem]">
+        <h1 className="mt-1 break-words text-[1.95rem] font-bold leading-[0.95] text-[#1f2937] sm:text-[2.2rem]">
           {member.name}
         </h1>
 
         {member.email ? (
-          <div className="mt-2 text-base text-[#5b6470] sm:text-[0.95rem]">
+          <div className="mt-2 break-all text-[0.95rem] text-[#5b6470] sm:text-[0.95rem]">
             {member.email}
           </div>
         ) : null}
@@ -81,7 +81,7 @@ export default function ProfileCard({
       </div>
 
       {onProfileImageUploaded ? (
-        <div className="mt-4 rounded-[22px] border border-[#e7e0d4] bg-[#fbfaf7] px-4 py-3">
+        <div className="mt-5 rounded-[22px] border border-[#e7e0d4] bg-[#fbfaf7] px-4 py-3">
           <div className="text-sm font-semibold text-[#3f3a33]">Profilbild</div>
 
           <p className="mt-1 text-sm leading-6 text-[#6b7280]">

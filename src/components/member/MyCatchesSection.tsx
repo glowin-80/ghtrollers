@@ -17,17 +17,30 @@ type MyCatchesSectionProps = {
 type CatchYearFilter = "all" | string;
 
 export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
-  const [selectedYear, setSelectedYear] = useState<CatchYearFilter>("all");
+  const currentSwedenYear = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "Europe/Stockholm",
+      year: "numeric",
+    });
+
+    return formatter.format(new Date());
+  }, []);
+
+  const [selectedYear, setSelectedYear] =
+    useState<CatchYearFilter>(currentSwedenYear);
 
   const availableYears = useMemo(() => {
-    return Array.from(
-      new Set(
-        catches
-          .map((item) => item.catch_date?.slice(0, 4))
-          .filter((year): year is string => Boolean(year))
-      )
-    ).sort((a, b) => Number(b) - Number(a));
-  }, [catches]);
+    const startYear = 2016;
+    const endYear = Number(currentSwedenYear);
+
+    const years: string[] = [];
+
+    for (let year = endYear; year >= startYear; year -= 1) {
+      years.push(String(year));
+    }
+
+    return years;
+  }, [currentSwedenYear]);
 
   const filteredCatches = useMemo(() => {
     if (selectedYear === "all") {
@@ -54,7 +67,7 @@ export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
           Filter
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setSelectedYear("all")}
@@ -68,21 +81,24 @@ export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
             Visa allt
           </button>
 
-          {availableYears.map((year) => (
-            <button
-              key={year}
-              type="button"
-              onClick={() => setSelectedYear(year)}
-              className={[
-                "rounded-full px-4 py-2 text-sm font-semibold transition",
-                selectedYear === year
-                  ? "bg-[#324b2f] text-white"
-                  : "border border-[#d8d2c7] bg-[#f7f4ee] text-[#4b5563] hover:bg-[#f1ece3]",
-              ].join(" ")}
+          <div className="relative">
+            <select
+              value={selectedYear === "all" ? currentSwedenYear : selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="rounded-full border border-[#d8d2c7] bg-[#f7f4ee] px-4 py-2 pr-10 text-sm font-semibold text-[#4b5563] outline-none transition hover:bg-[#f1ece3] focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+              aria-label="Välj år"
             >
-              {year}
-            </button>
-          ))}
+              {availableYears.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#6b7280]">
+              ▼
+            </span>
+          </div>
         </div>
       </div>
 
@@ -111,7 +127,8 @@ export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
                   </div>
 
                   <div className="mt-1 text-sm leading-6 text-[#6b7280]">
-                    Fångad av: {item.caught_for} • Registrerad av: {item.registered_by}
+                    Fångad av: {item.caught_for} • Registrerad av:{" "}
+                    {item.registered_by}
                   </div>
                 </div>
 
