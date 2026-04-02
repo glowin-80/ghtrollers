@@ -65,7 +65,7 @@ export default function ProfileCard({
             </div>
           ) : null}
 
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-sm font-medium text-[#5c4d3f] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
               {member.is_admin ? "Admin" : "Medlem"}
             </span>
@@ -75,33 +75,35 @@ export default function ProfileCard({
             </span>
           </div>
 
-          <div className="mt-4 flex gap-3">
-            <Link
-              href="/"
-              className="inline-flex h-[46px] min-w-0 flex-1 items-center justify-center rounded-full border border-[#d8d2c7] bg-white px-4 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
-            >
-              Till startsidan
-            </Link>
-
-            {onLogout ? (
-              <button
-                type="button"
-                onClick={onLogout}
-                className="inline-flex h-[46px] min-w-0 flex-1 items-center justify-center rounded-full bg-[#324b2f] px-4 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(50,75,47,0.22)] transition hover:bg-[#3e5d3b]"
+          <div className="mt-7 flex justify-center">
+            <div className="grid w-full max-w-[440px] grid-cols-2 gap-3">
+              <Link
+                href="/"
+                className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full border border-[#d8d2c7] bg-white px-5 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
               >
-                Logga ut
-              </button>
-            ) : null}
+                Till startsidan
+              </Link>
+
+              {onLogout ? (
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full bg-[#324b2f] px-5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(50,75,47,0.22)] transition hover:bg-[#3e5d3b]"
+                >
+                  Logga ut
+                </button>
+              ) : null}
+            </div>
           </div>
         </div>
 
         {onProfileImageUploaded ? (
-          <div className="mt-6 rounded-[24px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-sm">
+          <div className="mt-7 rounded-[24px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-sm">
             <div className="text-base font-semibold text-[#3f3a33]">
               Profilbild
             </div>
 
-            <p className="mt-1 text-sm leading-6 text-[#6b7280]">
+            <p className="mt-2 text-sm leading-6 text-[#6b7280]">
               Ladda upp en profilbild så visas den här och i knappen för Min sida.
             </p>
 
