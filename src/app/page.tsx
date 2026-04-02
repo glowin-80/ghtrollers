@@ -30,6 +30,8 @@ export default function Home() {
     longitude,
     gpsLoading,
     gpsError,
+    formMessage,
+    confirmMissingLocationOpen,
     mapOpen,
     previewUrl,
     fileInputKey,
@@ -47,6 +49,10 @@ export default function Home() {
     handleCloseMap,
     handleMapSelect,
     handleSubmit,
+    dismissFormMessage,
+    handleFormMessageAction,
+    handleConfirmMissingLocation,
+    handleCancelMissingLocation,
   } = useCatchUpload({
     isLoggedIn,
     hasActiveMembership,
@@ -105,6 +111,8 @@ export default function Home() {
             longitude={longitude}
             gpsLoading={gpsLoading}
             gpsError={gpsError}
+            formMessage={formMessage}
+            confirmMissingLocationOpen={confirmMissingLocationOpen}
             mapOpen={mapOpen}
             previewUrl={previewUrl}
             fileInputKey={fileInputKey}
@@ -122,6 +130,10 @@ export default function Home() {
             onCloseMap={handleCloseMap}
             onMapSelect={handleMapSelect}
             onImageChange={handleImageChange}
+            onDismissFormMessage={dismissFormMessage}
+            onFormMessageAction={handleFormMessageAction}
+            onConfirmMissingLocation={handleConfirmMissingLocation}
+            onCancelMissingLocation={handleCancelMissingLocation}
           />
         </div>
 

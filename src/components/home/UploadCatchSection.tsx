@@ -1,6 +1,8 @@
 "use client";
 
+
 import MembersOnlyOverlay from "@/components/shared/MembersOnlyOverlay";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import UploadCatchForm from "@/components/home/upload/UploadCatchForm";
 import MapPickerModal from "@/components/home/upload/MapPickerModal";
 import type { UploadCatchSectionProps } from "@/components/home/upload/types";
@@ -9,8 +11,11 @@ export default function UploadCatchSection({
   isLoggedIn,
   hasActiveMembership,
   mapOpen,
+  confirmMissingLocationOpen,
   onCloseMap,
   onMapSelect,
+  onConfirmMissingLocation,
+  onCancelMissingLocation,
   ...formProps
 }: UploadCatchSectionProps) {
   const shouldLock = !isLoggedIn || !hasActiveMembership;
@@ -43,6 +48,16 @@ export default function UploadCatchSection({
           onSelect={onMapSelect}
         />
       </div>
+
+      <ConfirmDialog
+        open={confirmMissingLocationOpen}
+        title="Ingen plats angiven"
+        description="Du har inte angett plats. Vill du fortsätta ändå?"
+        confirmLabel="Fortsätt ändå"
+        cancelLabel="Gå tillbaka"
+        onConfirm={onConfirmMissingLocation}
+        onCancel={onCancelMissingLocation}
+      />
     </section>
   );
 }

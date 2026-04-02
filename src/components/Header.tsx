@@ -146,7 +146,7 @@ export default function Header() {
     const nav = document.getElementById("site-nav");
 
     if (pathname !== "/") {
-      window.location.href = `/#${sectionId}`;
+      router.push(`/#${sectionId}`);
       return;
     }
 
