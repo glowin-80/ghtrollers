@@ -25,12 +25,6 @@ export default function ProfileCard({
     <section className="relative overflow-visible rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_12px_36px_rgba(18,35,28,0.08)]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[170px] rounded-t-[30px] bg-[radial-gradient(circle_at_top_left,rgba(228,209,165,0.45),transparent_42%),linear-gradient(180deg,rgba(244,236,221,0.78)_0%,rgba(252,251,248,0)_100%)]" />
 
-      <div className="pointer-events-none absolute left-6 right-6 top-[188px] h-px bg-gradient-to-r from-transparent via-[#d6c08a] to-transparent" />
-
-      <div className="pointer-events-none absolute left-1/2 top-[181px] -translate-x-1/2 text-base text-[#c8a85c]">
-        ✦
-      </div>
-
       <div className="relative px-5 pb-4 pt-7 sm:px-6 sm:pt-8">
         <div className="absolute left-4 top-4 z-10 sm:left-5 sm:top-5">
           <div className="relative">
@@ -80,7 +74,16 @@ export default function ProfileCard({
           </div>
         </div>
 
-        <div className="mt-10 flex justify-center">
+        <div className="mt-8">
+          <div className="pointer-events-none relative">
+            <div className="h-px bg-gradient-to-r from-transparent via-[#d6c08a] to-transparent" />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#fcfbf8] px-3 text-base text-[#c8a85c]">
+              ✦
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 flex justify-center">
           <div className="grid w-full max-w-[420px] grid-cols-2 gap-3">
             <Link
               href="/"
