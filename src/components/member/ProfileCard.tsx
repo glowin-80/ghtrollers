@@ -21,18 +21,18 @@ export default function ProfileCard({
 
   return (
     <section className="relative overflow-visible rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_12px_36px_rgba(18,35,28,0.08)]">
-      <div className="absolute inset-x-0 top-0 h-[210px] rounded-t-[30px] bg-[radial-gradient(circle_at_top_left,rgba(228,209,165,0.55),transparent_40%),linear-gradient(180deg,rgba(244,236,221,0.85)_0%,rgba(252,251,248,0)_100%)] pointer-events-none" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[210px] rounded-t-[30px] bg-[radial-gradient(circle_at_top_left,rgba(228,209,165,0.55),transparent_40%),linear-gradient(180deg,rgba(244,236,221,0.85)_0%,rgba(252,251,248,0)_100%)]" />
 
       <div className="pointer-events-none absolute left-6 right-6 top-[210px] h-px bg-gradient-to-r from-transparent via-[#d6c08a] to-transparent" />
 
-      <div className="pointer-events-none absolute left-1/2 top-[203px] -translate-x-1/2 text-[#c8a85c] text-lg">
+      <div className="pointer-events-none absolute left-1/2 top-[203px] -translate-x-1/2 text-lg text-[#c8a85c]">
         ✦
       </div>
 
       <div className="relative px-5 pb-4 pt-10 sm:px-6 sm:pt-11">
-        <div className="absolute -left-3 -top-8 z-10 sm:-left-4 sm:-top-9">
+        <div className="absolute left-3 top-3 z-10 sm:left-4 sm:top-4">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-[#e5d3a3]/40 blur-xl scale-110" />
+            <div className="absolute inset-0 scale-110 rounded-full bg-[#e5d3a3]/40 blur-xl" />
 
             <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-[4px] border-[#d6bf83] bg-gradient-to-br from-[#31492d] to-[#1f2b1d] shadow-[0_18px_36px_rgba(0,0,0,0.18)] sm:h-36 sm:w-36">
               {member.profile_image_url ? (
@@ -50,7 +50,7 @@ export default function ProfileCard({
           </div>
         </div>
 
-        <div className="pl-[120px] sm:pl-[142px]">
+        <div className="pl-[126px] sm:pl-[146px]">
           <div className="text-[0.95rem] font-medium tracking-wide text-[#74685a]">
             👋 Min sida
           </div>
@@ -78,7 +78,7 @@ export default function ProfileCard({
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
               href="/"
-              className="inline-flex min-h-[50px] items-center justify-center rounded-full border border-[#d8d2c7] bg-white px-5 py-2.5 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
+              className="inline-flex min-h-[46px] min-w-[140px] items-center justify-center rounded-full border border-[#d8d2c7] bg-white px-4 py-2 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
             >
               Till startsidan
             </Link>
@@ -87,7 +87,7 @@ export default function ProfileCard({
               <button
                 type="button"
                 onClick={onLogout}
-                className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-[#324b2f] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(50,75,47,0.22)] transition hover:bg-[#3e5d3b]"
+                className="inline-flex min-h-[46px] min-w-[140px] items-center justify-center rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(50,75,47,0.22)] transition hover:bg-[#3e5d3b]"
               >
                 Logga ut
               </button>
