@@ -40,7 +40,7 @@ export default function MinSidaPage() {
         setCatchesError(null);
       }
 
-      const { data: catchesData, error: catchesError } = await supabase
+      const { data: catchesData, error: catchesLoadError } = await supabase
         .from("catches")
         .select(
           "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, status, created_at"
@@ -48,8 +48,8 @@ export default function MinSidaPage() {
         .or(`caught_for.eq.${memberName},registered_by.eq.${memberName}`)
         .order("catch_date", { ascending: false });
 
-      if (catchesError) {
-        throw catchesError;
+      if (catchesLoadError) {
+        throw catchesLoadError;
       }
 
       if (!mountedRef.current) return;
@@ -154,6 +154,7 @@ export default function MinSidaPage() {
   function handleProfileImageUploaded(imageUrl: string) {
     setMember((prev) => {
       if (!prev) return prev;
+
       return {
         ...prev,
         profile_image_url: imageUrl,
@@ -163,9 +164,9 @@ export default function MinSidaPage() {
 
   if (pageLoading) {
     return (
-      <main className="px-4 pb-10 pt-6">
-        <div className="mx-auto max-w-6xl">
-          <div className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+      <main className="px-4 pb-8 pt-4">
+        <div className="mx-auto max-w-5xl">
+          <div className="rounded-[26px] border border-[#d8d2c7] bg-white/95 px-5 py-5 text-sm text-[#4b5563] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
             Laddar medlemssidan...
           </div>
         </div>
@@ -175,9 +176,9 @@ export default function MinSidaPage() {
 
   if (error) {
     return (
-      <main className="px-4 pb-10 pt-6">
-        <div className="mx-auto max-w-6xl">
-          <div className="rounded-[28px] border border-red-200 bg-white/95 p-6 text-red-700 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+      <main className="px-4 pb-8 pt-4">
+        <div className="mx-auto max-w-5xl">
+          <div className="rounded-[26px] border border-red-200 bg-white/95 px-5 py-5 text-sm text-red-700 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
             {error}
           </div>
         </div>
@@ -187,25 +188,25 @@ export default function MinSidaPage() {
 
   if (!member) {
     return (
-      <main className="px-4 pb-10 pt-6">
+      <main className="px-4 pb-8 pt-4">
         <div className="mx-auto max-w-4xl">
-          <div className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
-            <h1 className="text-3xl font-bold text-[#1f2937]">🔐 Min sida</h1>
-            <p className="mt-3 text-[#6b7280]">
+          <div className="rounded-[26px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+            <h1 className="text-2xl font-bold text-[#1f2937]">🔐 Min sida</h1>
+            <p className="mt-3 text-sm text-[#6b7280]">
               Du är inte inloggad ännu. Logga in för att komma till medlemssidan.
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 href="/"
-                className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
+                className="inline-flex rounded-full bg-[#324b2f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
               >
                 Till startsidan
               </Link>
 
               <Link
                 href="/login"
-                className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
+                className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-2.5 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
               >
                 Logga in
               </Link>
@@ -218,13 +219,9 @@ export default function MinSidaPage() {
 
   if (!member.is_active) {
     return (
-      <main className="px-4 pb-10 pt-6">
-        <div className="mx-auto max-w-6xl space-y-6">
-          <ProfileCard
-            member={member}
-            catchCount={0}
-            onLogout={handleLogout}
-          />
+      <main className="px-4 pb-8 pt-4">
+        <div className="mx-auto max-w-5xl space-y-4">
+          <ProfileCard member={member} catchCount={0} onLogout={handleLogout} />
           <PendingApprovalCard />
         </div>
       </main>
@@ -232,8 +229,8 @@ export default function MinSidaPage() {
   }
 
   return (
-    <main className="px-4 pb-10 pt-6">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <main className="px-4 pb-8 pt-4">
+      <div className="mx-auto max-w-5xl space-y-4">
         <ProfileCard
           member={member}
           catchCount={catches.length}
@@ -244,14 +241,14 @@ export default function MinSidaPage() {
         {member.is_admin ? <AdminToolsCard /> : null}
 
         {catchesLoading ? (
-          <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+          <section className="rounded-[26px] border border-[#d8d2c7] bg-white/95 px-5 py-5 text-sm text-[#4b5563] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
             Laddar dina fångster...
           </section>
         ) : null}
 
         {catchesError ? (
-          <section className="rounded-[28px] border border-amber-200 bg-white/95 p-6 text-[#7a4b00] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
-            <div className="font-semibold">{catchesError}</div>
+          <section className="rounded-[26px] border border-amber-200 bg-white/95 p-5 text-[#7a4b00] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+            <div className="text-sm font-semibold">{catchesError}</div>
             <p className="mt-2 text-sm text-[#8a5a00]">
               Resten av sidan fungerar, men fångstdelen kunde inte hämtas just nu.
             </p>

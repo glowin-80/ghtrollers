@@ -19,12 +19,18 @@ export default function ProfileCard({
     return null;
   }
 
+  const memberTitle = "Fiskarn";
+
   return (
-    <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
-      <div className="flex flex-col gap-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#ccb98d] bg-gradient-to-br from-[#31492d] to-[#1f2b1d] shadow-[0_8px_20px_rgba(0,0,0,0.16)]">
+    <section className="relative overflow-visible rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_12px_36px_rgba(18,35,28,0.08)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[170px] rounded-t-[30px] bg-[radial-gradient(circle_at_top_left,rgba(228,209,165,0.45),transparent_42%),linear-gradient(180deg,rgba(244,236,221,0.78)_0%,rgba(252,251,248,0)_100%)]" />
+
+      <div className="relative px-5 pb-4 pt-7 sm:px-6 sm:pt-8">
+        <div className="absolute left-4 top-4 z-10 sm:left-5 sm:top-5">
+          <div className="relative">
+            <div className="absolute inset-0 scale-110 rounded-full bg-[#e5d3a3]/35 blur-xl" />
+
+            <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-[4px] border-[#d6bf83] bg-gradient-to-br from-[#31492d] to-[#1f2b1d] shadow-[0_16px_30px_rgba(0,0,0,0.16)] sm:h-28 sm:w-28">
               {member.profile_image_url ? (
                 <img
                   src={member.profile_image_url}
@@ -34,34 +40,54 @@ export default function ProfileCard({
                   decoding="async"
                 />
               ) : (
-                <span className="text-3xl text-[#e5d3a3]">👤</span>
+                <span className="text-4xl text-[#e5d3a3]">👤</span>
               )}
             </div>
 
-            <div>
-              <div className="text-sm font-medium text-[#6f6253]">👋 Min sida</div>
-              <h1 className="mt-1 text-3xl font-bold text-[#1f2937]">
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-[#d8d2c7] bg-[#f2ede5] px-3 py-1 text-xs font-semibold text-[#5c4d3f] shadow-[0_6px_14px_rgba(0,0,0,0.08)]">
+              {catchCount} fångster
+            </div>
+          </div>
+        </div>
+
+        <div className="pl-[108px] sm:pl-[126px]">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-[0.95rem] font-medium tracking-wide text-[#74685a]">
+                👋 Min sida
+              </div>
+
+              <h1 className="mt-1 text-[1.95rem] font-bold leading-[0.94] text-[#1f2937] sm:text-[2.15rem]">
                 {member.name}
               </h1>
 
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[#5b6470]">
-                {member.email ? <span>{member.email}</span> : null}
-
-                <span className="rounded-full bg-[#f2ede5] px-3 py-1 font-medium text-[#5c4d3f]">
-                  {member.is_admin ? "Admin" : "Medlem"}
-                </span>
-
-                <span className="rounded-full bg-[#f2ede5] px-3 py-1 font-medium text-[#5c4d3f]">
-                  {catchCount} fångster
-                </span>
+              <div className="mt-2 text-[1rem] font-medium text-[#74685a] sm:text-[1.05rem]">
+                {memberTitle}
               </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-3">
+            <div className="shrink-0 -translate-y-1 pt-1">
+              <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-sm font-medium text-[#5c4d3f] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+                {member.is_admin ? "Admin" : "Medlem"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <div className="pointer-events-none relative">
+            <div className="h-px bg-gradient-to-r from-transparent via-[#d6c08a] to-transparent" />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#fcfbf8] px-3 text-base text-[#c8a85c]">
+              ✦
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <div className="grid w-full max-w-[420px] grid-cols-2 gap-3">
             <Link
               href="/"
-              className="rounded-full border border-[#d8d2c7] bg-white px-4 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
+              className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full border border-[#d8d2c7] bg-white px-5 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
             >
               Till startsidan
             </Link>
@@ -70,7 +96,7 @@ export default function ProfileCard({
               <button
                 type="button"
                 onClick={onLogout}
-                className="rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
+                className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full bg-[#324b2f] px-5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(50,75,47,0.22)] transition hover:bg-[#3e5d3b]"
               >
                 Logga ut
               </button>
@@ -79,20 +105,22 @@ export default function ProfileCard({
         </div>
 
         {onProfileImageUploaded ? (
-          <div className="rounded-[22px] border border-[#e7e0d4] bg-[#fbfaf7] p-4">
-            <div className="mb-2 text-sm font-semibold text-[#3f3a33]">
+          <div className="mt-7 rounded-[24px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-sm">
+            <div className="text-base font-semibold text-[#3f3a33]">
               Profilbild
             </div>
 
-            <p className="mb-3 text-sm text-[#6b7280]">
+            <p className="mt-2 text-sm leading-6 text-[#6b7280]">
               Ladda upp en profilbild så visas den här och i knappen för Min sida.
             </p>
 
-            <ProfileImageUploader
-              memberEmail={member.email ?? null}
-              currentImageUrl={member.profile_image_url ?? null}
-              onUploaded={onProfileImageUploaded}
-            />
+            <div className="mt-4">
+              <ProfileImageUploader
+                memberId={member.id}
+                currentImageUrl={member.profile_image_url ?? null}
+                onUploaded={onProfileImageUploaded}
+              />
+            </div>
           </div>
         ) : null}
       </div>
