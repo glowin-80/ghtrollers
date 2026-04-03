@@ -14,6 +14,9 @@ type NavItem = {
   type: "section" | "route" | "action";
 };
 
+type SlotDirection = "prev" | "next" | null;
+type SlotRole = "prev" | "current" | "next";
+
 const sectionItems: NavItem[] = [
   {
     id: "leaderboard",
@@ -45,20 +48,33 @@ const sectionItems: NavItem[] = [
   },
 ];
 
+const SLOT_ANIMATION_MS = 240;
+const SWIPE_THRESHOLD = 42;
+const MAX_DRAG_OFFSET = 34;
+
 function getWrappedIndex(index: number, length: number) {
   return (index + length) % length;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
 }
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
+
   const touchStartXRef = useRef<number | null>(null);
-  const touchDeltaXRef = useRef(0);
+  const animationTimeoutRef = useRef<number | null>(null);
 
   const [active, setActive] = useState("leaderboard");
   const [slotIndex, setSlotIndex] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  const [slotDirection, setSlotDirection] = useState<SlotDirection>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffsetX, setDragOffsetX] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -134,6 +150,10 @@ export default function Header() {
         "profile-image-updated",
         handleProfileImageUpdated
       );
+
+      if (animationTimeoutRef.current !== null) {
+        window.clearTimeout(animationTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -164,9 +184,9 @@ export default function Header() {
     ];
   }, [isLoggedIn]);
 
-  const currentSlotItem = sectionItems[slotIndex];
   const previousSlotItem =
     sectionItems[getWrappedIndex(slotIndex - 1, sectionItems.length)];
+  const currentSlotItem = sectionItems[slotIndex];
   const nextSlotItem =
     sectionItems[getWrappedIndex(slotIndex + 1, sectionItems.length)];
 
@@ -194,6 +214,8 @@ export default function Header() {
   }
 
   function handleClick(item: NavItem) {
+    if (slotDirection) return;
+
     if (item.type === "section" && item.section) {
       scrollToSection(item.section, item.id);
       return;
@@ -211,37 +233,110 @@ export default function Header() {
   }
 
   function cycleSlot(direction: "prev" | "next") {
-    setSlotIndex((current) =>
-      direction === "prev"
-        ? getWrappedIndex(current - 1, sectionItems.length)
-        : getWrappedIndex(current + 1, sectionItems.length)
-    );
+    if (slotDirection) return;
+
+    setDragOffsetX(0);
+    setIsDragging(false);
+    setSlotDirection(direction);
+
+    animationTimeoutRef.current = window.setTimeout(() => {
+      setSlotIndex((current) =>
+        direction === "prev"
+          ? getWrappedIndex(current - 1, sectionItems.length)
+          : getWrappedIndex(current + 1, sectionItems.length)
+      );
+      setSlotDirection(null);
+    }, SLOT_ANIMATION_MS);
   }
 
   function handleSlotTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+    if (slotDirection) return;
     touchStartXRef.current = event.touches[0]?.clientX ?? null;
-    touchDeltaXRef.current = 0;
+    setIsDragging(true);
   }
 
   function handleSlotTouchMove(event: React.TouchEvent<HTMLDivElement>) {
-    if (touchStartXRef.current === null) return;
+    if (touchStartXRef.current === null || slotDirection) return;
+
     const currentX = event.touches[0]?.clientX ?? touchStartXRef.current;
-    touchDeltaXRef.current = currentX - touchStartXRef.current;
+    const deltaX = currentX - touchStartXRef.current;
+
+    setDragOffsetX(clamp(deltaX, -MAX_DRAG_OFFSET, MAX_DRAG_OFFSET));
   }
 
   function handleSlotTouchEnd() {
-    const deltaX = touchDeltaXRef.current;
+    if (slotDirection) return;
+
+    const deltaX = dragOffsetX;
+
     touchStartXRef.current = null;
-    touchDeltaXRef.current = 0;
+    setIsDragging(false);
 
-    if (Math.abs(deltaX) < 35) return;
+    if (Math.abs(deltaX) >= SWIPE_THRESHOLD) {
+      setDragOffsetX(0);
 
-    if (deltaX > 0) {
-      cycleSlot("prev");
+      if (deltaX > 0) {
+        cycleSlot("prev");
+        return;
+      }
+
+      cycleSlot("next");
       return;
     }
 
-    cycleSlot("next");
+    setDragOffsetX(0);
+  }
+
+  function getSlideTranslatePercent(role: SlotRole) {
+    const base =
+      role === "prev" ? -64 : role === "next" ? 64 : 0;
+
+    const animatedShift =
+      slotDirection === "next"
+        ? -64
+        : slotDirection === "prev"
+        ? 64
+        : 0;
+
+    return base + animatedShift;
+  }
+
+  function getSlideStyle(role: SlotRole) {
+    const translatePercent = getSlideTranslatePercent(role);
+    const extraPixels = slotDirection ? 0 : dragOffsetX;
+
+    return {
+      transform: `translate(-50%, -50%) translateX(calc(${translatePercent}% + ${extraPixels}px))`,
+    };
+  }
+
+  function getSlideClassName(role: SlotRole) {
+    const isCurrent = role === "current";
+
+    const zIndexClass =
+      role === "current" ? "z-20" : "z-10";
+
+    const opacityClass =
+      isCurrent ? "opacity-100" : "opacity-100";
+
+    const scaleClass =
+      isCurrent ? "scale-100" : "scale-[0.96]";
+
+    const transitionClass = isDragging
+      ? ""
+      : "transition-transform duration-200 ease-out";
+
+    const slotAnimationClass = slotDirection
+      ? "transition-transform duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+      : transitionClass;
+
+    return [
+      "absolute left-1/2 top-1/2 h-[48px] w-[86%] -translate-y-1/2 select-none",
+      zIndexClass,
+      opacityClass,
+      scaleClass,
+      slotAnimationClass,
+    ].join(" ");
   }
 
   return (
@@ -269,11 +364,14 @@ export default function Header() {
               onTouchMove={handleSlotTouchMove}
               onTouchEnd={handleSlotTouchEnd}
             >
+              <div className="absolute inset-0 rounded-full bg-[#d8cfbf]" />
+
               <button
                 type="button"
                 aria-label={`Visa föregående: ${previousSlotItem.alt}`}
                 onClick={() => cycleSlot("prev")}
-                className="absolute inset-y-0 left-0 z-10 w-[24%]"
+                disabled={!!slotDirection}
+                className="absolute inset-y-0 left-0 z-30 w-[26%]"
               >
                 <span className="sr-only">Visa föregående</span>
               </button>
@@ -282,40 +380,61 @@ export default function Header() {
                 type="button"
                 aria-label={`Visa nästa: ${nextSlotItem.alt}`}
                 onClick={() => cycleSlot("next")}
-                className="absolute inset-y-0 right-0 z-10 w-[24%]"
+                disabled={!!slotDirection}
+                className="absolute inset-y-0 right-0 z-30 w-[26%]"
               >
                 <span className="sr-only">Visa nästa</span>
               </button>
 
-              <div className="absolute inset-0 rounded-full bg-[#d8cfbf] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]" />
-
-              <img
-                src={previousSlotItem.src}
-                alt=""
-                aria-hidden="true"
-                draggable={false}
-                className="pointer-events-none absolute left-[-38%] top-1/2 z-0 h-[48px] w-auto -translate-y-1/2 select-none opacity-95"
-              />
-
-              <img
-                src={nextSlotItem.src}
-                alt=""
-                aria-hidden="true"
-                draggable={false}
-                className="pointer-events-none absolute right-[-38%] top-1/2 z-0 h-[48px] w-auto -translate-y-1/2 select-none opacity-95"
-              />
+              <button
+                type="button"
+                onClick={() => handleClick(previousSlotItem)}
+                aria-label={`${previousSlotItem.alt} (föregående)`}
+                className={getSlideClassName("prev")}
+                style={getSlideStyle("prev")}
+                disabled={!!slotDirection}
+                tabIndex={-1}
+              >
+                <img
+                  src={previousSlotItem.src}
+                  alt=""
+                  aria-hidden="true"
+                  draggable={false}
+                  className="pointer-events-none block h-full w-full object-contain"
+                />
+              </button>
 
               <button
                 type="button"
                 onClick={() => handleClick(currentSlotItem)}
                 aria-label={currentSlotItem.alt}
-                className="absolute left-1/2 top-1/2 z-20 h-[48px] -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform duration-200 active:scale-[0.99]"
+                className={getSlideClassName("current")}
+                style={getSlideStyle("current")}
+                disabled={!!slotDirection}
               >
                 <img
                   src={currentSlotItem.src}
                   alt={currentSlotItem.alt}
                   draggable={false}
-                  className="pointer-events-none block h-[48px] w-auto object-contain select-none"
+                  className="pointer-events-none block h-full w-full object-contain"
+                />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleClick(nextSlotItem)}
+                aria-label={`${nextSlotItem.alt} (nästa)`}
+                className={getSlideClassName("next")}
+                style={getSlideStyle("next")}
+                disabled={!!slotDirection}
+                tabIndex={-1}
+              >
+                <img
+                  src={nextSlotItem.src}
+                  alt=""
+                  aria-hidden="true"
+                  draggable={false}
+                  className="pointer-events-none block h-full w-full object-contain"
                 />
               </button>
             </div>
@@ -343,7 +462,9 @@ export default function Header() {
           <div className="hidden flex-wrap items-center justify-center gap-3 sm:flex sm:gap-4 md:gap-5">
             {navItems.map((item) => {
               const isSectionActive =
-                item.type === "section" && active === item.id && pathname === "/";
+                item.type === "section" &&
+                active === item.id &&
+                pathname === "/";
 
               const isRouteActive =
                 item.type === "route" && item.href === pathname;
