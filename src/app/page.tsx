@@ -58,12 +58,41 @@ export default function Home() {
     hasActiveMembership,
   });
 
+  const currentSwedenYear = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "Europe/Stockholm",
+      year: "numeric",
+    });
+
+    return formatter.format(new Date());
+  }, []);
+
+  const availableLeaderboardYears = useMemo(() => {
+    const startYear = 2016;
+    const endYear = Number(currentSwedenYear);
+    const years: string[] = [];
+
+    for (let year = endYear; year >= startYear; year -= 1) {
+      years.push(String(year));
+    }
+
+    return years;
+  }, [currentSwedenYear]);
+
   const [filter, setFilter] = useState<LeaderboardFilter>("bigfive");
+  const [selectedLeaderboardYear, setSelectedLeaderboardYear] =
+    useState<string>(currentSwedenYear);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  const leaderboardCatches = useMemo(() => {
+    return approvedCatches.filter((catchItem) =>
+      catchItem.catch_date?.startsWith(selectedLeaderboardYear)
+    );
+  }, [approvedCatches, selectedLeaderboardYear]);
+
   const leaderboard = useMemo(() => {
-    return buildLeaderboard(approvedCatches, filter);
-  }, [approvedCatches, filter]);
+    return buildLeaderboard(leaderboardCatches, filter);
+  }, [leaderboardCatches, filter]);
 
   const recentApprovedCatches = useMemo(() => {
     return approvedCatches.slice(0, 5);
@@ -71,6 +100,10 @@ export default function Home() {
 
   const handleFilterChange = useCallback((value: LeaderboardFilter) => {
     setFilter(value);
+  }, []);
+
+  const handleLeaderboardYearChange = useCallback((value: string) => {
+    setSelectedLeaderboardYear(value);
   }, []);
 
   const handleImageClick = useCallback((url: string) => {
@@ -90,6 +123,9 @@ export default function Home() {
             members={members}
             filter={filter}
             onFilterChange={handleFilterChange}
+            selectedYear={selectedLeaderboardYear}
+            availableYears={availableLeaderboardYears}
+            onYearChange={handleLeaderboardYearChange}
           />
         </div>
 
