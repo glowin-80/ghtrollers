@@ -13,6 +13,12 @@ export type FineFishSpeciesStat = {
   totalWeight: string;
 };
 
+export type BestFineFishBySpecies = {
+  species: string;
+  weight: string;
+  weightG: number;
+};
+
 export type MemberCatch = {
   id: string;
   caught_for: string;
@@ -46,4 +52,5 @@ export type MemberStats = {
   totalFineFishWeight: string;
 
   fineFishSpeciesStats: FineFishSpeciesStat[];
+  bestFineFishBySpecies: BestFineFishBySpecies[];
 };

@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { calculateMemberStats } from "@/lib/member-page";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
 import ProfileCard from "@/components/member/ProfileCard";
 import StatsGrid from "@/components/member/StatsGrid";
@@ -22,8 +21,6 @@ export default function MinSidaPage() {
 
   const [error, setError] = useState<string | null>(null);
   const [catchesError, setCatchesError] = useState<string | null>(null);
-
-  const stats = useMemo(() => calculateMemberStats(catches), [catches]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -265,7 +262,7 @@ export default function MinSidaPage() {
 
         {!catchesLoading && !catchesError ? (
           <>
-            <StatsGrid stats={stats} />
+            <StatsGrid catches={catches} />
             <MyCatchesSection catches={catches} />
           </>
         ) : null}
