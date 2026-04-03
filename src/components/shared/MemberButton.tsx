@@ -16,14 +16,14 @@ function MemberButtonComponent({
     <Link href="/min-sida">
       <div
         className={[
-          "flex cursor-pointer items-center rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] shadow-md transition hover:scale-[1.03]",
-          compact ? "h-[47px] gap-2 px-8" : "gap-2 px-8 py-2",
+          "flex cursor-pointer items-center overflow-hidden rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] shadow-md transition hover:scale-[1.03]",
+          compact ? "h-[47px] pl-[2px] pr-6" : "h-[52px] pl-[3px] pr-8",
         ].join(" ")}
       >
         <div
           className={[
-            "flex items-center justify-center overflow-hidden rounded-full border border-[#bfa76a] bg-[#1f2b1d]",
-            compact ? "h-8 w-8" : "h-7 w-7",
+            "shrink-0 overflow-hidden rounded-full bg-[#1f2b1d]",
+            compact ? "h-[43px] w-[43px]" : "h-[46px] w-[46px]",
           ].join(" ")}
         >
           {profileImage ? (
@@ -34,17 +34,15 @@ function MemberButtonComponent({
               decoding="async"
             />
           ) : (
-            <span
-              className={compact ? "text-base text-[#d6c28a]" : "text-sm text-[#d6c28a]"}
-            >
-              👤
-            </span>
+            <div className="flex h-full w-full items-center justify-center text-[#d6c28a]">
+              <span className={compact ? "text-lg" : "text-xl"}>👤</span>
+            </div>
           )}
         </div>
 
         <span
           className={[
-            "font-semibold tracking-wide text-[#e5d3a3]",
+            "ml-3 font-semibold tracking-wide text-[#e5d3a3]",
             compact ? "text-[13px]" : "text-sm",
           ].join(" ")}
         >
