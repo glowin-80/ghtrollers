@@ -66,7 +66,7 @@ export default function GalleriPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <h1 className="text-[1.95rem] font-bold leading-none text-[#1f2937] sm:text-[2.15rem]">
-                🖼️ Galleri
+                Galleri
               </h1>
               <p className="mt-2 max-w-2xl text-sm text-[#67747d]">
                 Här hittar du alla godkända fångster för valt år. Välj år och bläddra genom bilderna i lugn och ro.
