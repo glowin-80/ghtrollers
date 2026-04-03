@@ -94,8 +94,8 @@ function getPlacementBadge(index: number) {
     badgeClass: "bg-[#f4ece5] text-[#7a5633] border border-[#e3d3c5]",
     rowClass:
       "border-[#e6ddd5] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]",
-    avatarClass: "border-[#d8b08d] ring-[#f3e8df] bg-[#fbfaf8]",
-    resultClass: "text-[#111827]",
+      avatarClass: "border-[#d8b08d] ring-[#f3e8df] bg-[#fbfaf8]",
+      resultClass: "text-[#111827]",
   };
 }
 
@@ -241,7 +241,7 @@ function LeaderboardSectionComponent({
           href="/all-time-high"
           className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full border-[2px] border-[#d7b75a] bg-[linear-gradient(180deg,#fff8e7_0%,#f5ecd0_100%)] px-4 py-2 text-sm font-bold text-[#4c3b17] shadow-[0_8px_18px_rgba(183,141,40,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] transition hover:brightness-[1.02]"
         >
-          {hasAnyAllTimeData ? "All-time-high" : "All-time-high"}
+          {hasAnyAllTimeData ? "Gå till All-time-high" : "Gå till All-time-high"}
         </Link>
       </div>
 
