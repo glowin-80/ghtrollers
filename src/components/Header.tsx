@@ -1,7 +1,7 @@
 "use client";
 
 import MemberButton from "@/components/shared/MemberButton";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -45,10 +45,18 @@ const sectionItems: NavItem[] = [
   },
 ];
 
+function getWrappedIndex(index: number, length: number) {
+  return (index + length) % length;
+}
+
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const touchStartXRef = useRef<number | null>(null);
+  const touchDeltaXRef = useRef(0);
+
   const [active, setActive] = useState("leaderboard");
+  const [slotIndex, setSlotIndex] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
@@ -129,6 +137,21 @@ export default function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    if (pathname === "/galleri") {
+      setActive("gallery");
+      setSlotIndex(sectionItems.findIndex((item) => item.id === "gallery"));
+      return;
+    }
+
+    if (pathname === "/") {
+      const currentIndex = sectionItems.findIndex((item) => item.id === active);
+      if (currentIndex >= 0) {
+        setSlotIndex(currentIndex);
+      }
+    }
+  }, [pathname, active]);
+
   const navItems = useMemo<NavItem[]>(() => {
     return [
       ...sectionItems,
@@ -140,6 +163,12 @@ export default function Header() {
       },
     ];
   }, [isLoggedIn]);
+
+  const currentSlotItem = sectionItems[slotIndex];
+  const previousSlotItem =
+    sectionItems[getWrappedIndex(slotIndex - 1, sectionItems.length)];
+  const nextSlotItem =
+    sectionItems[getWrappedIndex(slotIndex + 1, sectionItems.length)];
 
   function scrollToSection(sectionId: string, itemId: string) {
     setActive(itemId);
@@ -171,6 +200,7 @@ export default function Header() {
     }
 
     if (item.type === "route" && item.href) {
+      setActive(item.id);
       router.push(item.href);
       return;
     }
@@ -178,6 +208,40 @@ export default function Header() {
     if (item.type === "action") {
       router.push(isLoggedIn ? "/min-sida" : "/login");
     }
+  }
+
+  function cycleSlot(direction: "prev" | "next") {
+    setSlotIndex((current) =>
+      direction === "prev"
+        ? getWrappedIndex(current - 1, sectionItems.length)
+        : getWrappedIndex(current + 1, sectionItems.length)
+    );
+  }
+
+  function handleSlotTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+    touchStartXRef.current = event.touches[0]?.clientX ?? null;
+    touchDeltaXRef.current = 0;
+  }
+
+  function handleSlotTouchMove(event: React.TouchEvent<HTMLDivElement>) {
+    if (touchStartXRef.current === null) return;
+    const currentX = event.touches[0]?.clientX ?? touchStartXRef.current;
+    touchDeltaXRef.current = currentX - touchStartXRef.current;
+  }
+
+  function handleSlotTouchEnd() {
+    const deltaX = touchDeltaXRef.current;
+    touchStartXRef.current = null;
+    touchDeltaXRef.current = 0;
+
+    if (Math.abs(deltaX) < 35) return;
+
+    if (deltaX > 0) {
+      cycleSlot("prev");
+      return;
+    }
+
+    cycleSlot("next");
   }
 
   return (
@@ -198,7 +262,85 @@ export default function Header() {
         className="sticky top-0 z-50 border-b border-black/10 bg-[#e5dccd]/95 backdrop-blur-md"
       >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5">
+          <div className="flex items-center justify-center gap-3 sm:hidden">
+            <div
+              className="relative h-[48px] min-w-0 max-w-[360px] flex-1 overflow-hidden rounded-full"
+              onTouchStart={handleSlotTouchStart}
+              onTouchMove={handleSlotTouchMove}
+              onTouchEnd={handleSlotTouchEnd}
+            >
+              <button
+                type="button"
+                aria-label={`Visa föregående: ${previousSlotItem.alt}`}
+                onClick={() => cycleSlot("prev")}
+                className="absolute inset-y-0 left-0 z-10 w-[24%]"
+              >
+                <span className="sr-only">Visa föregående</span>
+              </button>
+
+              <button
+                type="button"
+                aria-label={`Visa nästa: ${nextSlotItem.alt}`}
+                onClick={() => cycleSlot("next")}
+                className="absolute inset-y-0 right-0 z-10 w-[24%]"
+              >
+                <span className="sr-only">Visa nästa</span>
+              </button>
+
+              <div className="absolute inset-0 rounded-full bg-[#d8cfbf] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]" />
+
+              <img
+                src={previousSlotItem.src}
+                alt=""
+                aria-hidden="true"
+                draggable={false}
+                className="pointer-events-none absolute left-[-38%] top-1/2 z-0 h-[48px] w-auto -translate-y-1/2 select-none opacity-95"
+              />
+
+              <img
+                src={nextSlotItem.src}
+                alt=""
+                aria-hidden="true"
+                draggable={false}
+                className="pointer-events-none absolute right-[-38%] top-1/2 z-0 h-[48px] w-auto -translate-y-1/2 select-none opacity-95"
+              />
+
+              <button
+                type="button"
+                onClick={() => handleClick(currentSlotItem)}
+                aria-label={currentSlotItem.alt}
+                className="absolute left-1/2 top-1/2 z-20 h-[48px] -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform duration-200 active:scale-[0.99]"
+              >
+                <img
+                  src={currentSlotItem.src}
+                  alt={currentSlotItem.alt}
+                  draggable={false}
+                  className="pointer-events-none block h-[48px] w-auto object-contain select-none"
+                />
+              </button>
+            </div>
+
+            {isLoggedIn ? (
+              <div className="shrink-0">
+                <MemberButton profileImage={profileImage} compact />
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleClick(navItems[navItems.length - 1])}
+                className="shrink-0 rounded-full bg-transparent transition-transform duration-300 hover:scale-105"
+              >
+                <img
+                  src="/nav/loggaIn.png"
+                  alt="Logga in"
+                  draggable={false}
+                  className="block h-[48px] w-auto object-contain"
+                />
+              </button>
+            )}
+          </div>
+
+          <div className="hidden flex-wrap items-center justify-center gap-3 sm:flex sm:gap-4 md:gap-5">
             {navItems.map((item) => {
               const isSectionActive =
                 item.type === "section" && active === item.id && pathname === "/";
