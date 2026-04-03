@@ -43,7 +43,7 @@ function MemberButtonComponent({
         <span
           className={[
             "ml-3 font-semibold tracking-wide text-[#e5d3a3]",
-            compact ? "text-[13px]" : "text-sm",
+            compact ? "text-[15px]" : "text-sm",
           ].join(" ")}
         >
           MIN SIDA
