@@ -206,6 +206,8 @@ function LeaderboardSectionComponent({
     }, {});
   }, [members]);
 
+  const hasAnyAllTimeData = allTimeHighlights.length > 0;
+
   return (
     <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-4 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-5">
       <div className="mb-3 flex items-center gap-2">
@@ -291,68 +293,13 @@ function LeaderboardSectionComponent({
         )}
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-[24px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_10px_22px_rgba(18,35,28,0.07)]">
-        <div className="pointer-events-none h-[88px] bg-[radial-gradient(circle_at_top_left,rgba(228,209,165,0.45),transparent_44%),linear-gradient(180deg,rgba(244,236,221,0.78)_0%,rgba(252,251,248,0)_100%)]" />
-
-        <div className="-mt-14 px-4 pb-4 sm:px-5 sm:pb-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <div className="text-[0.92rem] font-medium tracking-wide text-[#74685a]">
-                🏅 Historiska rekord
-              </div>
-              <h3 className="mt-1 text-[1.5rem] font-bold leading-none text-[#1f2937] sm:text-[1.7rem]">
-                All-time-high
-              </h3>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-[#6b7280]">
-                En levande highscore som alltid bygger på godkända catches i databasen.
-              </p>
-            </div>
-
-            <Link
-              href="/all-time-high"
-              className="shrink-0 rounded-full border border-[#d8d2c7] bg-white px-3.5 py-2 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
-            >
-              Öppna all-time-high
-            </Link>
-          </div>
-
-          <div className="mt-5 pointer-events-none relative">
-            <div className="h-px bg-gradient-to-r from-transparent via-[#d6c08a] to-transparent" />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#fcfbf8] px-3 text-base text-[#c8a85c]">
-              ✦
-            </div>
-          </div>
-
-          {allTimeHighlights.length === 0 ? (
-            <div className="mt-5 rounded-[20px] border border-dashed border-[#d8d2c7] bg-white/75 px-4 py-5 text-sm text-[#6b7280]">
-              All-time-high fylls automatiskt när det finns godkända catches i databasen.
-            </div>
-          ) : (
-            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {allTimeHighlights.map((item) => (
-                <div
-                  key={item.filter}
-                  className="rounded-[20px] border border-[#e5ddd0] bg-white/82 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]"
-                >
-                  <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#8b7460]">
-                    {item.title}
-                  </div>
-                  <div className="mt-1 truncate text-[1.05rem] font-bold leading-tight text-[#1f2937]">
-                    {item.winnerName}
-                  </div>
-                  <div className="mt-1 text-sm font-semibold text-[#31414b]">
-                    {formatWeight(item.filter, item.total)}
-                  </div>
-                  <div className="mt-1 text-[0.8rem] text-[#6b7280]">
-                    {item.filter === "bigfive"
-                      ? `${item.sourceCount || 0} fiskar i totalen`
-                      : item.detail || "Historiskt rekord"}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      <div className="mt-4">
+        <Link
+          href="/all-time-high"
+          className="flex min-h-[56px] w-full items-center justify-center rounded-[20px] border-[2.5px] border-[#d7b75a] bg-[linear-gradient(180deg,#fff8e7_0%,#f5ecd0_100%)] px-4 py-3 text-[1rem] font-bold text-[#4c3b17] shadow-[0_10px_22px_rgba(183,141,40,0.14),inset_0_1px_0_rgba(255,255,255,0.75)] transition hover:brightness-[1.02]"
+        >
+          {hasAnyAllTimeData ? "Öppna All-time-high" : "All-time-high"}
+        </Link>
       </div>
     </section>
   );

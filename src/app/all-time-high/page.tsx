@@ -48,18 +48,14 @@ function getSectionId(filter: LeaderboardFilter) {
 
 function getCardCopy(item: AllTimeHighlight) {
   if (item.filter === "bigfive") {
-    if (item.sourceCount && item.sourceCount >= 5) {
-      return "Byggd på de fem bästa godkända fiskarna";
-    }
-
-    return `Byggd på ${item.sourceCount || 0} godkända fiskar hittills`;
+    return "Big Five";
   }
 
   if (item.filter === "fina" && item.detail) {
-    return `Art: ${item.detail}`;
+    return item.detail;
   }
 
-  return `Gren: ${item.title}`;
+  return item.title;
 }
 
 function EmptyAllTimeCard({ filter }: { filter: LeaderboardFilter }) {
@@ -74,7 +70,7 @@ function EmptyAllTimeCard({ filter }: { filter: LeaderboardFilter }) {
     <section id={getSectionId(filter)} className="scroll-mt-[360px]">
       <div className="rounded-[30px] border border-dashed border-[#d8d2c7] bg-[#fcfbf8] px-5 py-6 shadow-[0_10px_24px_rgba(18,35,28,0.05)] sm:px-6">
         <div className="text-[0.92rem] font-medium tracking-wide text-[#74685a]">
-          🏅 {titleMap[filter]}
+          {titleMap[filter]}
         </div>
         <h2 className="mt-2 text-[1.75rem] font-bold leading-none text-[#1f2937] sm:text-[1.95rem]">
           Ingen highscore ännu
@@ -129,15 +125,11 @@ function AllTimeCard({
           <div className="pl-[108px] sm:pl-[126px]">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="text-[0.95rem] font-medium tracking-wide text-[#74685a]">
-                  🏆 {item.title}
-                </div>
-
-                <h1 className="mt-1 text-[1.95rem] font-bold leading-[0.94] text-[#1f2937] sm:text-[2.15rem]">
+                <h1 className="text-[1.95rem] font-bold leading-[0.94] text-[#1f2937] sm:text-[2.15rem]">
                   {item.winnerName}
                 </h1>
 
-                <div className="mt-2 text-[1rem] font-medium text-[#74685a] sm:text-[1.05rem]">
+                <div className="mt-2 text-[1.2rem] font-medium leading-tight text-[#74685a] sm:text-[1.35rem]">
                   {getCardCopy(item)}
                 </div>
               </div>
@@ -242,9 +234,6 @@ export default function AllTimeHighPage() {
               <h1 className="mt-2 text-[2rem] font-bold leading-none text-[#1f2937] sm:text-[2.3rem]">
                 All-time-high
               </h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-[#6b7280] sm:text-[0.96rem]">
-                Här visas de högsta godkända resultaten genom tiderna. Vyn bygger direkt på catches och uppdateras automatiskt när ett nytt rekord slås.
-              </p>
             </div>
 
             <Link
@@ -255,7 +244,7 @@ export default function AllTimeHighPage() {
             </Link>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-2 overflow-x-auto pb-1">
+          <div className="mt-4 flex flex-wrap gap-2 overflow-x-auto pb-1">
             {sections.map((item) => (
               <a
                 key={item.value}
