@@ -26,6 +26,9 @@ export default function PendingCatchCard({
     item.compressed_image_size_bytes
   );
 
+  const isApproving = workingKey === `catch-approve-${item.id}`;
+  const isRejecting = workingKey === `catch-reject-${item.id}`;
+
   return (
     <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] p-4">
       <div className="flex flex-col gap-4 lg:flex-row">
@@ -75,19 +78,19 @@ export default function PendingCatchCard({
             <button
               type="button"
               onClick={() => onApprove(item.id)}
-              disabled={workingKey === `catch-approve-${item.id}`}
-              className="rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3e5d3b] disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isApproving}
+              className="min-w-[148px] rounded-full bg-[#324b2f] px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-[#3e5d3b] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {workingKey === `catch-approve-${item.id}` ? "Jobbar..." : "Godkänn fångst"}
+              {isApproving ? "Godkänner..." : "Godkänn fångst"}
             </button>
 
             <button
               type="button"
               onClick={() => onReject(item.id)}
-              disabled={workingKey === `catch-reject-${item.id}`}
-              className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isRejecting}
+              className="min-w-[110px] rounded-full border border-red-200 bg-white px-4 py-2 text-center text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {workingKey === `catch-reject-${item.id}` ? "Jobbar..." : "Ta bort"}
+              {isRejecting ? "Jobbar..." : "Ta bort"}
             </button>
           </div>
         </div>

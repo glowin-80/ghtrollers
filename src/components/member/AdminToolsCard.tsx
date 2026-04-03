@@ -14,6 +14,7 @@ import {
 } from "@/lib/admin-tools";
 import PendingMembersSection from "@/components/member/admin/PendingMembersSection";
 import PendingCatchesSection from "@/components/member/admin/PendingCatchesSection";
+import InlineMessage from "@/components/shared/InlineMessage";
 
 export default function AdminToolsCard() {
   const [pendingMembers, setPendingMembers] = useState<PendingMember[]>([]);
@@ -22,9 +23,24 @@ export default function AdminToolsCard() {
   const [loadingCatches, setLoadingCatches] = useState(true);
   const [workingKey, setWorkingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
 
   const pendingMembersCount = useMemo(() => pendingMembers.length, [pendingMembers]);
   const pendingCatchesCount = useMemo(() => pendingCatches.length, [pendingCatches]);
+
+  useEffect(() => {
+    if (!successToast) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setSuccessToast(null);
+    }, 3200);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [successToast]);
 
   const loadPendingMembers = useCallback(async () => {
     try {
@@ -117,6 +133,7 @@ export default function AdminToolsCard() {
       setError(null);
       await approvePendingCatch(catchId);
       setPendingCatches((prev) => prev.filter((item) => item.id !== catchId));
+      setSuccessToast("Fisken är Godkänd, på med ny mask och kör hårt!");
     } catch (err) {
       console.error(err);
       setError("Kunde inte godkänna fångsten.");
@@ -148,46 +165,60 @@ export default function AdminToolsCard() {
   }, []);
 
   return (
-    <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
-      <h2 className="text-3xl font-bold text-[#1f2937]">🛠️ Adminverktyg</h2>
-
-      <p className="mt-3 text-[#6b7280]">
-        Du är admin och kan hantera inkomna medlemsansökningar och väntande
-        fångster.
-      </p>
-
-      {error ? (
-        <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
+    <>
+      {successToast ? (
+        <div className="pointer-events-none fixed inset-x-4 top-4 z-[70] flex justify-center sm:inset-x-6">
+          <div className="pointer-events-auto w-full max-w-md shadow-[0_14px_36px_rgba(18,35,28,0.18)]">
+            <InlineMessage
+              variant="success"
+              message={successToast}
+              onDismiss={() => setSuccessToast(null)}
+            />
+          </div>
         </div>
       ) : null}
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-3 text-sm text-[#374151]">
-          Väntande medlemsansökningar: <span className="font-bold">{pendingMembersCount}</span>
+      <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+        <h2 className="text-3xl font-bold text-[#1f2937]">🛠️ Adminverktyg</h2>
+
+        <p className="mt-3 text-[#6b7280]">
+          Du är admin och kan hantera inkomna medlemsansökningar och väntande
+          fångster.
+        </p>
+
+        {error ? (
+          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        ) : null}
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-3 text-sm text-[#374151]">
+            Väntande medlemsansökningar: <span className="font-bold">{pendingMembersCount}</span>
+          </div>
+
+          <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-3 text-sm text-[#374151]">
+            Väntande fångster: <span className="font-bold">{pendingCatchesCount}</span>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-3 text-sm text-[#374151]">
-          Väntande fångster: <span className="font-bold">{pendingCatchesCount}</span>
-        </div>
-      </div>
+        <PendingMembersSection
+          pendingMembers={pendingMembers}
+          loading={loadingMembers}
+          workingKey={workingKey}
+          onApprove={approveMember}
+          onMakeAdmin={makeAdmin}
+          onReject={rejectMember}
+        />
 
-      <PendingMembersSection
-        pendingMembers={pendingMembers}
-        loading={loadingMembers}
-        workingKey={workingKey}
-        onApprove={approveMember}
-        onMakeAdmin={makeAdmin}
-        onReject={rejectMember}
-      />
-
-      <PendingCatchesSection
-        pendingCatches={pendingCatches}
-        loading={loadingCatches}
-        workingKey={workingKey}
-        onApprove={approveCatch}
-        onReject={rejectCatch}
-      />
-    </section>
+        <PendingCatchesSection
+          pendingCatches={pendingCatches}
+          loading={loadingCatches}
+          workingKey={workingKey}
+          onApprove={approveCatch}
+          onReject={rejectCatch}
+        />
+      </section>
+    </>
   );
 }
