@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
-
 import ProfileCard from "@/components/member/ProfileCard";
 import StatsGrid from "@/components/member/StatsGrid";
 import MyCatchesSection from "@/components/member/MyCatchesSection";
@@ -13,6 +12,8 @@ import PendingApprovalCard from "@/components/member/PendingApprovalCard";
 
 const REQUEST_TIMEOUT_MS = 15000;
 const SLOW_LOADING_HINT_MS = 8000;
+const MIN_RESUME_REFRESH_INTERVAL_MS = 4000;
+const HIDDEN_DURATION_BEFORE_RESUME_REFRESH_MS = 1500;
 
 function withTimeout<T>(
   promise: PromiseLike<T>,
@@ -38,6 +39,8 @@ function withTimeout<T>(
 
 export default function MinSidaPage() {
   const mountedRef = useRef(true);
+  const lastResumeRefreshAtRef = useRef(0);
+  const hiddenSinceRef = useRef<number | null>(null);
 
   const [pageLoading, setPageLoading] = useState(true);
   const [pageLoadingSlow, setPageLoadingSlow] = useState(false);
@@ -194,9 +197,60 @@ export default function MinSidaPage() {
     }
   }, [loadMemberCatches]);
 
+  const refreshAfterResume = useCallback(() => {
+    if (!mountedRef.current) return;
+
+    const now = Date.now();
+
+    if (now - lastResumeRefreshAtRef.current < MIN_RESUME_REFRESH_INTERVAL_MS) {
+      return;
+    }
+
+    lastResumeRefreshAtRef.current = now;
+    void loadPage();
+  }, [loadPage]);
+
   useEffect(() => {
     void loadPage();
   }, [loadPage]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        hiddenSinceRef.current = Date.now();
+        return;
+      }
+
+      const hiddenFor =
+        hiddenSinceRef.current === null
+          ? HIDDEN_DURATION_BEFORE_RESUME_REFRESH_MS
+          : Date.now() - hiddenSinceRef.current;
+
+      hiddenSinceRef.current = null;
+
+      if (hiddenFor >= HIDDEN_DURATION_BEFORE_RESUME_REFRESH_MS) {
+        refreshAfterResume();
+      }
+    };
+
+    const handleWindowFocus = () => {
+      refreshAfterResume();
+    };
+
+    const handlePageShow = () => {
+      refreshAfterResume();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleWindowFocus);
+    window.addEventListener("pageshow", handlePageShow);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleWindowFocus);
+      window.removeEventListener("pageshow", handlePageShow);
+    };
+  }, [refreshAfterResume]);
 
   const handleRetryPageLoad = useCallback(() => {
     void loadPage();
@@ -227,13 +281,18 @@ export default function MinSidaPage() {
       <main className="px-4 pb-8 pt-4">
         <div className="mx-auto max-w-5xl">
           <div className="rounded-[26px] border border-[#d8d2c7] bg-white/95 px-5 py-5 text-sm text-[#4b5563] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
-            <div className="font-medium text-[#374151]">Laddar medlemssidan...</div>
+            <div className="font-medium text-[#374151]">
+              Laddar medlemssidan...
+            </div>
 
             {pageLoadingSlow ? (
               <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-[#7a4b00]">
-                <div className="font-semibold">Det här tar längre tid än väntat.</div>
+                <div className="font-semibold">
+                  Det här tar längre tid än väntat.
+                </div>
                 <p className="mt-1">
-                  Om sidan öppnats från en genväg på telefonen kan en ny laddning hjälpa.
+                  Om sidan öppnats från en genväg på telefonen kan en ny laddning
+                  hjälpa.
                 </p>
 
                 <div className="mt-4 flex flex-wrap gap-3">
@@ -359,7 +418,8 @@ export default function MinSidaPage() {
           <section className="rounded-[26px] border border-amber-200 bg-white/95 p-5 text-[#7a4b00] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
             <div className="text-sm font-semibold">{catchesError}</div>
             <p className="mt-2 text-sm text-[#8a5a00]">
-              Resten av sidan fungerar, men fångstdelen kunde inte hämtas just nu.
+              Resten av sidan fungerar, men fångstdelen kunde inte hämtas just
+              nu.
             </p>
 
             <button

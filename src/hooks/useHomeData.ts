@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import {
@@ -8,8 +10,13 @@ import type { Catch, Member } from "@/types/home";
 
 export type MembershipStatus = "guest" | "pending" | "active";
 
+const MIN_RESUME_REFRESH_INTERVAL_MS = 4000;
+const HIDDEN_DURATION_BEFORE_RESUME_REFRESH_MS = 1500;
+
 export function useHomeData() {
   const mountedRef = useRef(true);
+  const lastResumeRefreshAtRef = useRef(0);
+  const hiddenSinceRef = useRef<number | null>(null);
 
   const [members, setMembers] = useState<Member[]>([]);
   const [approvedCatches, setApprovedCatches] = useState<Catch[]>([]);
@@ -130,6 +137,20 @@ export function useHomeData() {
     void loadAuthState();
   }, [loadAuthState, loadHomeData]);
 
+  const refreshAfterResume = useCallback(() => {
+    if (!mountedRef.current) return;
+
+    const now = Date.now();
+
+    if (now - lastResumeRefreshAtRef.current < MIN_RESUME_REFRESH_INTERVAL_MS) {
+      return;
+    }
+
+    lastResumeRefreshAtRef.current = now;
+    void loadAuthState();
+    void loadHomeData();
+  }, [loadAuthState, loadHomeData]);
+
   useEffect(() => {
     mountedRef.current = true;
 
@@ -160,11 +181,49 @@ export function useHomeData() {
       }
     });
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        hiddenSinceRef.current = Date.now();
+        return;
+      }
+
+      const hiddenFor =
+        hiddenSinceRef.current === null
+          ? HIDDEN_DURATION_BEFORE_RESUME_REFRESH_MS
+          : Date.now() - hiddenSinceRef.current;
+
+      hiddenSinceRef.current = null;
+
+      if (hiddenFor >= HIDDEN_DURATION_BEFORE_RESUME_REFRESH_MS) {
+        refreshAfterResume();
+      }
+    };
+
+    const handleWindowFocus = () => {
+      refreshAfterResume();
+    };
+
+    const handlePageShow = () => {
+      refreshAfterResume();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleWindowFocus);
+    window.addEventListener("pageshow", handlePageShow);
+
     return () => {
       mountedRef.current = false;
       subscription.unsubscribe();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleWindowFocus);
+      window.removeEventListener("pageshow", handlePageShow);
     };
-  }, [loadAuthState, loadHomeData, loadMembershipStatus]);
+  }, [
+    loadAuthState,
+    loadHomeData,
+    loadMembershipStatus,
+    refreshAfterResume,
+  ]);
 
   return {
     members,
