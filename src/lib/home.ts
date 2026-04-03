@@ -80,8 +80,59 @@ export function buildLeaderboard(
     }));
 }
 
+function getBigFiveScore(catchItem: Catch) {
+  return catchItem.fish_type === "Abborre"
+    ? catchItem.weight_g * 4
+    : catchItem.weight_g;
+}
+
+function getBigFiveLeader(catches: Catch[]) {
+  if (!catches.length) {
+    return null;
+  }
+
+  const groupedCatches: Record<string, Catch[]> = {};
+
+  catches.forEach((catchItem) => {
+    if (!groupedCatches[catchItem.caught_for]) {
+      groupedCatches[catchItem.caught_for] = [];
+    }
+
+    groupedCatches[catchItem.caught_for].push(catchItem);
+  });
+
+  const candidates = Object.entries(groupedCatches)
+    .map(([name, memberCatches]) => {
+      const topFiveCatches = [...memberCatches]
+        .sort((a, b) => getBigFiveScore(b) - getBigFiveScore(a))
+        .slice(0, 5);
+
+      const total = topFiveCatches.reduce(
+        (sum, catchItem) => sum + getBigFiveScore(catchItem),
+        0
+      );
+
+      const sortedDates = topFiveCatches
+        .map((catchItem) => catchItem.catch_date)
+        .filter(Boolean)
+        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+      const latestTopFiveDate = sortedDates[0] || null;
+
+      return {
+        name,
+        total,
+        sourceCount: topFiveCatches.length,
+        catchDate: latestTopFiveDate,
+      };
+    })
+    .sort((a, b) => b.total - a.total);
+
+  return candidates[0] || null;
+}
+
 export function buildAllTimeHighlights(catches: Catch[]): AllTimeHighlight[] {
-  const bigFiveLeader = buildLeaderboard(catches, "bigfive")[0];
+  const bigFiveLeader = getBigFiveLeader(catches);
   const largestPerch = [...catches]
     .filter((catchItem) => catchItem.fish_type === "Abborre")
     .sort((a, b) => b.weight_g - a.weight_g)[0];
@@ -101,6 +152,7 @@ export function buildAllTimeHighlights(catches: Catch[]): AllTimeHighlight[] {
       winnerName: bigFiveLeader.name,
       total: bigFiveLeader.total,
       sourceCount: bigFiveLeader.sourceCount,
+      catchDate: bigFiveLeader.catchDate,
     });
   }
 

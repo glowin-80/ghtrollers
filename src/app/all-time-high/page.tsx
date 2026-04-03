@@ -123,7 +123,7 @@ function AllTimeCard({
           </div>
 
           <div className="pl-[108px] sm:pl-[126px]">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1">
                 <h1 className="text-[1.95rem] font-bold leading-[0.94] text-[#1f2937] sm:text-[2.15rem]">
                   {item.winnerName}
@@ -132,12 +132,6 @@ function AllTimeCard({
                 <div className="mt-2 text-[1.2rem] font-medium leading-tight text-[#74685a] sm:text-[1.35rem]">
                   {getCardCopy(item)}
                 </div>
-              </div>
-
-              <div className="shrink-0 -translate-y-1 pt-1">
-                <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-sm font-medium text-[#5c4d3f] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
-                  All time
-                </span>
               </div>
             </div>
           </div>
@@ -166,7 +160,7 @@ function AllTimeCard({
                 Datum
               </div>
               <div className="mt-2 text-[1.02rem] font-semibold leading-snug text-[#374151]">
-                {item.filter === "bigfive" ? "Löpande total" : formatDate(item.catchDate)}
+                {formatDate(item.catchDate)}
               </div>
             </div>
           </div>
