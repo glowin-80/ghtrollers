@@ -187,6 +187,10 @@ export default function Header() {
   const activeMobileItem =
     sectionItems.find((item) => item.id === active) ?? sectionItems[0];
 
+  const mobileDropdownItems = sectionItems.filter(
+    (item) => item.id !== activeMobileItem.id
+  );
+
   function performNavigation(item: NavItem) {
     if (item.type === "section" && item.section) {
       setActive(item.id);
@@ -252,10 +256,7 @@ export default function Header() {
         className="sticky top-0 z-50 border-b border-black/10 bg-[#e5dccd]/95 backdrop-blur-md"
       >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
-          <div
-            ref={mobileMenuRef}
-            className="relative sm:hidden"
-          >
+          <div ref={mobileMenuRef} className="relative sm:hidden">
             <div className="flex items-center justify-center gap-3">
               <div className="min-w-0 flex-1">
                 <button
@@ -263,7 +264,7 @@ export default function Header() {
                   aria-expanded={isMobileMenuOpen}
                   aria-controls="mobile-nav-dropdown"
                   onClick={toggleMobileMenu}
-                  className="block w-full rounded-full bg-transparent transition-transform duration-200 active:scale-[0.99]"
+                  className="relative block w-full rounded-full bg-transparent transition-transform duration-200 active:scale-[0.99]"
                 >
                   <img
                     src={activeMobileItem.src}
@@ -271,6 +272,16 @@ export default function Header() {
                     draggable={false}
                     className="block h-[48px] w-full object-contain object-left"
                   />
+
+                  <span
+                    aria-hidden="true"
+                    className={[
+                      "pointer-events-none absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/18 px-1.5 py-1 text-[11px] text-[#f2e2b6] transition-all duration-200",
+                      isMobileMenuOpen ? "rotate-180" : "rotate-0",
+                    ].join(" ")}
+                  >
+                    ▼
+                  </span>
                 </button>
               </div>
 
@@ -299,35 +310,24 @@ export default function Header() {
               className={[
                 "overflow-hidden transition-all duration-300 ease-out",
                 isMobileMenuOpen
-                  ? "mt-2 max-h-[320px] opacity-100"
+                  ? "mt-2 max-h-[280px] opacity-100"
                   : "mt-0 max-h-0 opacity-0",
               ].join(" ")}
             >
               <div className="space-y-2 pb-1">
-                {sectionItems.map((item) => {
-                  const isActive =
-                    (item.type === "route" && item.href === pathname) ||
-                    (item.type === "section" &&
-                      pathname === "/" &&
-                      active === item.id);
-
+                {mobileDropdownItems.map((item) => {
                   return (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => handleClick(item)}
-                      className={[
-                        "block w-full rounded-full bg-transparent transition-all duration-200",
-                        isActive
-                          ? "scale-[1.01] opacity-100"
-                          : "opacity-95 hover:scale-[1.01]",
-                      ].join(" ")}
+                      className="block w-[90%] rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
                     >
                       <img
                         src={item.src}
                         alt={item.alt}
                         draggable={false}
-                        className="block h-[48px] w-full object-contain object-left"
+                        className="block h-[43px] w-full object-contain object-left"
                       />
                     </button>
                   );
