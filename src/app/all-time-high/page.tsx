@@ -123,7 +123,7 @@ function AllTimeCard({
           </div>
 
           <div className="pl-[108px] sm:pl-[126px]">
-            <div className="flex items-start gap-3">
+            <div className="flex min-h-[136px] items-start gap-3 sm:min-h-[150px]">
               <div className="min-w-0 flex-1">
                 <h1 className="text-[1.95rem] font-bold leading-[0.94] text-[#1f2937] sm:text-[2.15rem]">
                   {item.winnerName}
