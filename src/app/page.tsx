@@ -95,7 +95,7 @@ export default function Home() {
   }, [leaderboardCatches, filter]);
 
   const recentApprovedCatches = useMemo(() => {
-    return approvedCatches.slice(0, 5);
+    return approvedCatches.slice(0, 6);
   }, [approvedCatches]);
 
   const handleFilterChange = useCallback((value: LeaderboardFilter) => {
