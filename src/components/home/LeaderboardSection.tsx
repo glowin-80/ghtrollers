@@ -8,6 +8,9 @@ type LeaderboardSectionProps = {
   members: Member[];
   filter: LeaderboardFilter;
   onFilterChange: (value: LeaderboardFilter) => void;
+  selectedYear: string;
+  availableYears: string[];
+  onYearChange: (value: string) => void;
 };
 
 const filters: { label: string; value: LeaderboardFilter }[] = [
@@ -186,6 +189,9 @@ function LeaderboardSectionComponent({
   members,
   filter,
   onFilterChange,
+  selectedYear,
+  availableYears,
+  onYearChange,
 }: LeaderboardSectionProps) {
   const topThree = useMemo(() => leaderboard.slice(0, 3), [leaderboard]);
 
@@ -203,6 +209,31 @@ function LeaderboardSectionComponent({
         <h2 className="text-[1.95rem] font-bold leading-none text-[#1f2937]">
           Leaderboard
         </h2>
+      </div>
+
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#7b7468]">
+          År
+        </div>
+
+        <div className="relative shrink-0">
+          <select
+            value={selectedYear}
+            onChange={(e) => onYearChange(e.target.value)}
+            className="rounded-full border border-[#d8d2c7] bg-[#f7f4ee] px-4 py-2 pr-10 text-sm font-semibold text-[#4b5563] outline-none transition hover:bg-[#f1ece3] focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+            aria-label="Välj år för leaderboard"
+          >
+            {availableYears.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+
+          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#6b7280]">
+            ▼
+          </span>
+        </div>
       </div>
 
       <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
@@ -234,14 +265,18 @@ function LeaderboardSectionComponent({
               {getHeadline(filter)}
             </h3>
             <p className="mt-1 text-sm text-[#6b7280]">
-              Topp 3 just nu i vald kategori.
+              Topp 3 för {selectedYear}.
             </p>
           </div>
+
+          <span className="shrink-0 rounded-full bg-[#f2ede5] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#5c4d3f]">
+            {selectedYear}
+          </span>
         </div>
 
         {topThree.length === 0 ? (
           <div className="rounded-[20px] border border-dashed border-[#d8d2c7] bg-[#fbfaf7] px-4 py-6 text-sm text-[#6b7280]">
-            Inga godkända fångster ännu.
+            Inga godkända fångster ännu för {selectedYear}.
           </div>
         ) : (
           <div className="space-y-3">
