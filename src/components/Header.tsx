@@ -3,7 +3,7 @@
 import MemberButton from "@/components/shared/MemberButton";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { useAuthMember } from "@/hooks/useAuthMember";
 
 type NavItem = {
   id: string;
@@ -48,90 +48,11 @@ const sectionItems: NavItem[] = [
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+  const { isLoggedIn, profileImageUrl } = useAuthMember();
 
   const [active, setActive] = useState("leaderboard");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadSessionAndProfile() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!mounted) return;
-
-      setIsLoggedIn(!!session);
-
-      if (!session?.user?.email) {
-        setProfileImage(null);
-        return;
-      }
-
-      const { data: memberData, error } = await supabase
-        .from("members")
-        .select("profile_image_url")
-        .eq("email", session.user.email)
-        .maybeSingle();
-
-      if (error) {
-        console.error(error);
-        setProfileImage(null);
-        return;
-      }
-
-      setProfileImage(memberData?.profile_image_url || null);
-    }
-
-    loadSessionAndProfile();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setIsLoggedIn(!!session);
-
-      if (!session?.user?.email) {
-        setProfileImage(null);
-        return;
-      }
-
-      const { data: memberData, error } = await supabase
-        .from("members")
-        .select("profile_image_url")
-        .eq("email", session.user.email)
-        .maybeSingle();
-
-      if (error) {
-        console.error(error);
-        setProfileImage(null);
-        return;
-      }
-
-      setProfileImage(memberData?.profile_image_url || null);
-    });
-
-    function handleProfileImageUpdated(event: Event) {
-      const customEvent = event as CustomEvent<{ imageUrl?: string }>;
-      const imageUrl = customEvent.detail?.imageUrl || null;
-      setProfileImage(imageUrl);
-    }
-
-    window.addEventListener("profile-image-updated", handleProfileImageUpdated);
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-      window.removeEventListener(
-        "profile-image-updated",
-        handleProfileImageUpdated
-      );
-    };
-  }, []);
 
   useEffect(() => {
     if (pathname === "/galleri") {
@@ -256,51 +177,52 @@ export default function Header() {
         className="sticky top-0 z-50 border-b border-black/10 bg-[#e5dccd]/95 backdrop-blur-md"
       >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
-          <div ref={mobileMenuRef} className="relative sm:hidden">
-            <div className="flex items-center gap-[6px]">
-              <div className="min-w-0 flex-[0_1_54%]">
-                <button
-                  type="button"
-                  aria-expanded={isMobileMenuOpen}
-                  aria-controls="mobile-nav-dropdown"
-                  onClick={toggleMobileMenu}
-                  className="relative block w-full rounded-full bg-transparent transition-transform duration-200 active:scale-[0.99]"
-                >
-                  <img
-                    src={activeMobileItem.src}
-                    alt={activeMobileItem.alt}
-                    draggable={false}
-                    className="block h-[44px] w-full object-contain object-left"
-                  />
+          <div ref={mobileMenuRef} className="sm:hidden">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-nav-dropdown"
+                className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] px-4 py-2.5 text-left shadow-md transition hover:scale-[1.01]"
+              >
+                <span className="min-w-0 flex-1 truncate text-sm font-semibold uppercase tracking-[0.08em] text-[#e5d3a3]">
+                  {activeMobileItem.alt}
+                </span>
 
-                  <span
-                    aria-hidden="true"
-                    className={[
-                      "pointer-events-none absolute right-[30px] top-[85%] z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-[11px] font-bold leading-none text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
-                      isMobileMenuOpen ? "rotate-180" : "rotate-0",
-                    ].join(" ")}
+                <span
+                  className={[
+                    "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#bfa76a]/60 bg-[#243320] text-[#e5d3a3] transition-transform duration-300",
+                    isMobileMenuOpen ? "rotate-180" : "rotate-0",
+                  ].join(" ")}
+                  aria-hidden="true"
+                >
+                  <svg
+                    viewBox="0 0 20 20"
+                    className="h-4 w-4"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    ▼
-                  </span>
-                </button>
-              </div>
+                    <path
+                      d="M5 7.5L10 12.5L15 7.5"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </button>
 
               {isLoggedIn ? (
-                <div className="shrink-0">
-                  <MemberButton profileImage={profileImage} compact />
-                </div>
+                <MemberButton profileImage={profileImageUrl} compact />
               ) : (
                 <button
                   type="button"
                   onClick={() => handleClick(navItems[navItems.length - 1])}
-                  className="shrink-0 rounded-full bg-transparent transition-transform duration-300 hover:scale-105"
+                  className="shrink-0 rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] px-4 py-[13px] text-sm font-semibold uppercase tracking-[0.08em] text-[#e5d3a3] shadow-md transition hover:scale-[1.01]"
                 >
-                  <img
-                    src="/nav/loggaIn.png"
-                    alt="Logga in"
-                    draggable={false}
-                    className="block h-[44px] w-auto object-contain"
-                  />
+                  Logga in
                 </button>
               )}
             </div>
@@ -321,14 +243,9 @@ export default function Header() {
                       key={item.id}
                       type="button"
                       onClick={() => handleClick(item)}
-                      className="block w-[90%] rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
+                      className="flex w-full items-center justify-center rounded-[24px] border border-[#d6c8af] bg-[#f6f0e4] px-4 py-2.5 text-center text-[0.92rem] font-semibold text-[#2f3b2a] shadow-sm transition hover:bg-[#efe6d5]"
                     >
-                      <img
-                        src={item.src}
-                        alt={item.alt}
-                        draggable={false}
-                        className="block h-[40px] w-full object-contain object-left"
-                      />
+                      {item.alt}
                     </button>
                   );
                 })}
@@ -336,38 +253,10 @@ export default function Header() {
             </div>
           </div>
 
-          <div className="hidden flex-wrap items-center justify-center gap-3 sm:flex sm:gap-4 md:gap-5">
+          <nav className="hidden sm:flex sm:items-center sm:justify-center sm:gap-3">
             {navItems.map((item) => {
-              const isSectionActive =
-                item.type === "section" &&
-                active === item.id &&
-                pathname === "/";
-
-              const isRouteActive =
-                item.type === "route" && item.href === pathname;
-
-              const isActive = isSectionActive || isRouteActive;
-
-              if (item.id === "account") {
-                return isLoggedIn ? (
-                  <div key={item.id} className="flex items-center">
-                    <MemberButton profileImage={profileImage} />
-                  </div>
-                ) : (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => handleClick(item)}
-                    className="rounded-full bg-transparent opacity-95 transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]"
-                  >
-                    <img
-                      src="/nav/loggaIn.png"
-                      alt="Logga in"
-                      draggable={false}
-                      className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]"
-                    />
-                  </button>
-                );
+              if (item.id === "account" && isLoggedIn) {
+                return <MemberButton key={item.id} profileImage={profileImageUrl} />;
               }
 
               return (
@@ -376,23 +265,20 @@ export default function Header() {
                   type="button"
                   onClick={() => handleClick(item)}
                   className={[
-                    "rounded-full bg-transparent transition-all duration-300",
-                    "hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]",
-                    isActive
-                      ? "scale-105 drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]"
-                      : "opacity-95",
+                    "group relative overflow-hidden rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] px-3 py-2 shadow-md transition hover:scale-[1.03]",
+                    active === item.id ? "ring-2 ring-[#d6c28a]" : "",
                   ].join(" ")}
                 >
                   <img
                     src={item.src}
                     alt={item.alt}
+                    className="h-9 w-auto object-contain"
                     draggable={false}
-                    className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]"
                   />
                 </button>
               );
             })}
-          </div>
+          </nav>
         </div>
       </div>
     </>

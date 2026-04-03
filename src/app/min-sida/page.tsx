@@ -1,162 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
-import type { MemberCatch, MemberProfile } from "@/types/member-page";
 import ProfileCard from "@/components/member/ProfileCard";
 import StatsGrid from "@/components/member/StatsGrid";
 import MyCatchesSection from "@/components/member/MyCatchesSection";
 import AdminToolsCard from "@/components/member/AdminToolsCard";
 import PendingApprovalCard from "@/components/member/PendingApprovalCard";
+import { useMemberPageData } from "@/hooks/useMemberPageData";
+import { signOutMember } from "@/lib/member-service";
 
 export default function MinSidaPage() {
-  const mountedRef = useRef(true);
-
-  const [pageLoading, setPageLoading] = useState(true);
-  const [catchesLoading, setCatchesLoading] = useState(false);
-
-  const [member, setMember] = useState<MemberProfile | null>(null);
-  const [catches, setCatches] = useState<MemberCatch[]>([]);
-
-  const [error, setError] = useState<string | null>(null);
-  const [catchesError, setCatchesError] = useState<string | null>(null);
-
-  useEffect(() => {
-    mountedRef.current = true;
-
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
-  const loadMemberCatches = useCallback(async (memberName: string) => {
-    try {
-      if (mountedRef.current) {
-        setCatchesLoading(true);
-        setCatchesError(null);
-      }
-
-      const { data: catchesData, error: catchesLoadError } = await supabase
-        .from("catches")
-        .select(
-          "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, status, created_at"
-        )
-        .or(`caught_for.eq.${memberName},registered_by.eq.${memberName}`)
-        .order("catch_date", { ascending: false });
-
-      if (catchesLoadError) {
-        throw catchesLoadError;
-      }
-
-      if (!mountedRef.current) return;
-
-      setCatches(catchesData || []);
-    } catch (err) {
-      console.error(err);
-
-      if (!mountedRef.current) return;
-
-      setCatches([]);
-      setCatchesError("Kunde inte ladda dina fångster just nu.");
-    } finally {
-      if (mountedRef.current) {
-        setCatchesLoading(false);
-      }
-    }
-  }, []);
-
-  const loadPage = useCallback(async () => {
-    try {
-      if (mountedRef.current) {
-        setPageLoading(true);
-        setError(null);
-        setCatchesError(null);
-      }
-
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        throw sessionError;
-      }
-
-      if (!session?.user) {
-        if (!mountedRef.current) return;
-
-        setMember(null);
-        setCatches([]);
-        setPageLoading(false);
-        return;
-      }
-
-      const user = session.user;
-
-      const { data: memberData, error: memberError } = await supabase
-        .from("members")
-        .select("id, name, email, is_admin, is_active, profile_image_url")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (memberError) {
-        throw memberError;
-      }
-
-      const resolvedMember: MemberProfile = memberData
-        ? memberData
-        : {
-            id: user.id,
-            name:
-              (user.user_metadata?.name as string | undefined) ||
-              user.email ||
-              "Medlem",
-            email: user.email,
-            is_admin: false,
-            is_active: false,
-            profile_image_url: null,
-          };
-
-      if (!mountedRef.current) return;
-
-      setMember(resolvedMember);
-      setPageLoading(false);
-
-      if (!resolvedMember.is_active) {
-        setCatches([]);
-        return;
-      }
-
-      await loadMemberCatches(resolvedMember.name || "");
-    } catch (err) {
-      console.error(err);
-
-      if (!mountedRef.current) return;
-
-      setError("Kunde inte ladda medlemssidan.");
-      setPageLoading(false);
-    }
-  }, [loadMemberCatches]);
-
-  useEffect(() => {
-    loadPage();
-  }, [loadPage]);
+  const {
+    pageLoading,
+    catchesLoading,
+    member,
+    catches,
+    error,
+    catchesError,
+    loadMemberCatches,
+    handleProfileImageUploaded,
+  } = useMemberPageData();
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await signOutMember();
     window.location.href = "/";
-  }
-
-  function handleProfileImageUploaded(imageUrl: string) {
-    setMember((prev) => {
-      if (!prev) return prev;
-
-      return {
-        ...prev,
-        profile_image_url: imageUrl,
-      };
-    });
   }
 
   if (pageLoading) {
