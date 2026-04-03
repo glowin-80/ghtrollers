@@ -31,6 +31,7 @@ export default function Home() {
     gpsLoading,
     gpsError,
     formMessage,
+    validationErrors,
     confirmMissingLocationOpen,
     mapOpen,
     previewUrl,
@@ -158,6 +159,7 @@ export default function Home() {
             gpsLoading={gpsLoading}
             gpsError={gpsError}
             formMessage={formMessage}
+            validationErrors={validationErrors}
             confirmMissingLocationOpen={confirmMissingLocationOpen}
             mapOpen={mapOpen}
             previewUrl={previewUrl}
