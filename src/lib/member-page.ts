@@ -2,6 +2,7 @@ import type {
   BestFineFishBySpecies,
   MemberCatch,
   MemberStats,
+  SpeciesAggregateStat,
 } from "@/types/member-page";
 
 export function formatWeight(weightG: number | null | undefined): string {
@@ -89,25 +90,54 @@ export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
 
   const sum = (arr: MemberCatch[]) => arr.reduce((s, c) => s + c.weight_g, 0);
 
-  const speciesMap: Record<string, { count: number; weight: number }> = {};
+  const fineSpeciesMap: Record<string, { count: number; weight: number }> = {};
   const bestFineFishBySpeciesMap: Record<string, number> = {};
+  const speciesAggregateMap: Record<string, { count: number; weight: number }> = {};
 
-  fine.forEach((c) => {
-    const key = normalizeFineFishSpeciesName(c.fine_fish_type);
-
-    if (!speciesMap[key]) {
-      speciesMap[key] = { count: 0, weight: 0 };
+  perch.forEach((c) => {
+    if (!speciesAggregateMap.Abborre) {
+      speciesAggregateMap.Abborre = { count: 0, weight: 0 };
     }
 
-    speciesMap[key].count += 1;
-    speciesMap[key].weight += c.weight_g;
-
-    if (!bestFineFishBySpeciesMap[key] || c.weight_g > bestFineFishBySpeciesMap[key]) {
-      bestFineFishBySpeciesMap[key] = c.weight_g;
-    }
+    speciesAggregateMap.Abborre.count += 1;
+    speciesAggregateMap.Abborre.weight += c.weight_g;
   });
 
-  const fineFishSpeciesStats = Object.entries(speciesMap)
+  pike.forEach((c) => {
+    if (!speciesAggregateMap.Gädda) {
+      speciesAggregateMap.Gädda = { count: 0, weight: 0 };
+    }
+
+    speciesAggregateMap.Gädda.count += 1;
+    speciesAggregateMap.Gädda.weight += c.weight_g;
+  });
+
+  fine.forEach((c) => {
+    const species = normalizeFineFishSpeciesName(c.fine_fish_type);
+
+    if (!fineSpeciesMap[species]) {
+      fineSpeciesMap[species] = { count: 0, weight: 0 };
+    }
+
+    fineSpeciesMap[species].count += 1;
+    fineSpeciesMap[species].weight += c.weight_g;
+
+    if (
+      !bestFineFishBySpeciesMap[species] ||
+      c.weight_g > bestFineFishBySpeciesMap[species]
+    ) {
+      bestFineFishBySpeciesMap[species] = c.weight_g;
+    }
+
+    if (!speciesAggregateMap[species]) {
+      speciesAggregateMap[species] = { count: 0, weight: 0 };
+    }
+
+    speciesAggregateMap[species].count += 1;
+    speciesAggregateMap[species].weight += c.weight_g;
+  });
+
+  const fineFishSpeciesStats = Object.entries(fineSpeciesMap)
     .map(([species, data]) => ({
       species,
       count: data.count,
@@ -137,6 +167,23 @@ export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
       return a.species.localeCompare(b.species, "sv");
     });
 
+  const speciesAggregateStats: SpeciesAggregateStat[] = Object.entries(
+    speciesAggregateMap
+  )
+    .map(([species, data]) => ({
+      species,
+      count: data.count,
+      totalWeight: formatWeight(data.weight),
+      totalWeightG: data.weight,
+    }))
+    .sort((a, b) => {
+      if (b.totalWeightG !== a.totalWeightG) {
+        return b.totalWeightG - a.totalWeightG;
+      }
+
+      return a.species.localeCompare(b.species, "sv");
+    });
+
   return {
     totalCatches: catches.length,
     approvedCatches: approved.length,
@@ -161,5 +208,6 @@ export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
 
     fineFishSpeciesStats,
     bestFineFishBySpecies,
+    speciesAggregateStats,
   };
 }

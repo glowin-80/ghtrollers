@@ -13,11 +13,9 @@ type CatchYearFilter = "all" | string;
 function StatCard({
   title,
   value,
-  emphasis = "normal",
 }: {
   title: string;
   value: string | number;
-  emphasis?: "normal" | "strong";
 }) {
   return (
     <div className="rounded-[20px] border border-[#ddd8cf] bg-[#fffdfb] px-3.5 py-3 shadow-sm">
@@ -25,12 +23,7 @@ function StatCard({
         {title}
       </div>
 
-      <div
-        className={[
-          "mt-2 break-words font-bold leading-tight text-[#1f2937]",
-          emphasis === "strong" ? "text-[1.45rem]" : "text-[1.2rem]",
-        ].join(" ")}
-      >
+      <div className="mt-2 break-words text-[1.2rem] font-bold leading-tight text-[#1f2937]">
         {value}
       </div>
     </div>
@@ -85,7 +78,7 @@ function YearFilterControls({
             value={selectedYear === "all" ? currentSwedenYear : selectedYear}
             onChange={(e) => onChange(e.target.value)}
             className="rounded-full border border-[#d8d2c7] bg-[#f7f4ee] px-4 py-2 pr-10 text-sm font-semibold text-[#4b5563] outline-none transition hover:bg-[#f1ece3] focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
-            aria-label="Välj år"
+            aria-label="Välj år för stats"
           >
             {availableYears.map((year) => (
               <option key={year} value={year}>
@@ -185,23 +178,15 @@ export default function StatsGrid({ catches }: Props) {
         ) : (
           <>
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <StatCard
-                title="Bästa Big Five"
-                value={stats.bestBigFive}
-                emphasis="strong"
-              />
-              <StatCard
-                title="Bästa Fina Fisken"
-                value={stats.bestFineFish}
-                emphasis="strong"
-              />
-              <StatCard title="Största Gäddan" value={stats.biggestPike} />
-              <StatCard title="Största Abborren" value={stats.biggestPerch} />
+              <StatCard title="Min bästa Big Five" value={stats.bestBigFive} />
+              <StatCard title="Min bästa Fina Fisken" value={stats.bestFineFish} />
+              <StatCard title="Min bästa Gädda" value={stats.biggestPike} />
+              <StatCard title="Min bästa Abborre" value={stats.biggestPerch} />
 
               {stats.bestFineFishBySpecies.map((item) => (
                 <StatCard
                   key={item.species}
-                  title={`Bästa ${item.species}`}
+                  title={`Min bästa ${item.species}`}
                   value={item.weight}
                 />
               ))}
@@ -235,55 +220,45 @@ export default function StatsGrid({ catches }: Props) {
                 </span>
               </div>
 
-              <div className="mt-4 space-y-4">
-                <div>
-                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#7b7468]">
-                    Antal
-                  </h4>
+              {stats.speciesAggregateStats.length > 0 ? (
+                <div className="mt-4 space-y-4">
+                  <div>
+                    <h4 className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#7b7468]">
+                      Antal
+                    </h4>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <StatCard title="Abborrar" value={stats.totalPerchCount} />
-                    <StatCard title="Gäddor" value={stats.totalPikeCount} />
-                    <StatCard title="Fina fisken" value={stats.totalFineFishCount} />
+                    <div className="grid grid-cols-2 gap-3">
+                      {stats.speciesAggregateStats.map((item) => (
+                        <StatCard
+                          key={`count-${item.species}`}
+                          title={item.species}
+                          value={item.count}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#7b7468]">
+                      Vikt
+                    </h4>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      {stats.speciesAggregateStats.map((item) => (
+                        <StatCard
+                          key={`weight-${item.species}`}
+                          title={item.species}
+                          value={item.totalWeight}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                <div>
-                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#7b7468]">
-                    Vikt
-                  </h4>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <StatCard title="Abborrar" value={stats.totalPerchWeight} />
-                    <StatCard title="Gäddor" value={stats.totalPikeWeight} />
-                    <StatCard title="Fina fisken" value={stats.totalFineFishWeight} />
-                  </div>
+              ) : (
+                <div className="mt-4 rounded-2xl border border-dashed border-[#d8d2c7] bg-[#faf8f4] p-5 text-sm text-[#6b7280]">
+                  Det finns inga godkända fångster att visa för det valda året.
                 </div>
-              </div>
-
-              {stats.fineFishSpeciesStats.length > 0 ? (
-                <div className="mt-5 rounded-[18px] border border-[#e7e0d4] bg-white px-4 py-4">
-                  <h4 className="text-sm font-semibold text-[#1f2937]">
-                    Fina fisken per art
-                  </h4>
-
-                  <div className="mt-3 space-y-2">
-                    {stats.fineFishSpeciesStats.map((item) => (
-                      <div
-                        key={item.species}
-                        className="flex items-center justify-between gap-3 border-b border-[#eee8de] pb-2 text-sm last:border-b-0 last:pb-0"
-                      >
-                        <span className="font-medium text-[#374151]">
-                          {item.species}
-                        </span>
-                        <span className="text-[#6b7280]">
-                          {item.count} st · {item.totalWeight}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
+              )}
             </div>
           </>
         )}
