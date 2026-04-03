@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { buildLeaderboard } from "@/lib/home";
+import {
+  buildAllTimeHighlights,
+  buildBigFiveBreakdowns,
+  buildLeaderboard,
+} from "@/lib/home";
 import type { LeaderboardFilter } from "@/types/home";
 import { useHomeData } from "@/hooks/useHomeData";
 import { useCatchUpload } from "@/hooks/useCatchUpload";
@@ -11,12 +15,8 @@ import RecentApprovedSection from "@/components/home/RecentApprovedSection";
 import MapPreviewSection from "@/components/home/MapPreviewSection";
 
 export default function Home() {
-  const {
-    members,
-    approvedCatches,
-    isLoggedIn,
-    hasActiveMembership,
-  } = useHomeData();
+  const { members, approvedCatches, isLoggedIn, hasActiveMembership } =
+    useHomeData();
 
   const {
     caughtFor,
@@ -94,6 +94,14 @@ export default function Home() {
     return buildLeaderboard(leaderboardCatches, filter);
   }, [leaderboardCatches, filter]);
 
+  const bigFiveBreakdowns = useMemo(() => {
+    return buildBigFiveBreakdowns(leaderboardCatches);
+  }, [leaderboardCatches]);
+
+  const allTimeHighlights = useMemo(() => {
+    return buildAllTimeHighlights(approvedCatches);
+  }, [approvedCatches]);
+
   const recentApprovedCatches = useMemo(() => {
     return approvedCatches.slice(0, 6);
   }, [approvedCatches]);
@@ -126,6 +134,8 @@ export default function Home() {
             selectedYear={selectedLeaderboardYear}
             availableYears={availableLeaderboardYears}
             onYearChange={handleLeaderboardYearChange}
+            allTimeHighlights={allTimeHighlights}
+            bigFiveBreakdowns={bigFiveBreakdowns}
           />
         </div>
 
