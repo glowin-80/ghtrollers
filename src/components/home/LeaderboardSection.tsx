@@ -90,9 +90,9 @@ function getPlacementBadge(index: number) {
       "bg-[#f4ece5] text-[#7a5633] border border-[#e3d3c5]",
     rowClass:
       "border-[#e6ddd5] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]",
-    avatarClass:
-      "border-[#d8b08d] ring-[#f3e8df] bg-[#fbfaf8]",
-    resultClass: "text-[#111827]",
+      avatarClass:
+        "border-[#d8b08d] ring-[#f3e8df] bg-[#fbfaf8]",
+      resultClass: "text-[#111827]",
   };
 }
 
@@ -211,7 +211,7 @@ function LeaderboardSectionComponent({
         </h2>
       </div>
 
-      <div className="mb-3 flex items-center justify-end">
+      <div className="mb-3 flex items-center justify-start">
         <div className="relative shrink-0">
           <select
             value={selectedYear}
