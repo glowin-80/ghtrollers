@@ -39,7 +39,7 @@ function RecentApprovedSectionComponent({
 }: RecentApprovedSectionProps) {
   return (
     <section className="rounded-[28px] border border-[#d6ddd7] bg-[#f6f5ef] p-4 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-5">
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-[1.75rem] font-bold leading-none text-[#152532]">
             🔥 Nya godkända fångster
@@ -51,7 +51,7 @@ function RecentApprovedSectionComponent({
 
         <Link
           href="/galleri"
-          className="shrink-0 rounded-full border border-[#d7d0c3] bg-white px-3 py-2 text-sm font-semibold text-[#31414b] transition hover:bg-[#f2efe8]"
+          className="shrink-0 self-start rounded-full border border-[#d7d0c3] bg-white px-3 py-2 text-sm font-semibold text-[#31414b] transition hover:bg-[#f2efe8]"
         >
           Öppna galleri
         </Link>
@@ -66,11 +66,11 @@ function RecentApprovedSectionComponent({
               key={item.id}
               className="overflow-hidden rounded-[22px] border border-[#cfd6cf] bg-white shadow-sm"
             >
-              <div className="flex min-h-[96px]">
+              <div className="flex h-[104px]">
                 <button
                   type="button"
                   onClick={() => item.image_url && onImageClick(item.image_url)}
-                  className="h-auto w-[104px] shrink-0 overflow-hidden bg-[#ebe7de] disabled:cursor-default"
+                  className="h-[104px] w-[104px] shrink-0 overflow-hidden bg-[#ebe7de] disabled:cursor-default"
                   disabled={!item.image_url}
                   aria-label={`Öppna bild för ${item.caught_for}`}
                 >
