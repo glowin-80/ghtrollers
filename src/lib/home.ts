@@ -1,5 +1,6 @@
 import type {
   AllTimeHighlight,
+  BigFiveBreakdown,
   Catch,
   LeaderboardEntry,
   LeaderboardFilter,
@@ -11,6 +12,64 @@ export const HOME_ACTIVE_MEMBERS_SELECT =
 export const HOME_APPROVED_CATCHES_SELECT =
   "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, latitude, longitude, status, created_at";
 
+function getBigFiveScore(catchItem: Catch) {
+  return catchItem.fish_type === "Abborre"
+    ? catchItem.weight_g * 4
+    : catchItem.weight_g;
+}
+
+function getFishLabel(catchItem: Catch) {
+  if (catchItem.fish_type === "Fina fisken" && catchItem.fine_fish_type) {
+    return catchItem.fine_fish_type;
+  }
+
+  return catchItem.fish_type;
+}
+
+export function buildBigFiveBreakdowns(catches: Catch[]): Record<string, BigFiveBreakdown> {
+  if (!catches.length) {
+    return {};
+  }
+
+  const groupedCatches: Record<string, Catch[]> = {};
+
+  catches.forEach((catchItem) => {
+    if (!groupedCatches[catchItem.caught_for]) {
+      groupedCatches[catchItem.caught_for] = [];
+    }
+
+    groupedCatches[catchItem.caught_for].push(catchItem);
+  });
+
+  return Object.fromEntries(
+    Object.entries(groupedCatches).map(([name, memberCatches]) => {
+      const topFiveCatches = [...memberCatches]
+        .sort((a, b) => getBigFiveScore(b) - getBigFiveScore(a))
+        .slice(0, 5);
+
+      const items = topFiveCatches.map((catchItem) => ({
+        catchId: catchItem.id,
+        fishLabel: getFishLabel(catchItem),
+        originalWeight: catchItem.weight_g,
+        adjustedWeight: getBigFiveScore(catchItem),
+        catchDate: catchItem.catch_date || null,
+        usesMultiplier: catchItem.fish_type === "Abborre",
+      }));
+
+      const total = items.reduce((sum, item) => sum + item.adjustedWeight, 0);
+
+      return [
+        name,
+        {
+          name,
+          total,
+          items,
+        },
+      ];
+    })
+  );
+}
+
 export function buildLeaderboard(
   catches: Catch[],
   filter: LeaderboardFilter
@@ -20,33 +79,15 @@ export function buildLeaderboard(
   }
 
   if (filter === "bigfive") {
-    const groupedScores: Record<string, number[]> = {};
+    const breakdowns = buildBigFiveBreakdowns(catches);
 
-    catches.forEach((catchItem) => {
-      const score =
-        catchItem.fish_type === "Abborre"
-          ? catchItem.weight_g * 4
-          : catchItem.weight_g;
-
-      if (!groupedScores[catchItem.caught_for]) {
-        groupedScores[catchItem.caught_for] = [];
-      }
-
-      groupedScores[catchItem.caught_for].push(score);
-    });
-
-    return Object.entries(groupedScores)
-      .map(([name, scores]) => {
-        const topFiveScores = [...scores].sort((a, b) => b - a).slice(0, 5);
-        const total = topFiveScores.reduce((sum, value) => sum + value, 0);
-
-        return {
-          name,
-          total,
-          detail: null,
-          sourceCount: topFiveScores.length,
-        };
-      })
+    return Object.values(breakdowns)
+      .map((entry) => ({
+        name: entry.name,
+        total: entry.total,
+        detail: null,
+        sourceCount: entry.items.length,
+      }))
       .sort((a, b) => b.total - a.total);
   }
 
@@ -80,49 +121,20 @@ export function buildLeaderboard(
     }));
 }
 
-function getBigFiveScore(catchItem: Catch) {
-  return catchItem.fish_type === "Abborre"
-    ? catchItem.weight_g * 4
-    : catchItem.weight_g;
-}
-
 function getBigFiveLeader(catches: Catch[]) {
-  if (!catches.length) {
-    return null;
-  }
-
-  const groupedCatches: Record<string, Catch[]> = {};
-
-  catches.forEach((catchItem) => {
-    if (!groupedCatches[catchItem.caught_for]) {
-      groupedCatches[catchItem.caught_for] = [];
-    }
-
-    groupedCatches[catchItem.caught_for].push(catchItem);
-  });
-
-  const candidates = Object.entries(groupedCatches)
-    .map(([name, memberCatches]) => {
-      const topFiveCatches = [...memberCatches]
-        .sort((a, b) => getBigFiveScore(b) - getBigFiveScore(a))
-        .slice(0, 5);
-
-      const total = topFiveCatches.reduce(
-        (sum, catchItem) => sum + getBigFiveScore(catchItem),
-        0
-      );
-
-      const sortedDates = topFiveCatches
-        .map((catchItem) => catchItem.catch_date)
-        .filter(Boolean)
-        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-
-      const latestTopFiveDate = sortedDates[0] || null;
+  const breakdowns = buildBigFiveBreakdowns(catches);
+  const candidates = Object.values(breakdowns)
+    .map((entry) => {
+      const latestTopFiveDate =
+        [...entry.items]
+          .map((item) => item.catchDate)
+          .filter(Boolean)
+          .sort((a, b) => new Date(b as string).getTime() - new Date(a as string).getTime())[0] || null;
 
       return {
-        name,
-        total,
-        sourceCount: topFiveCatches.length,
+        name: entry.name,
+        total: entry.total,
+        sourceCount: entry.items.length,
         catchDate: latestTopFiveDate,
       };
     })

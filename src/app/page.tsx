@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { buildAllTimeHighlights, buildLeaderboard } from "@/lib/home";
+import {
+  buildAllTimeHighlights,
+  buildBigFiveBreakdowns,
+  buildLeaderboard,
+} from "@/lib/home";
 import type { LeaderboardFilter } from "@/types/home";
 import { useHomeData } from "@/hooks/useHomeData";
 import { useCatchUpload } from "@/hooks/useCatchUpload";
@@ -90,6 +94,10 @@ export default function Home() {
     return buildLeaderboard(leaderboardCatches, filter);
   }, [leaderboardCatches, filter]);
 
+  const bigFiveBreakdowns = useMemo(() => {
+    return buildBigFiveBreakdowns(leaderboardCatches);
+  }, [leaderboardCatches]);
+
   const allTimeHighlights = useMemo(() => {
     return buildAllTimeHighlights(approvedCatches);
   }, [approvedCatches]);
@@ -127,6 +135,7 @@ export default function Home() {
             availableYears={availableLeaderboardYears}
             onYearChange={handleLeaderboardYearChange}
             allTimeHighlights={allTimeHighlights}
+            bigFiveBreakdowns={bigFiveBreakdowns}
           />
         </div>
 

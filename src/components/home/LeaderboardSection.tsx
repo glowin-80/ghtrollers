@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import type {
   AllTimeHighlight,
+  BigFiveBreakdown,
   LeaderboardEntry,
   LeaderboardFilter,
   Member,
@@ -18,6 +19,7 @@ type LeaderboardSectionProps = {
   availableYears: string[];
   onYearChange: (value: string) => void;
   allTimeHighlights: AllTimeHighlight[];
+  bigFiveBreakdowns: Record<string, BigFiveBreakdown>;
 };
 
 const filters: { label: string; value: LeaderboardFilter }[] = [
@@ -37,6 +39,22 @@ function formatWeight(filter: LeaderboardFilter, total: number) {
   }
 
   return `${total} g`;
+}
+
+function formatWeightFromGrams(weight: number) {
+  if (weight >= 1000) {
+    return `${(weight / 1000).toFixed(2)} kg`;
+  }
+
+  return `${weight} g`;
+}
+
+function formatDate(dateString?: string | null) {
+  if (!dateString) {
+    return "Saknas";
+  }
+
+  return new Intl.DateTimeFormat("sv-SE").format(new Date(dateString));
 }
 
 function getHeadline(filter: LeaderboardFilter) {
@@ -94,9 +112,61 @@ function getPlacementBadge(index: number) {
     badgeClass: "bg-[#f4ece5] text-[#7a5633] border border-[#e3d3c5]",
     rowClass:
       "border-[#e6ddd5] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]",
-      avatarClass: "border-[#d8b08d] ring-[#f3e8df] bg-[#fbfaf8]",
-      resultClass: "text-[#111827]",
+    avatarClass: "border-[#d8b08d] ring-[#f3e8df] bg-[#fbfaf8]",
+    resultClass: "text-[#111827]",
   };
+}
+
+function BigFiveBreakdownPanel({
+  breakdown,
+}: {
+  breakdown: BigFiveBreakdown;
+}) {
+  return (
+    <div className="mt-3 rounded-[18px] border border-[#dccb97] bg-white/72 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#7a6540]">
+          Underlag för Big Five
+        </div>
+        <div className="text-[0.78rem] font-semibold text-[#6c5b3d]">
+          Total: {formatWeightFromGrams(breakdown.total)}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {breakdown.items.map((item) => (
+          <div
+            key={item.catchId}
+            className="rounded-[16px] border border-[#eadfbe] bg-[#fffdf7] px-3 py-2.5"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[0.95rem] font-bold leading-tight text-[#1f2937]">
+                  {item.fishLabel}
+                </div>
+                <div className="mt-1 text-[0.8rem] text-[#6b7280]">
+                  {formatDate(item.catchDate)}
+                </div>
+              </div>
+
+              <div className="shrink-0 text-right">
+                <div className="text-[0.92rem] font-bold leading-tight text-[#1f2937]">
+                  {item.usesMultiplier
+                    ? `${formatWeightFromGrams(item.originalWeight)} ×4`
+                    : formatWeightFromGrams(item.originalWeight)}
+                </div>
+                <div className="mt-1 text-[0.78rem] font-semibold text-[#7a6540]">
+                  {item.usesMultiplier
+                    ? `Räknas som ${formatWeightFromGrams(item.adjustedWeight)}`
+                    : "Ingen justering"}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function LeaderboardRow({
@@ -104,17 +174,25 @@ function LeaderboardRow({
   index,
   filter,
   imageUrl,
+  bigFiveBreakdown,
+  isExpanded,
+  onToggleExpanded,
 }: {
   entry: LeaderboardEntry;
   index: number;
   filter: LeaderboardFilter;
   imageUrl: string | null;
+  bigFiveBreakdown?: BigFiveBreakdown;
+  isExpanded: boolean;
+  onToggleExpanded?: () => void;
 }) {
   const styles = getPlacementBadge(index);
   const secondaryText =
     filter === "fina" && entry.detail
       ? `${entry.detail} · ${getPlacementCopy(index)}`
       : getPlacementCopy(index);
+
+  const isBigFiveRow = filter === "bigfive" && bigFiveBreakdown && onToggleExpanded;
 
   return (
     <div
@@ -152,37 +230,83 @@ function LeaderboardRow({
         </div>
       </div>
 
-      <div className="mt-3 flex items-center gap-3">
-        <div className="relative shrink-0">
-          <div
-            className={[
-              "flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 ring-2",
-              styles.avatarClass,
-            ].join(" ")}
-          >
-            {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt={entry.name}
-                className="h-full w-full object-cover"
-                loading="lazy"
-                decoding="async"
-              />
-            ) : (
-              <span className="text-sm font-bold text-[#5b6470]">
-                {getInitials(entry.name)}
-              </span>
-            )}
+      {isBigFiveRow ? (
+        <button
+          type="button"
+          onClick={onToggleExpanded}
+          className="mt-3 flex w-full items-center gap-3 text-left"
+          aria-expanded={isExpanded}
+        >
+          <div className="relative shrink-0">
+            <div
+              className={[
+                "flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 ring-2",
+                styles.avatarClass,
+              ].join(" ")}
+            >
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={entry.name}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <span className="text-sm font-bold text-[#5b6470]">
+                  {getInitials(entry.name)}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-[1.35rem] font-extrabold leading-none text-[#1f2937] sm:text-[1.5rem]">
-            {entry.name}
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[1.35rem] font-extrabold leading-none text-[#1f2937] sm:text-[1.5rem]">
+              {entry.name}
+            </div>
+            <div className="mt-1 text-sm text-[#6b7280]">{secondaryText}</div>
+            <div className="mt-1.5 text-[0.78rem] font-semibold text-[#6c5b3d]">
+              {isExpanded ? "Dölj underlag" : "Visa underlag"}
+            </div>
           </div>
-          <div className="mt-1 text-sm text-[#6b7280]">{secondaryText}</div>
+        </button>
+      ) : (
+        <div className="mt-3 flex items-center gap-3">
+          <div className="relative shrink-0">
+            <div
+              className={[
+                "flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 ring-2",
+                styles.avatarClass,
+              ].join(" ")}
+            >
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={entry.name}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <span className="text-sm font-bold text-[#5b6470]">
+                  {getInitials(entry.name)}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[1.35rem] font-extrabold leading-none text-[#1f2937] sm:text-[1.5rem]">
+              {entry.name}
+            </div>
+            <div className="mt-1 text-sm text-[#6b7280]">{secondaryText}</div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {isBigFiveRow && isExpanded ? (
+        <BigFiveBreakdownPanel breakdown={bigFiveBreakdown} />
+      ) : null}
     </div>
   );
 }
@@ -196,8 +320,10 @@ function LeaderboardSectionComponent({
   availableYears,
   onYearChange,
   allTimeHighlights,
+  bigFiveBreakdowns,
 }: LeaderboardSectionProps) {
   const topThree = useMemo(() => leaderboard.slice(0, 3), [leaderboard]);
+  const [expandedBigFiveName, setExpandedBigFiveName] = useState<string | null>(null);
 
   const memberImageMap = useMemo(() => {
     return members.reduce<Record<string, string | null>>((acc, member) => {
@@ -207,6 +333,10 @@ function LeaderboardSectionComponent({
   }, [members]);
 
   const hasAnyAllTimeData = allTimeHighlights.length > 0;
+
+  const handleToggleExpanded = (name: string) => {
+    setExpandedBigFiveName((current) => (current === name ? null : name));
+  };
 
   return (
     <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-4 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-5">
@@ -273,7 +403,11 @@ function LeaderboardSectionComponent({
             <h3 className="text-[1.65rem] font-bold leading-none text-[#1f2937] sm:text-[1.85rem]">
               {getHeadline(filter)}
             </h3>
-            <p className="mt-1 text-sm text-[#6b7280]">Topp 3 för {selectedYear}.</p>
+            <p className="mt-1 text-sm text-[#6b7280]">
+              {filter === "bigfive"
+                ? "Tryck på ett resultat för att se underlaget."
+                : `Topp 3 för ${selectedYear}.`}
+            </p>
           </div>
 
           <span className="shrink-0 rounded-full bg-[#f2ede5] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#5c4d3f]">
@@ -294,6 +428,15 @@ function LeaderboardSectionComponent({
                 index={index}
                 filter={filter}
                 imageUrl={memberImageMap[entry.name] || null}
+                bigFiveBreakdown={
+                  filter === "bigfive" ? bigFiveBreakdowns[entry.name] : undefined
+                }
+                isExpanded={expandedBigFiveName === entry.name}
+                onToggleExpanded={
+                  filter === "bigfive"
+                    ? () => handleToggleExpanded(entry.name)
+                    : undefined
+                }
               />
             ))}
           </div>

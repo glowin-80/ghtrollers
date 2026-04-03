@@ -36,6 +36,21 @@ export type LeaderboardEntry = {
   sourceCount?: number;
 };
 
+export type BigFiveBreakdownItem = {
+  catchId: string;
+  fishLabel: string;
+  originalWeight: number;
+  adjustedWeight: number;
+  catchDate: string | null;
+  usesMultiplier: boolean;
+};
+
+export type BigFiveBreakdown = {
+  name: string;
+  total: number;
+  items: BigFiveBreakdownItem[];
+};
+
 export type AllTimeHighlight = {
   filter: LeaderboardFilter;
   title: string;
