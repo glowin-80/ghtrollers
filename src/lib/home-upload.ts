@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { compressImageFile } from "@/lib/image-processing";
 import type { UploadImageResult } from "@/types/home";
 import type {
   GpsErrorState,
@@ -96,41 +97,14 @@ export function getGeolocationErrorState(
 }
 
 export async function compressImage(file: File): Promise<File> {
-  const imageBitmap = await createImageBitmap(file);
-
-  const maxWidth = 1200;
-  const maxHeight = 1200;
-  const { width, height } = imageBitmap;
-
-  const scale = Math.min(maxWidth / width, maxHeight / height, 1);
-
-  const targetWidth = Math.round(width * scale);
-  const targetHeight = Math.round(height * scale);
-
-  const canvas = document.createElement("canvas");
-  canvas.width = targetWidth;
-  canvas.height = targetHeight;
-
-  const ctx = canvas.getContext("2d");
-
-  if (!ctx) {
-    throw new Error("Kunde inte skapa canvas-kontext.");
-  }
-
-  ctx.drawImage(imageBitmap, 0, 0, targetWidth, targetHeight);
-
-  const blob = await new Promise<Blob | null>((resolve) => {
-    canvas.toBlob(resolve, "image/jpeg", 0.78);
-  });
-
-  if (!blob) {
-    throw new Error("Kunde inte komprimera bilden.");
-  }
-
   const originalName = file.name.replace(/\.[^/.]+$/, "");
 
-  return new File([blob], `${originalName}.jpg`, {
-    type: "image/jpeg",
+  return compressImageFile(file, {
+    maxWidth: 1200,
+    maxHeight: 1200,
+    quality: 0.78,
+    outputType: "image/jpeg",
+    outputName: `${originalName}.jpg`,
   });
 }
 
