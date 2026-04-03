@@ -239,6 +239,10 @@ export default function Header() {
     setIsDragging(false);
     setSlotDirection(direction);
 
+    if (animationTimeoutRef.current !== null) {
+      window.clearTimeout(animationTimeoutRef.current);
+    }
+
     animationTimeoutRef.current = window.setTimeout(() => {
       setSlotIndex((current) =>
         direction === "prev"
@@ -288,40 +292,35 @@ export default function Header() {
   }
 
   function getSlideTranslatePercent(role: SlotRole) {
-    const base =
-      role === "prev" ? -64 : role === "next" ? 64 : 0;
+    const base = role === "prev" ? -64 : role === "next" ? 64 : 0;
 
     const animatedShift =
-      slotDirection === "next"
-        ? -64
-        : slotDirection === "prev"
-        ? 64
-        : 0;
+      slotDirection === "next" ? -64 : slotDirection === "prev" ? 64 : 0;
 
     return base + animatedShift;
   }
 
-  function getSlideStyle(role: SlotRole) {
+  function getAnimatedInnerStyle(role: SlotRole) {
     const translatePercent = getSlideTranslatePercent(role);
-    const extraPixels = slotDirection ? 0 : dragOffsetX;
+    const dragPixels = slotDirection ? 0 : dragOffsetX;
 
     return {
-      transform: `translate(-50%, -50%) translateX(calc(${translatePercent}% + ${extraPixels}px))`,
+      transform: `translateX(calc(${translatePercent}% + ${dragPixels}px))`,
     };
   }
 
-  function getSlideClassName(role: SlotRole) {
-    const isCurrent = role === "current";
+  function getOuterSlotClassName(role: SlotRole) {
+    const zIndexClass = role === "current" ? "z-20" : "z-10";
 
-    const zIndexClass =
-      role === "current" ? "z-20" : "z-10";
+    return [
+      "absolute inset-y-0 left-1/2 w-[86%] -translate-x-1/2",
+      "flex items-center justify-center",
+      zIndexClass,
+    ].join(" ");
+  }
 
-    const opacityClass =
-      isCurrent ? "opacity-100" : "opacity-100";
-
-    const scaleClass =
-      isCurrent ? "scale-100" : "scale-[0.96]";
-
+  function getAnimatedInnerClassName(role: SlotRole) {
+    const scaleClass = role === "current" ? "scale-100" : "scale-[0.96]";
     const transitionClass = isDragging
       ? ""
       : "transition-transform duration-200 ease-out";
@@ -331,9 +330,7 @@ export default function Header() {
       : transitionClass;
 
     return [
-      "absolute left-1/2 top-1/2 h-[48px] w-[86%] -translate-y-1/2 select-none",
-      zIndexClass,
-      opacityClass,
+      "flex h-[48px] w-full items-center justify-center",
       scaleClass,
       slotAnimationClass,
     ].join(" ");
@@ -390,52 +387,64 @@ export default function Header() {
                 type="button"
                 onClick={() => handleClick(previousSlotItem)}
                 aria-label={`${previousSlotItem.alt} (föregående)`}
-                className={getSlideClassName("prev")}
-                style={getSlideStyle("prev")}
+                className={getOuterSlotClassName("prev")}
                 disabled={!!slotDirection}
                 tabIndex={-1}
               >
-                <img
-                  src={previousSlotItem.src}
-                  alt=""
-                  aria-hidden="true"
-                  draggable={false}
-                  className="pointer-events-none block h-full w-full object-contain"
-                />
+                <div
+                  className={getAnimatedInnerClassName("prev")}
+                  style={getAnimatedInnerStyle("prev")}
+                >
+                  <img
+                    src={previousSlotItem.src}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                    className="pointer-events-none block h-[48px] w-auto max-w-none object-contain"
+                  />
+                </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleClick(currentSlotItem)}
                 aria-label={currentSlotItem.alt}
-                className={getSlideClassName("current")}
-                style={getSlideStyle("current")}
+                className={getOuterSlotClassName("current")}
                 disabled={!!slotDirection}
               >
-                <img
-                  src={currentSlotItem.src}
-                  alt={currentSlotItem.alt}
-                  draggable={false}
-                  className="pointer-events-none block h-full w-full object-contain"
-                />
+                <div
+                  className={getAnimatedInnerClassName("current")}
+                  style={getAnimatedInnerStyle("current")}
+                >
+                  <img
+                    src={currentSlotItem.src}
+                    alt={currentSlotItem.alt}
+                    draggable={false}
+                    className="pointer-events-none block h-[48px] w-auto max-w-none object-contain"
+                  />
+                </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleClick(nextSlotItem)}
                 aria-label={`${nextSlotItem.alt} (nästa)`}
-                className={getSlideClassName("next")}
-                style={getSlideStyle("next")}
+                className={getOuterSlotClassName("next")}
                 disabled={!!slotDirection}
                 tabIndex={-1}
               >
-                <img
-                  src={nextSlotItem.src}
-                  alt=""
-                  aria-hidden="true"
-                  draggable={false}
-                  className="pointer-events-none block h-full w-full object-contain"
-                />
+                <div
+                  className={getAnimatedInnerClassName("next")}
+                  style={getAnimatedInnerStyle("next")}
+                >
+                  <img
+                    src={nextSlotItem.src}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                    className="pointer-events-none block h-[48px] w-auto max-w-none object-contain"
+                  />
+                </div>
               </button>
             </div>
 
