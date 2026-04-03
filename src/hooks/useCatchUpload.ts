@@ -3,7 +3,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import {
   getGeolocationErrorState,
-  normalizeFineFishType,
+  normalizeFineFishTypeForSave,
+  normalizeFineFishTypeInput,
   uploadCatchImage,
 } from "@/lib/home-upload";
 import type {
@@ -108,7 +109,7 @@ export function useCatchUpload({
   }, []);
 
   const handleFineFishTypeChange = useCallback((value: string) => {
-    setFineFishType(normalizeFineFishType(value));
+    setFineFishType(normalizeFineFishTypeInput(value));
   }, []);
 
   const handleWeightChange = useCallback((value: string) => {
@@ -232,7 +233,7 @@ export function useCatchUpload({
         return;
       }
 
-      const normalizedFineFishType = normalizeFineFishType(fineFishType);
+      const normalizedFineFishType = normalizeFineFishTypeForSave(fineFishType);
 
       if (fishType === "Fina fisken" && !normalizedFineFishType) {
         setFormMessage({

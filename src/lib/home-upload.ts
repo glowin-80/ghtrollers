@@ -23,18 +23,34 @@ export function formatCatchDate(dateString: string) {
   }).format(date);
 }
 
-export function normalizeFineFishType(value: string): string {
-  const trimmed = value.trim().replace(/\s+/g, " ");
+function uppercaseFirstRealCharacter(value: string): string {
+  const firstNonWhitespaceIndex = value.search(/\S/);
 
-  if (!trimmed) {
+  if (firstNonWhitespaceIndex === -1) {
+    return value;
+  }
+
+  const lowerCased = value.toLocaleLowerCase("sv-SE");
+
+  return (
+    lowerCased.slice(0, firstNonWhitespaceIndex) +
+    lowerCased.charAt(firstNonWhitespaceIndex).toLocaleUpperCase("sv-SE") +
+    lowerCased.slice(firstNonWhitespaceIndex + 1)
+  );
+}
+
+export function normalizeFineFishTypeInput(value: string): string {
+  return uppercaseFirstRealCharacter(value);
+}
+
+export function normalizeFineFishTypeForSave(value: string): string {
+  const cleaned = value.trim().replace(/\s+/g, " ");
+
+  if (!cleaned) {
     return "";
   }
 
-  const lowerCased = trimmed.toLocaleLowerCase("sv-SE");
-
-  return (
-    lowerCased.charAt(0).toLocaleUpperCase("sv-SE") + lowerCased.slice(1)
-  );
+  return uppercaseFirstRealCharacter(cleaned);
 }
 
 export function detectMobileHelpPlatform(): MobileHelpPlatform {
