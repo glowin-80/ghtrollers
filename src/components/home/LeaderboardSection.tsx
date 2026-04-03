@@ -217,7 +217,7 @@ function LeaderboardSectionComponent({
         </h2>
       </div>
 
-      <div className="mb-3 flex items-center justify-start">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
         <div className="relative shrink-0">
           <select
             value={selectedYear}
@@ -236,6 +236,13 @@ function LeaderboardSectionComponent({
             ▼
           </span>
         </div>
+
+        <Link
+          href="/all-time-high"
+          className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full border-[2px] border-[#d7b75a] bg-[linear-gradient(180deg,#fff8e7_0%,#f5ecd0_100%)] px-4 py-2 text-sm font-bold text-[#4c3b17] shadow-[0_8px_18px_rgba(183,141,40,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] transition hover:brightness-[1.02]"
+        >
+          {hasAnyAllTimeData ? "All-time-high" : "All-time-high"}
+        </Link>
       </div>
 
       <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
@@ -291,15 +298,6 @@ function LeaderboardSectionComponent({
             ))}
           </div>
         )}
-      </div>
-
-      <div className="mt-4">
-        <Link
-          href="/all-time-high"
-          className="flex min-h-[56px] w-full items-center justify-center rounded-[20px] border-[2.5px] border-[#d7b75a] bg-[linear-gradient(180deg,#fff8e7_0%,#f5ecd0_100%)] px-4 py-3 text-[1rem] font-bold text-[#4c3b17] shadow-[0_10px_22px_rgba(183,141,40,0.14),inset_0_1px_0_rgba(255,255,255,0.75)] transition hover:brightness-[1.02]"
-        >
-          {hasAnyAllTimeData ? "Öppna All-time-high" : "All-time-high"}
-        </Link>
       </div>
     </section>
   );

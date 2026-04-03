@@ -152,7 +152,7 @@ function AllTimeCard({
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="rounded-[22px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+            <div className="rounded-[22px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:col-span-2">
               <div className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#8b7460]">
                 Resultat
               </div>
@@ -161,34 +161,12 @@ function AllTimeCard({
               </div>
             </div>
 
-            <div className="rounded-[22px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
-              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#8b7460]">
-                Detalj
-              </div>
-              <div className="mt-2 text-[1.02rem] font-semibold leading-snug text-[#374151]">
-                {item.filter === "bigfive"
-                  ? `${item.sourceCount || 0} fiskar i totalen`
-                  : item.detail || item.title}
-              </div>
-            </div>
-
-            <div className="rounded-[22px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+            <div className="rounded-[22px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:col-span-2">
               <div className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#8b7460]">
                 Datum
               </div>
               <div className="mt-2 text-[1.02rem] font-semibold leading-snug text-[#374151]">
                 {item.filter === "bigfive" ? "Löpande total" : formatDate(item.catchDate)}
-              </div>
-            </div>
-
-            <div className="rounded-[22px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
-              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#8b7460]">
-                Plats
-              </div>
-              <div className="mt-2 text-[1.02rem] font-semibold leading-snug text-[#374151]">
-                {item.filter === "bigfive"
-                  ? "Summering av bästa godkända fångsterna"
-                  : item.locationName || "Plats ej angiven"}
               </div>
             </div>
           </div>
