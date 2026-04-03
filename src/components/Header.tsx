@@ -1,7 +1,7 @@
 "use client";
 
 import MemberButton from "@/components/shared/MemberButton";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -48,9 +48,13 @@ const sectionItems: NavItem[] = [
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
+
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+
   const [active, setActive] = useState("leaderboard");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -129,6 +133,45 @@ export default function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    if (pathname === "/galleri") {
+      setActive("gallery");
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
+    if (pathname === "/") {
+      setIsMobileMenuOpen(false);
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    function handlePointerDown(event: MouseEvent | TouchEvent) {
+      if (!mobileMenuRef.current) return;
+
+      const target = event.target as Node | null;
+      if (target && !mobileMenuRef.current.contains(target)) {
+        setIsMobileMenuOpen(false);
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
   const navItems = useMemo<NavItem[]>(() => {
     return [
       ...sectionItems,
@@ -141,43 +184,58 @@ export default function Header() {
     ];
   }, [isLoggedIn]);
 
-  function scrollToSection(sectionId: string, itemId: string) {
-    setActive(itemId);
+  const activeMobileItem =
+    sectionItems.find((item) => item.id === active) ?? sectionItems[0];
 
-    const nav = document.getElementById("site-nav");
+  const mobileDropdownItems = sectionItems.filter(
+    (item) => item.id !== activeMobileItem.id
+  );
 
-    if (pathname !== "/") {
-      router.push(`/#${sectionId}`);
-      return;
-    }
-
-    const el = document.getElementById(sectionId);
-    if (!el) return;
-
-    const navHeight = nav ? nav.offsetHeight : 0;
-    const elementTop = el.getBoundingClientRect().top + window.scrollY;
-    const targetPosition = elementTop - navHeight - 20;
-
-    window.scrollTo({
-      top: targetPosition,
-      behavior: "smooth",
-    });
-  }
-
-  function handleClick(item: NavItem) {
+  function performNavigation(item: NavItem) {
     if (item.type === "section" && item.section) {
-      scrollToSection(item.section, item.id);
+      setActive(item.id);
+      setIsMobileMenuOpen(false);
+
+      const nav = document.getElementById("site-nav");
+
+      if (pathname !== "/") {
+        router.push(`/#${item.section}`);
+        return;
+      }
+
+      const el = document.getElementById(item.section);
+      if (!el) return;
+
+      const navHeight = nav ? nav.offsetHeight : 0;
+      const elementTop = el.getBoundingClientRect().top + window.scrollY;
+      const targetPosition = elementTop - navHeight - 20;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth",
+      });
       return;
     }
 
     if (item.type === "route" && item.href) {
+      setActive(item.id);
+      setIsMobileMenuOpen(false);
       router.push(item.href);
       return;
     }
 
     if (item.type === "action") {
+      setIsMobileMenuOpen(false);
       router.push(isLoggedIn ? "/min-sida" : "/login");
     }
+  }
+
+  function handleClick(item: NavItem) {
+    performNavigation(item);
+  }
+
+  function toggleMobileMenu() {
+    setIsMobileMenuOpen((prev) => !prev);
   }
 
   return (
@@ -198,10 +256,92 @@ export default function Header() {
         className="sticky top-0 z-50 border-b border-black/10 bg-[#e5dccd]/95 backdrop-blur-md"
       >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5">
+          <div ref={mobileMenuRef} className="relative sm:hidden">
+            <div className="flex items-center gap-[6px]">
+              <div className="min-w-0 flex-[0_1_54%]">
+                <button
+                  type="button"
+                  aria-expanded={isMobileMenuOpen}
+                  aria-controls="mobile-nav-dropdown"
+                  onClick={toggleMobileMenu}
+                  className="relative block w-full rounded-full bg-transparent transition-transform duration-200 active:scale-[0.99]"
+                >
+                  <img
+                    src={activeMobileItem.src}
+                    alt={activeMobileItem.alt}
+                    draggable={false}
+                    className="block h-[44px] w-full object-contain object-left"
+                  />
+
+                  <span
+                    aria-hidden="true"
+                    className={[
+                      "pointer-events-none absolute right-[30px] top-[85%] z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-[11px] font-bold leading-none text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
+                      isMobileMenuOpen ? "rotate-180" : "rotate-0",
+                    ].join(" ")}
+                  >
+                    ▼
+                  </span>
+                </button>
+              </div>
+
+              {isLoggedIn ? (
+                <div className="shrink-0">
+                  <MemberButton profileImage={profileImage} compact />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleClick(navItems[navItems.length - 1])}
+                  className="shrink-0 rounded-full bg-transparent transition-transform duration-300 hover:scale-105"
+                >
+                  <img
+                    src="/nav/loggaIn.png"
+                    alt="Logga in"
+                    draggable={false}
+                    className="block h-[44px] w-auto object-contain"
+                  />
+                </button>
+              )}
+            </div>
+
+            <div
+              id="mobile-nav-dropdown"
+              className={[
+                "overflow-hidden transition-all duration-300 ease-out",
+                isMobileMenuOpen
+                  ? "mt-2 max-h-[260px] opacity-100"
+                  : "mt-0 max-h-0 opacity-0",
+              ].join(" ")}
+            >
+              <div className="space-y-2 pb-1">
+                {mobileDropdownItems.map((item) => {
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => handleClick(item)}
+                      className="block w-[90%] rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
+                    >
+                      <img
+                        src={item.src}
+                        alt={item.alt}
+                        draggable={false}
+                        className="block h-[40px] w-full object-contain object-left"
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden flex-wrap items-center justify-center gap-3 sm:flex sm:gap-4 md:gap-5">
             {navItems.map((item) => {
               const isSectionActive =
-                item.type === "section" && active === item.id && pathname === "/";
+                item.type === "section" &&
+                active === item.id &&
+                pathname === "/";
 
               const isRouteActive =
                 item.type === "route" && item.href === pathname;
