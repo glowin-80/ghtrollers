@@ -190,34 +190,28 @@ export default function Header() {
   const nextSlotItem =
     sectionItems[getWrappedIndex(slotIndex + 1, sectionItems.length)];
 
-  function scrollToSection(sectionId: string, itemId: string) {
-    setActive(itemId);
-
-    const nav = document.getElementById("site-nav");
-
-    if (pathname !== "/") {
-      router.push(`/#${sectionId}`);
-      return;
-    }
-
-    const el = document.getElementById(sectionId);
-    if (!el) return;
-
-    const navHeight = nav ? nav.offsetHeight : 0;
-    const elementTop = el.getBoundingClientRect().top + window.scrollY;
-    const targetPosition = elementTop - navHeight - 20;
-
-    window.scrollTo({
-      top: targetPosition,
-      behavior: "smooth",
-    });
-  }
-
-  function handleClick(item: NavItem) {
-    if (slotDirection) return;
-
+  function performNavigation(item: NavItem) {
     if (item.type === "section" && item.section) {
-      scrollToSection(item.section, item.id);
+      setActive(item.id);
+
+      const nav = document.getElementById("site-nav");
+
+      if (pathname !== "/") {
+        router.push(`/#${item.section}`);
+        return;
+      }
+
+      const el = document.getElementById(item.section);
+      if (!el) return;
+
+      const navHeight = nav ? nav.offsetHeight : 0;
+      const elementTop = el.getBoundingClientRect().top + window.scrollY;
+      const targetPosition = elementTop - navHeight - 20;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth",
+      });
       return;
     }
 
@@ -232,8 +226,24 @@ export default function Header() {
     }
   }
 
-  function cycleSlot(direction: "prev" | "next") {
+  function handleClick(item: NavItem) {
     if (slotDirection) return;
+    performNavigation(item);
+  }
+
+  function cycleSlot(
+    direction: "prev" | "next",
+    options?: { navigateOnComplete?: boolean }
+  ) {
+    if (slotDirection) return;
+
+    const targetIndex =
+      direction === "prev"
+        ? getWrappedIndex(slotIndex - 1, sectionItems.length)
+        : getWrappedIndex(slotIndex + 1, sectionItems.length);
+
+    const targetItem = sectionItems[targetIndex];
+    const navigateOnComplete = options?.navigateOnComplete ?? false;
 
     setDragOffsetX(0);
     setIsDragging(false);
@@ -244,12 +254,12 @@ export default function Header() {
     }
 
     animationTimeoutRef.current = window.setTimeout(() => {
-      setSlotIndex((current) =>
-        direction === "prev"
-          ? getWrappedIndex(current - 1, sectionItems.length)
-          : getWrappedIndex(current + 1, sectionItems.length)
-      );
+      setSlotIndex(targetIndex);
       setSlotDirection(null);
+
+      if (navigateOnComplete) {
+        performNavigation(targetItem);
+      }
     }, SLOT_ANIMATION_MS);
   }
 
@@ -280,11 +290,11 @@ export default function Header() {
       setDragOffsetX(0);
 
       if (deltaX > 0) {
-        cycleSlot("prev");
+        cycleSlot("prev", { navigateOnComplete: true });
         return;
       }
 
-      cycleSlot("next");
+      cycleSlot("next", { navigateOnComplete: true });
       return;
     }
 
@@ -383,13 +393,9 @@ export default function Header() {
                 <span className="sr-only">Visa nästa</span>
               </button>
 
-              <button
-                type="button"
-                onClick={() => handleClick(previousSlotItem)}
-                aria-label={`${previousSlotItem.alt} (föregående)`}
+              <div
+                aria-hidden="true"
                 className={getOuterSlotClassName("prev")}
-                disabled={!!slotDirection}
-                tabIndex={-1}
               >
                 <div
                   className={getAnimatedInnerClassName("prev")}
@@ -398,12 +404,11 @@ export default function Header() {
                   <img
                     src={previousSlotItem.src}
                     alt=""
-                    aria-hidden="true"
                     draggable={false}
                     className="pointer-events-none block h-[48px] w-auto max-w-none object-contain"
                   />
                 </div>
-              </button>
+              </div>
 
               <button
                 type="button"
@@ -425,13 +430,9 @@ export default function Header() {
                 </div>
               </button>
 
-              <button
-                type="button"
-                onClick={() => handleClick(nextSlotItem)}
-                aria-label={`${nextSlotItem.alt} (nästa)`}
+              <div
+                aria-hidden="true"
                 className={getOuterSlotClassName("next")}
-                disabled={!!slotDirection}
-                tabIndex={-1}
               >
                 <div
                   className={getAnimatedInnerClassName("next")}
@@ -440,12 +441,11 @@ export default function Header() {
                   <img
                     src={nextSlotItem.src}
                     alt=""
-                    aria-hidden="true"
                     draggable={false}
                     className="pointer-events-none block h-[48px] w-auto max-w-none object-contain"
                   />
                 </div>
-              </button>
+              </div>
             </div>
 
             {isLoggedIn ? (
