@@ -276,7 +276,7 @@ export default function Header() {
                   <span
                     aria-hidden="true"
                     className={[
-                      "pointer-events-none absolute right-[30px] top-[80%] z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-[11px] font-bold leading-none text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
+                      "pointer-events-none absolute right-[30px] top-[85%] z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-[11px] font-bold leading-none text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
                       isMobileMenuOpen ? "rotate-180" : "rotate-0",
                     ].join(" ")}
                   >
