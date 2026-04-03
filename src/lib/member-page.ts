@@ -1,4 +1,9 @@
-import type { MemberCatch, MemberStats } from "@/types/member-page";
+import type {
+  BestFineFishBySpecies,
+  MemberCatch,
+  MemberStats,
+  SpeciesAggregateStat,
+} from "@/types/member-page";
 
 export function formatWeight(weightG: number | null | undefined): string {
   if (!weightG || weightG <= 0) {
@@ -43,6 +48,18 @@ export function getStatusClasses(status: string): string {
   return "bg-[#eef2f3] text-[#4b5563]";
 }
 
+function normalizeFineFishSpeciesName(value: string | null | undefined): string {
+  const raw = (value || "Okänd").trim();
+
+  if (!raw) {
+    return "Okänd";
+  }
+
+  const normalized = raw.toLowerCase();
+
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
 export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
   const approved = catches.filter((c) => c.status === "approved");
   const pending = catches.filter((c) => c.status === "pending");
@@ -66,39 +83,106 @@ export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
     c.fish_type === "Abborre" ? c.weight_g * 4 : c.weight_g
   );
 
-  const bestBigFive = scores
+  const bestBigFive = [...scores]
     .sort((a, b) => b - a)
     .slice(0, 5)
-    .reduce((sum, v) => sum + v, 0);
+    .reduce((sum, value) => sum + value, 0);
 
-  const sum = (arr: MemberCatch[]) =>
-    arr.reduce((s, c) => s + c.weight_g, 0);
+  const sum = (arr: MemberCatch[]) => arr.reduce((s, c) => s + c.weight_g, 0);
 
-  const speciesMap: Record<string, { count: number; weight: number }> = {};
+  const fineSpeciesMap: Record<string, { count: number; weight: number }> = {};
+  const bestFineFishBySpeciesMap: Record<string, number> = {};
+  const speciesAggregateMap: Record<string, { count: number; weight: number }> = {};
 
-  fine.forEach((c) => {
-    const raw = (c.fine_fish_type || "Okänd").trim();
-
-const normalized = raw.toLowerCase();
-
-const key =
-  normalized.charAt(0).toUpperCase() + normalized.slice(1);
-
-    if (!speciesMap[key]) {
-      speciesMap[key] = { count: 0, weight: 0 };
+  perch.forEach((c) => {
+    if (!speciesAggregateMap.Abborre) {
+      speciesAggregateMap.Abborre = { count: 0, weight: 0 };
     }
 
-    speciesMap[key].count += 1;
-    speciesMap[key].weight += c.weight_g;
+    speciesAggregateMap.Abborre.count += 1;
+    speciesAggregateMap.Abborre.weight += c.weight_g;
   });
 
-  const fineFishSpeciesStats = Object.entries(speciesMap)
+  pike.forEach((c) => {
+    if (!speciesAggregateMap.Gädda) {
+      speciesAggregateMap.Gädda = { count: 0, weight: 0 };
+    }
+
+    speciesAggregateMap.Gädda.count += 1;
+    speciesAggregateMap.Gädda.weight += c.weight_g;
+  });
+
+  fine.forEach((c) => {
+    const species = normalizeFineFishSpeciesName(c.fine_fish_type);
+
+    if (!fineSpeciesMap[species]) {
+      fineSpeciesMap[species] = { count: 0, weight: 0 };
+    }
+
+    fineSpeciesMap[species].count += 1;
+    fineSpeciesMap[species].weight += c.weight_g;
+
+    if (
+      !bestFineFishBySpeciesMap[species] ||
+      c.weight_g > bestFineFishBySpeciesMap[species]
+    ) {
+      bestFineFishBySpeciesMap[species] = c.weight_g;
+    }
+
+    if (!speciesAggregateMap[species]) {
+      speciesAggregateMap[species] = { count: 0, weight: 0 };
+    }
+
+    speciesAggregateMap[species].count += 1;
+    speciesAggregateMap[species].weight += c.weight_g;
+  });
+
+  const fineFishSpeciesStats = Object.entries(fineSpeciesMap)
     .map(([species, data]) => ({
       species,
       count: data.count,
       totalWeight: `${(data.weight / 1000).toFixed(2)} kg`,
     }))
-    .sort((a, b) => b.count - a.count);
+    .sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+
+      return a.species.localeCompare(b.species, "sv");
+    });
+
+  const bestFineFishBySpecies: BestFineFishBySpecies[] = Object.entries(
+    bestFineFishBySpeciesMap
+  )
+    .map(([species, weight]) => ({
+      species,
+      weight: formatWeight(weight),
+      weightG: weight,
+    }))
+    .sort((a, b) => {
+      if (b.weightG !== a.weightG) {
+        return b.weightG - a.weightG;
+      }
+
+      return a.species.localeCompare(b.species, "sv");
+    });
+
+  const speciesAggregateStats: SpeciesAggregateStat[] = Object.entries(
+    speciesAggregateMap
+  )
+    .map(([species, data]) => ({
+      species,
+      count: data.count,
+      totalWeight: formatWeight(data.weight),
+      totalWeightG: data.weight,
+    }))
+    .sort((a, b) => {
+      if (b.totalWeightG !== a.totalWeightG) {
+        return b.totalWeightG - a.totalWeightG;
+      }
+
+      return a.species.localeCompare(b.species, "sv");
+    });
 
   return {
     totalCatches: catches.length,
@@ -108,7 +192,7 @@ const key =
     biggestPike: formatWeight(biggestPike),
     biggestPerch: formatWeight(biggestPerch),
     bestFineFish: bestFine
-      ? `${bestFine.fine_fish_type || "Okänd"} - ${formatWeight(
+      ? `${normalizeFineFishSpeciesName(bestFine.fine_fish_type)} - ${formatWeight(
           bestFine.weight_g
         )}`
       : "-",
@@ -123,5 +207,7 @@ const key =
     totalFineFishWeight: formatWeight(sum(fine)),
 
     fineFishSpeciesStats,
+    bestFineFishBySpecies,
+    speciesAggregateStats,
   };
 }
