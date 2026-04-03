@@ -104,7 +104,7 @@ export default function Home() {
 
     const timeout = window.setTimeout(() => {
       setShowSlowLoadingHelp(true);
-    }, 1500);
+    }, 1600);
 
     return () => {
       window.clearTimeout(timeout);
