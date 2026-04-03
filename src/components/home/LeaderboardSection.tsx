@@ -1,7 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { memo, useMemo } from "react";
-import type { LeaderboardEntry, LeaderboardFilter, Member } from "@/types/home";
+import type {
+  AllTimeHighlight,
+  LeaderboardEntry,
+  LeaderboardFilter,
+  Member,
+} from "@/types/home";
 
 type LeaderboardSectionProps = {
   leaderboard: LeaderboardEntry[];
@@ -11,6 +17,7 @@ type LeaderboardSectionProps = {
   selectedYear: string;
   availableYears: string[];
   onYearChange: (value: string) => void;
+  allTimeHighlights: AllTimeHighlight[];
 };
 
 const filters: { label: string; value: LeaderboardFilter }[] = [
@@ -63,8 +70,7 @@ function getPlacementBadge(index: number) {
         "bg-[#4c3b17] text-[#f8e7a3] border border-[#6a5220]",
       rowClass:
         "border-[#d7b75a] bg-gradient-to-r from-[#fffaf0] via-[#fff6dd] to-[#f5e7b8] shadow-[0_12px_24px_rgba(183,141,40,0.14)]",
-      avatarClass:
-        "border-[#e5cb79] ring-[#f3e5ae]/70 bg-white",
+      avatarClass: "border-[#e5cb79] ring-[#f3e5ae]/70 bg-white",
       resultClass: "text-[#1f2937]",
     };
   }
@@ -77,8 +83,7 @@ function getPlacementBadge(index: number) {
         "bg-[#eef2f6] text-[#495563] border border-[#d8e0e8]",
       rowClass:
         "border-[#dde4ea] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]",
-      avatarClass:
-        "border-[#cfd7df] ring-[#edf1f4] bg-[#f9fafb]",
+      avatarClass: "border-[#cfd7df] ring-[#edf1f4] bg-[#f9fafb]",
       resultClass: "text-[#111827]",
     };
   }
@@ -86,13 +91,11 @@ function getPlacementBadge(index: number) {
   return {
     medal: "🥉",
     label: "3:e plats",
-    badgeClass:
-      "bg-[#f4ece5] text-[#7a5633] border border-[#e3d3c5]",
+    badgeClass: "bg-[#f4ece5] text-[#7a5633] border border-[#e3d3c5]",
     rowClass:
       "border-[#e6ddd5] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]",
-      avatarClass:
-        "border-[#d8b08d] ring-[#f3e8df] bg-[#fbfaf8]",
-      resultClass: "text-[#111827]",
+    avatarClass: "border-[#d8b08d] ring-[#f3e8df] bg-[#fbfaf8]",
+    resultClass: "text-[#111827]",
   };
 }
 
@@ -192,6 +195,7 @@ function LeaderboardSectionComponent({
   selectedYear,
   availableYears,
   onYearChange,
+  allTimeHighlights,
 }: LeaderboardSectionProps) {
   const topThree = useMemo(() => leaderboard.slice(0, 3), [leaderboard]);
 
@@ -260,9 +264,7 @@ function LeaderboardSectionComponent({
             <h3 className="text-[1.65rem] font-bold leading-none text-[#1f2937] sm:text-[1.85rem]">
               {getHeadline(filter)}
             </h3>
-            <p className="mt-1 text-sm text-[#6b7280]">
-              Topp 3 för {selectedYear}.
-            </p>
+            <p className="mt-1 text-sm text-[#6b7280]">Topp 3 för {selectedYear}.</p>
           </div>
 
           <span className="shrink-0 rounded-full bg-[#f2ede5] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#5c4d3f]">
@@ -287,6 +289,70 @@ function LeaderboardSectionComponent({
             ))}
           </div>
         )}
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-[24px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_10px_22px_rgba(18,35,28,0.07)]">
+        <div className="pointer-events-none h-[88px] bg-[radial-gradient(circle_at_top_left,rgba(228,209,165,0.45),transparent_44%),linear-gradient(180deg,rgba(244,236,221,0.78)_0%,rgba(252,251,248,0)_100%)]" />
+
+        <div className="-mt-14 px-4 pb-4 sm:px-5 sm:pb-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-[0.92rem] font-medium tracking-wide text-[#74685a]">
+                🏅 Historiska rekord
+              </div>
+              <h3 className="mt-1 text-[1.5rem] font-bold leading-none text-[#1f2937] sm:text-[1.7rem]">
+                All-time-high
+              </h3>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-[#6b7280]">
+                En levande highscore som alltid bygger på godkända catches i databasen.
+              </p>
+            </div>
+
+            <Link
+              href="/all-time-high"
+              className="shrink-0 rounded-full border border-[#d8d2c7] bg-white px-3.5 py-2 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
+            >
+              Öppna all-time-high
+            </Link>
+          </div>
+
+          <div className="mt-5 pointer-events-none relative">
+            <div className="h-px bg-gradient-to-r from-transparent via-[#d6c08a] to-transparent" />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#fcfbf8] px-3 text-base text-[#c8a85c]">
+              ✦
+            </div>
+          </div>
+
+          {allTimeHighlights.length === 0 ? (
+            <div className="mt-5 rounded-[20px] border border-dashed border-[#d8d2c7] bg-white/75 px-4 py-5 text-sm text-[#6b7280]">
+              All-time-high fylls automatiskt när det finns godkända catches i databasen.
+            </div>
+          ) : (
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {allTimeHighlights.map((item) => (
+                <div
+                  key={item.filter}
+                  className="rounded-[20px] border border-[#e5ddd0] bg-white/82 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]"
+                >
+                  <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#8b7460]">
+                    {item.title}
+                  </div>
+                  <div className="mt-1 truncate text-[1.05rem] font-bold leading-tight text-[#1f2937]">
+                    {item.winnerName}
+                  </div>
+                  <div className="mt-1 text-sm font-semibold text-[#31414b]">
+                    {formatWeight(item.filter, item.total)}
+                  </div>
+                  <div className="mt-1 text-[0.8rem] text-[#6b7280]">
+                    {item.filter === "bigfive"
+                      ? `${item.sourceCount || 0} fiskar i totalen`
+                      : item.detail || "Historiskt rekord"}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

@@ -33,6 +33,18 @@ export type LeaderboardEntry = {
   name: string;
   total: number;
   detail?: string | null;
+  sourceCount?: number;
+};
+
+export type AllTimeHighlight = {
+  filter: LeaderboardFilter;
+  title: string;
+  winnerName: string;
+  total: number;
+  detail?: string | null;
+  catchDate?: string | null;
+  locationName?: string | null;
+  sourceCount?: number;
 };
 
 export type UploadImageResult = {

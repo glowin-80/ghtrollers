@@ -1,4 +1,9 @@
-import type { Catch, LeaderboardEntry, LeaderboardFilter } from "@/types/home";
+import type {
+  AllTimeHighlight,
+  Catch,
+  LeaderboardEntry,
+  LeaderboardFilter,
+} from "@/types/home";
 
 export const HOME_ACTIVE_MEMBERS_SELECT =
   "id, name, category, profile_image_url";
@@ -39,6 +44,7 @@ export function buildLeaderboard(
           name,
           total,
           detail: null,
+          sourceCount: topFiveScores.length,
         };
       })
       .sort((a, b) => b.total - a.total);
@@ -70,5 +76,67 @@ export function buildLeaderboard(
       name: catchItem.caught_for,
       total: catchItem.weight_g,
       detail: filter === "fina" ? catchItem.fine_fish_type || null : null,
+      sourceCount: 1,
     }));
+}
+
+export function buildAllTimeHighlights(catches: Catch[]): AllTimeHighlight[] {
+  const bigFiveLeader = buildLeaderboard(catches, "bigfive")[0];
+  const largestPerch = [...catches]
+    .filter((catchItem) => catchItem.fish_type === "Abborre")
+    .sort((a, b) => b.weight_g - a.weight_g)[0];
+  const largestPike = [...catches]
+    .filter((catchItem) => catchItem.fish_type === "Gädda")
+    .sort((a, b) => b.weight_g - a.weight_g)[0];
+  const largestFineFish = [...catches]
+    .filter((catchItem) => catchItem.fish_type === "Fina fisken")
+    .sort((a, b) => b.weight_g - a.weight_g)[0];
+
+  const highlights: AllTimeHighlight[] = [];
+
+  if (bigFiveLeader) {
+    highlights.push({
+      filter: "bigfive",
+      title: "Big Five",
+      winnerName: bigFiveLeader.name,
+      total: bigFiveLeader.total,
+      sourceCount: bigFiveLeader.sourceCount,
+    });
+  }
+
+  if (largestPerch) {
+    highlights.push({
+      filter: "abborre",
+      title: "Abborre",
+      winnerName: largestPerch.caught_for,
+      total: largestPerch.weight_g,
+      catchDate: largestPerch.catch_date,
+      locationName: largestPerch.location_name || null,
+    });
+  }
+
+  if (largestPike) {
+    highlights.push({
+      filter: "gädda",
+      title: "Gädda",
+      winnerName: largestPike.caught_for,
+      total: largestPike.weight_g,
+      catchDate: largestPike.catch_date,
+      locationName: largestPike.location_name || null,
+    });
+  }
+
+  if (largestFineFish) {
+    highlights.push({
+      filter: "fina",
+      title: "Fina fisken",
+      winnerName: largestFineFish.caught_for,
+      total: largestFineFish.weight_g,
+      detail: largestFineFish.fine_fish_type || null,
+      catchDate: largestFineFish.catch_date,
+      locationName: largestFineFish.location_name || null,
+    });
+  }
+
+  return highlights;
 }
