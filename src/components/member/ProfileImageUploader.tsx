@@ -2,6 +2,11 @@
 
 import { useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { compressImageFile } from "@/lib/image-processing";
+import {
+  PROFILE_IMAGE_UPDATED_EVENT,
+  type ProfileImageUpdatedDetail,
+} from "@/lib/auth-member-events";
 import ProfileImageCropModal from "@/components/member/ProfileImageCropModal";
 
 type ProfileImageUploaderProps = {
@@ -19,39 +24,13 @@ export default function ProfileImageUploader({
   const [uploading, setUploading] = useState(false);
   const [rawImage, setRawImage] = useState<string | null>(null);
 
-  async function compressImage(file: File): Promise<File> {
-    const imageBitmap = await createImageBitmap(file);
-
-    const maxWidth = 800;
-    const maxHeight = 800;
-    const { width, height } = imageBitmap;
-
-    const scale = Math.min(maxWidth / width, maxHeight / height, 1);
-    const targetWidth = Math.round(width * scale);
-    const targetHeight = Math.round(height * scale);
-
-    const canvas = document.createElement("canvas");
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-
-    const ctx = canvas.getContext("2d");
-
-    if (!ctx) {
-      throw new Error("Kunde inte skapa canvas-kontext.");
-    }
-
-    ctx.drawImage(imageBitmap, 0, 0, targetWidth, targetHeight);
-
-    const blob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob(resolve, "image/jpeg", 0.86);
-    });
-
-    if (!blob) {
-      throw new Error("Kunde inte komprimera bilden.");
-    }
-
-    return new File([blob], "profile.jpg", {
-      type: "image/jpeg",
+  async function compressProfileImage(file: File): Promise<File> {
+    return compressImageFile(file, {
+      maxWidth: 800,
+      maxHeight: 800,
+      quality: 0.86,
+      outputType: "image/jpeg",
+      outputName: "profile.jpg",
     });
   }
 
@@ -74,7 +53,7 @@ export default function ProfileImageUploader({
     try {
       setUploading(true);
 
-      const compressedFile = await compressImage(file);
+      const compressedFile = await compressProfileImage(file);
       const filePath = `profiles/${memberId}.jpg`;
 
       const { error: uploadError } = await supabase.storage
@@ -107,7 +86,7 @@ export default function ProfileImageUploader({
 
       onUploaded(imageUrl);
       window.dispatchEvent(
-        new CustomEvent("profile-image-updated", {
+        new CustomEvent<ProfileImageUpdatedDetail>(PROFILE_IMAGE_UPDATED_EVENT, {
           detail: { imageUrl },
         })
       );

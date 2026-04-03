@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 import Header from "../components/Header";
+import AppProviders from "@/components/providers/AppProviders";
 
 export const metadata: Metadata = {
   title: "Gäddhäng Trollers",
@@ -45,8 +46,10 @@ export default function RootLayout({
           />
 
           <div className="relative z-10">
-            <Header />
-            {children}
+            <AppProviders>
+              <Header />
+              {children}
+            </AppProviders>
           </div>
         </div>
       </body>
