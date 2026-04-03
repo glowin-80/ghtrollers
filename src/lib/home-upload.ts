@@ -23,6 +23,20 @@ export function formatCatchDate(dateString: string) {
   }).format(date);
 }
 
+export function normalizeFineFishType(value: string): string {
+  const trimmed = value.trim().replace(/\s+/g, " ");
+
+  if (!trimmed) {
+    return "";
+  }
+
+  const lowerCased = trimmed.toLocaleLowerCase("sv-SE");
+
+  return (
+    lowerCased.charAt(0).toLocaleUpperCase("sv-SE") + lowerCased.slice(1)
+  );
+}
+
 export function detectMobileHelpPlatform(): MobileHelpPlatform {
   if (typeof navigator === "undefined") {
     return "iphone";
