@@ -211,11 +211,7 @@ function LeaderboardSectionComponent({
         </h2>
       </div>
 
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#7b7468]">
-          År
-        </div>
-
+      <div className="mb-3 flex items-center justify-end">
         <div className="relative shrink-0">
           <select
             value={selectedYear}
