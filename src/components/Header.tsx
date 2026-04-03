@@ -3,7 +3,7 @@
 import MemberButton from "@/components/shared/MemberButton";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { useAuthMember } from "@/hooks/useAuthMember";
 
 type NavItem = {
   id: string;
@@ -48,90 +48,11 @@ const sectionItems: NavItem[] = [
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+  const { isLoggedIn, profileImageUrl } = useAuthMember();
 
   const [active, setActive] = useState("leaderboard");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadSessionAndProfile() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!mounted) return;
-
-      setIsLoggedIn(!!session);
-
-      if (!session?.user?.email) {
-        setProfileImage(null);
-        return;
-      }
-
-      const { data: memberData, error } = await supabase
-        .from("members")
-        .select("profile_image_url")
-        .eq("email", session.user.email)
-        .maybeSingle();
-
-      if (error) {
-        console.error(error);
-        setProfileImage(null);
-        return;
-      }
-
-      setProfileImage(memberData?.profile_image_url || null);
-    }
-
-    loadSessionAndProfile();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setIsLoggedIn(!!session);
-
-      if (!session?.user?.email) {
-        setProfileImage(null);
-        return;
-      }
-
-      const { data: memberData, error } = await supabase
-        .from("members")
-        .select("profile_image_url")
-        .eq("email", session.user.email)
-        .maybeSingle();
-
-      if (error) {
-        console.error(error);
-        setProfileImage(null);
-        return;
-      }
-
-      setProfileImage(memberData?.profile_image_url || null);
-    });
-
-    function handleProfileImageUpdated(event: Event) {
-      const customEvent = event as CustomEvent<{ imageUrl?: string }>;
-      const imageUrl = customEvent.detail?.imageUrl || null;
-      setProfileImage(imageUrl);
-    }
-
-    window.addEventListener("profile-image-updated", handleProfileImageUpdated);
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-      window.removeEventListener(
-        "profile-image-updated",
-        handleProfileImageUpdated
-      );
-    };
-  }, []);
 
   useEffect(() => {
     if (pathname === "/galleri") {
@@ -287,7 +208,7 @@ export default function Header() {
 
               {isLoggedIn ? (
                 <div className="shrink-0">
-                  <MemberButton profileImage={profileImage} compact />
+                  <MemberButton profileImage={profileImageUrl} compact />
                 </div>
               ) : (
                 <button
@@ -351,7 +272,7 @@ export default function Header() {
               if (item.id === "account") {
                 return isLoggedIn ? (
                   <div key={item.id} className="flex items-center">
-                    <MemberButton profileImage={profileImage} />
+                    <MemberButton profileImage={profileImageUrl} />
                   </div>
                 ) : (
                   <button

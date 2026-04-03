@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getGeolocationErrorState } from "@/lib/home-upload";
+import { useCatchUploadForm } from "@/hooks/useCatchUploadForm";
+import { validateCatchUpload } from "@/lib/catch-upload-validation";
 import {
-  getGeolocationErrorState,
-  normalizeFineFishTypeForSave,
-  normalizeFineFishTypeInput,
-  uploadCatchImage,
-} from "@/lib/home-upload";
+  CatchUploadDatabaseError,
+  submitCatchWithImage,
+} from "@/lib/catch-upload-service";
 import type {
   GpsErrorState,
   UploadFeedbackMessage,
@@ -23,14 +23,27 @@ export function useCatchUpload({
 }: UseCatchUploadOptions) {
   const router = useRouter();
 
-  const [caughtFor, setCaughtFor] = useState("");
-  const [registeredBy, setRegisteredBy] = useState("");
-  const [fishType, setFishType] = useState("");
-  const [fineFishType, setFineFishType] = useState("");
-  const [weight, setWeight] = useState("");
-  const [catchDate, setCatchDate] = useState("");
-  const [locationName, setLocationName] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const {
+    caughtFor,
+    registeredBy,
+    fishType,
+    fineFishType,
+    weight,
+    catchDate,
+    locationName,
+    imageFile,
+    previewUrl,
+    fileInputKey,
+    resetForm,
+    handleCaughtForChange,
+    handleFishTypeChange,
+    handleRegisteredByChange,
+    handleFineFishTypeChange,
+    handleWeightChange,
+    handleCatchDateChange,
+    handleLocationNameChange,
+    handleImageChange,
+  } = useCatchUploadForm();
 
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
@@ -38,41 +51,22 @@ export function useCatchUpload({
   const [gpsError, setGpsError] = useState<GpsErrorState | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [fileInputKey, setFileInputKey] = useState(0);
-
   const [formMessage, setFormMessage] = useState<UploadFeedbackMessage | null>(null);
   const [confirmMissingLocationOpen, setConfirmMissingLocationOpen] =
     useState(false);
 
-  const previewUrl = useMemo(() => {
-    if (!imageFile) return null;
-    return URL.createObjectURL(imageFile);
-  }, [imageFile]);
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
-  const resetForm = useCallback(() => {
-    setCaughtFor("");
-    setRegisteredBy("");
-    setFishType("");
-    setFineFishType("");
-    setWeight("");
-    setCatchDate("");
-    setLocationName("");
-    setImageFile(null);
+  const resetLocationState = useCallback(() => {
     setLatitude(null);
     setLongitude(null);
     setGpsError(null);
     setMapOpen(false);
     setConfirmMissingLocationOpen(false);
-    setFileInputKey((prev) => prev + 1);
   }, []);
+
+  const resetEntireForm = useCallback(() => {
+    resetForm();
+    resetLocationState();
+  }, [resetForm, resetLocationState]);
 
   const dismissFormMessage = useCallback(() => {
     setFormMessage(null);
@@ -83,50 +77,6 @@ export function useCatchUpload({
       router.push("/login");
     }
   }, [formMessage, router]);
-
-  const handleCaughtForChange = useCallback((value: string) => {
-    setCaughtFor((prevCaughtFor) => {
-      setRegisteredBy((prevRegisteredBy) =>
-        prevRegisteredBy === "" || prevRegisteredBy === prevCaughtFor
-          ? value
-          : prevRegisteredBy
-      );
-
-      return value;
-    });
-  }, []);
-
-  const handleFishTypeChange = useCallback((value: string) => {
-    setFishType(value);
-
-    if (value !== "Fina fisken") {
-      setFineFishType("");
-    }
-  }, []);
-
-  const handleRegisteredByChange = useCallback((value: string) => {
-    setRegisteredBy(value);
-  }, []);
-
-  const handleFineFishTypeChange = useCallback((value: string) => {
-    setFineFishType(normalizeFineFishTypeInput(value));
-  }, []);
-
-  const handleWeightChange = useCallback((value: string) => {
-    setWeight(value);
-  }, []);
-
-  const handleCatchDateChange = useCallback((value: string) => {
-    setCatchDate(value);
-  }, []);
-
-  const handleLocationNameChange = useCallback((value: string) => {
-    setLocationName(value);
-  }, []);
-
-  const handleImageChange = useCallback((file: File | null) => {
-    setImageFile(file);
-  }, []);
 
   const handleGetGps = useCallback(() => {
     if (!hasActiveMembership) {
@@ -151,7 +101,7 @@ export function useCatchUpload({
         setLongitude(position.coords.longitude);
 
         if (!locationName.trim()) {
-          setLocationName("GPS-hämtad plats");
+          handleLocationNameChange("GPS-hämtad plats");
         }
 
         setGpsError(null);
@@ -168,7 +118,7 @@ export function useCatchUpload({
         maximumAge: 30000,
       }
     );
-  }, [hasActiveMembership, locationName]);
+  }, [hasActiveMembership, locationName, handleLocationNameChange]);
 
   const handleOpenMap = useCallback(() => {
     setGpsError(null);
@@ -190,69 +140,37 @@ export function useCatchUpload({
       setGpsError(null);
 
       if (!locationName.trim()) {
-        setLocationName(`Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+        handleLocationNameChange(`Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
       }
 
       setMapOpen(false);
     },
-    [hasActiveMembership, locationName]
+    [hasActiveMembership, locationName, handleLocationNameChange]
   );
 
   const submitCatch = useCallback(
     async ({ allowMissingLocation }: { allowMissingLocation: boolean }) => {
-      if (!isLoggedIn) {
-        setFormMessage({
-          variant: "error",
-          message: "Du behöver vara inloggad för att registrera en fångst.",
-          actionLabel: "Logga in",
-          actionType: "login",
-        });
-        return;
-      }
+      const validationResult = validateCatchUpload({
+        isLoggedIn,
+        hasActiveMembership,
+        caughtFor,
+        registeredBy,
+        fishType,
+        fineFishType,
+        weight,
+        catchDate,
+        locationName,
+        imageFile,
+        allowMissingLocation,
+      });
 
-      if (!hasActiveMembership) {
-        setFormMessage({
-          variant: "info",
-          message:
-            "Ditt medlemskap är under granskning, så snart vi fiskat klart kikar vi på din ansökan.",
-        });
-        return;
-      }
+      if (!validationResult.ok) {
+        if (validationResult.requiresMissingLocationConfirmation) {
+          setConfirmMissingLocationOpen(true);
+          return;
+        }
 
-      if (
-        !caughtFor.trim() ||
-        !registeredBy.trim() ||
-        !fishType.trim() ||
-        !weight.trim() ||
-        !catchDate
-      ) {
-        setFormMessage({
-          variant: "error",
-          message: "Fyll i alla obligatoriska fält.",
-        });
-        return;
-      }
-
-      const normalizedFineFishType = normalizeFineFishTypeForSave(fineFishType);
-
-      if (fishType === "Fina fisken" && !normalizedFineFishType) {
-        setFormMessage({
-          variant: "error",
-          message: "Fyll i art på fina fisken.",
-        });
-        return;
-      }
-
-      if (!imageFile) {
-        setFormMessage({
-          variant: "error",
-          message: "Välj en bild.",
-        });
-        return;
-      }
-
-      if (!locationName.trim() && !allowMissingLocation) {
-        setConfirmMissingLocationOpen(true);
+        setFormMessage(validationResult.message);
         return;
       }
 
@@ -261,38 +179,20 @@ export function useCatchUpload({
       setConfirmMissingLocationOpen(false);
 
       try {
-        const uploadResult = await uploadCatchImage(imageFile);
+        await submitCatchWithImage({
+          caughtFor,
+          registeredBy,
+          fishType,
+          fineFishType: validationResult.normalizedFineFishType,
+          weight,
+          catchDate,
+          locationName,
+          latitude,
+          longitude,
+          imageFile: imageFile as File,
+        });
 
-        const { error } = await supabase.from("catches").insert([
-          {
-            caught_for: caughtFor.trim(),
-            registered_by: registeredBy.trim(),
-            fish_type: fishType,
-            fine_fish_type:
-              fishType === "Fina fisken" ? normalizedFineFishType : null,
-            weight_g: Number(weight),
-            catch_date: catchDate,
-            location_name: locationName.trim() || null,
-            image_url: uploadResult.imageUrl,
-            latitude,
-            longitude,
-            original_image_size_bytes: uploadResult.originalSizeBytes,
-            compressed_image_size_bytes: uploadResult.compressedSizeBytes,
-            status: "pending",
-          },
-        ]);
-
-        if (error) {
-          console.error(error);
-          setFormMessage({
-            variant: "error",
-            message: "Fel vid sparning.",
-          });
-          setLoading(false);
-          return;
-        }
-
-        resetForm();
+        resetEntireForm();
         setFormMessage({
           variant: "success",
           message: "Fångsten skickades in och väntar på godkännande.",
@@ -301,11 +201,14 @@ export function useCatchUpload({
         console.error(error);
         setFormMessage({
           variant: "error",
-          message: "Fel vid bilduppladdning.",
+          message:
+            error instanceof CatchUploadDatabaseError
+              ? "Fel vid sparning."
+              : "Fel vid bilduppladdning.",
         });
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     },
     [
       isLoggedIn,
@@ -316,11 +219,11 @@ export function useCatchUpload({
       fineFishType,
       weight,
       catchDate,
-      imageFile,
       locationName,
+      imageFile,
       latitude,
       longitude,
-      resetForm,
+      resetEntireForm,
     ]
   );
 
