@@ -9,8 +9,9 @@ type NavItem = {
   id: string;
   src: string;
   section?: string;
+  href?: string;
   alt: string;
-  type: "section" | "action";
+  type: "section" | "route" | "action";
 };
 
 const sectionItems: NavItem[] = [
@@ -31,9 +32,9 @@ const sectionItems: NavItem[] = [
   {
     id: "gallery",
     src: "/nav/galleri.png",
-    section: "approved-section",
+    href: "/galleri",
     alt: "Galleri",
-    type: "section",
+    type: "route",
   },
   {
     id: "map",
@@ -169,6 +170,11 @@ export default function Header() {
       return;
     }
 
+    if (item.type === "route" && item.href) {
+      router.push(item.href);
+      return;
+    }
+
     if (item.type === "action") {
       router.push(isLoggedIn ? "/min-sida" : "/login");
     }
@@ -194,8 +200,13 @@ export default function Header() {
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5">
             {navItems.map((item) => {
-              const isActive =
+              const isSectionActive =
                 item.type === "section" && active === item.id && pathname === "/";
+
+              const isRouteActive =
+                item.type === "route" && item.href === pathname;
+
+              const isActive = isSectionActive || isRouteActive;
 
               if (item.id === "account") {
                 return isLoggedIn ? (

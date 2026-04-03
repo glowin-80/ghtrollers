@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { memo } from "react";
 import type { Catch } from "@/types/home";
 
@@ -16,44 +17,90 @@ function getCatchLabel(item: Catch) {
   return item.fish_type;
 }
 
+function formatWeight(weightG: number) {
+  if (weightG >= 1000) {
+    return `${(weightG / 1000).toFixed(2)} kg`;
+  }
+
+  return `${weightG} g`;
+}
+
+function formatDate(dateString: string) {
+  if (!dateString) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("sv-SE").format(new Date(dateString));
+}
+
 function RecentApprovedSectionComponent({
   catches,
   onImageClick,
 }: RecentApprovedSectionProps) {
   return (
-    <section className="mb-5 rounded-[28px] border border-[#d6ddd7] bg-[#f6f5ef] p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
-      <h2 className="mb-3 text-xl font-bold text-[#152532]">
-        🔥 Nya godkända fångster
-      </h2>
+    <section className="rounded-[28px] border border-[#d6ddd7] bg-[#f6f5ef] p-4 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-5">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-[1.75rem] font-bold leading-none text-[#152532]">
+            🔥 Nya godkända fångster
+          </h2>
+          <p className="mt-1 text-sm text-[#5b6871]">
+            Senaste 6 godkända fångsterna.
+          </p>
+        </div>
+
+        <Link
+          href="/galleri"
+          className="shrink-0 self-start rounded-full border border-[#d7d0c3] bg-white px-3 py-2 text-sm font-semibold text-[#31414b] transition hover:bg-[#f2efe8]"
+        >
+          Öppna galleri
+        </Link>
+      </div>
 
       {catches.length === 0 ? (
-        <p className="text-[#475862]">Inga godkända fångster ännu.</p>
+        <p className="text-sm text-[#475862]">Inga godkända fångster ännu.</p>
       ) : (
-        <ul className="space-y-4">
+        <ul className="space-y-3">
           {catches.map((item) => (
             <li
               key={item.id}
-              className="overflow-hidden rounded-2xl border border-[#cfd6cf] bg-white shadow-sm"
+              className="overflow-hidden rounded-[22px] border border-[#cfd6cf] bg-white shadow-sm"
             >
-              {item.image_url && (
-                <img
-                  src={item.image_url}
-                  alt={`${item.caught_for} fångst`}
-                  onClick={() => onImageClick(item.image_url!)}
-                  className="h-52 w-full cursor-pointer object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-              )}
+              <div className="flex h-[104px]">
+                <button
+                  type="button"
+                  onClick={() => item.image_url && onImageClick(item.image_url)}
+                  className="h-[104px] w-[104px] shrink-0 overflow-hidden bg-[#ebe7de] disabled:cursor-default"
+                  disabled={!item.image_url}
+                  aria-label={`Öppna bild för ${item.caught_for}`}
+                >
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={`${item.caught_for} fångst`}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-[#6b7280]">
+                      Ingen bild
+                    </div>
+                  )}
+                </button>
 
-              <div className="p-4">
-                <div className="text-[18px] text-[#1d2934]">
-                  <strong>{item.caught_for}</strong> – {getCatchLabel(item)}{" "}
-                  {item.weight_g} g
-                </div>
+                <div className="min-w-0 flex-1 px-3.5 py-3">
+                  <div className="truncate text-[0.98rem] font-bold leading-tight text-[#1d2934]">
+                    {item.caught_for}
+                  </div>
 
-                <div className="mt-1 text-sm text-[#51616b]">
-                  {item.location_name || "Plats ej angiven"} • {item.catch_date}
+                  <div className="mt-1 line-clamp-2 text-[0.9rem] leading-snug text-[#2f3f49]">
+                    {getCatchLabel(item)} · {formatWeight(item.weight_g)}
+                  </div>
+
+                  <div className="mt-1.5 text-[0.78rem] leading-snug text-[#687780]">
+                    {(item.location_name || "Plats ej angiven") + " · " + formatDate(item.catch_date)}
+                  </div>
                 </div>
               </div>
             </li>

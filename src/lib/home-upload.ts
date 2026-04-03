@@ -23,6 +23,36 @@ export function formatCatchDate(dateString: string) {
   }).format(date);
 }
 
+function uppercaseFirstRealCharacter(value: string): string {
+  const firstNonWhitespaceIndex = value.search(/\S/);
+
+  if (firstNonWhitespaceIndex === -1) {
+    return value;
+  }
+
+  const lowerCased = value.toLocaleLowerCase("sv-SE");
+
+  return (
+    lowerCased.slice(0, firstNonWhitespaceIndex) +
+    lowerCased.charAt(firstNonWhitespaceIndex).toLocaleUpperCase("sv-SE") +
+    lowerCased.slice(firstNonWhitespaceIndex + 1)
+  );
+}
+
+export function normalizeFineFishTypeInput(value: string): string {
+  return uppercaseFirstRealCharacter(value);
+}
+
+export function normalizeFineFishTypeForSave(value: string): string {
+  const cleaned = value.trim().replace(/\s+/g, " ");
+
+  if (!cleaned) {
+    return "";
+  }
+
+  return uppercaseFirstRealCharacter(cleaned);
+}
+
 export function detectMobileHelpPlatform(): MobileHelpPlatform {
   if (typeof navigator === "undefined") {
     return "iphone";
