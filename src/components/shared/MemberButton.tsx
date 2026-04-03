@@ -17,7 +17,7 @@ function MemberButtonComponent({
       <div
         className={[
           "flex cursor-pointer items-center rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] shadow-md transition hover:scale-[1.03]",
-          compact ? "h-[48px] gap-2 px-3" : "gap-2 px-4 py-2",
+          compact ? "h-[44px] gap-2 px-4" : "gap-2 px-4 py-2",
         ].join(" ")}
       >
         <div
@@ -34,7 +34,9 @@ function MemberButtonComponent({
               decoding="async"
             />
           ) : (
-            <span className={compact ? "text-base text-[#d6c28a]" : "text-sm text-[#d6c28a]"}>
+            <span
+              className={compact ? "text-base text-[#d6c28a]" : "text-sm text-[#d6c28a]"}
+            >
               👤
             </span>
           )}

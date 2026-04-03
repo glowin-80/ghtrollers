@@ -257,8 +257,8 @@ export default function Header() {
       >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
           <div ref={mobileMenuRef} className="relative sm:hidden">
-            <div className="flex items-center gap-2">
-              <div className="min-w-0 flex-[0_1_56%]">
+            <div className="flex items-center gap-[6px]">
+              <div className="min-w-0 flex-[0_1_54%]">
                 <button
                   type="button"
                   aria-expanded={isMobileMenuOpen}
@@ -276,7 +276,7 @@ export default function Header() {
                   <span
                     aria-hidden="true"
                     className={[
-                      "pointer-events-none absolute right-2 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-black/28 text-[13px] font-bold text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.25)] transition-transform duration-200",
+                      "pointer-events-none absolute right-[30px] top-[56%] z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-[11px] font-bold leading-none text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
                       isMobileMenuOpen ? "rotate-180" : "rotate-0",
                     ].join(" ")}
                   >
