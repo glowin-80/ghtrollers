@@ -17,7 +17,7 @@ function MemberButtonComponent({
       <div
         className={[
           "flex cursor-pointer items-center rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] shadow-md transition hover:scale-[1.03]",
-          compact ? "h-[48px] gap-2 px-8" : "gap-2 px-8 py-2",
+          compact ? "h-[47px] gap-2 px-8" : "gap-2 px-8 py-2",
         ].join(" ")}
       >
         <div
