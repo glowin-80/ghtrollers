@@ -24,15 +24,6 @@ export type UploadFeedbackMessage = {
   actionType?: "login";
 };
 
-export type UploadValidationField =
-  | "caughtFor"
-  | "registeredBy"
-  | "fishType"
-  | "fineFishType"
-  | "weight"
-  | "catchDate"
-  | "imageFile";
-
 export type UploadCatchSectionProps = {
   isLoggedIn: boolean;
   hasActiveMembership: boolean;
@@ -49,7 +40,6 @@ export type UploadCatchSectionProps = {
   gpsLoading: boolean;
   gpsError: GpsErrorState | null;
   formMessage: UploadFeedbackMessage | null;
-  validationErrors: Partial<Record<UploadValidationField, boolean>>;
   confirmMissingLocationOpen: boolean;
   mapOpen: boolean;
   previewUrl: string | null;

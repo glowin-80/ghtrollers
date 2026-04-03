@@ -5,7 +5,6 @@ import type { Member } from "@/types/home";
 import type {
   GpsErrorState,
   UploadFeedbackMessage,
-  UploadValidationField,
 } from "@/components/home/upload/types";
 import InlineMessage from "@/components/shared/InlineMessage";
 import CatchDateField from "@/components/home/upload/CatchDateField";
@@ -25,7 +24,6 @@ type UploadCatchFormProps = {
   gpsLoading: boolean;
   gpsError: GpsErrorState | null;
   formMessage: UploadFeedbackMessage | null;
-  validationErrors: Partial<Record<UploadValidationField, boolean>>;
   previewUrl: string | null;
   fileInputKey: number;
   loading: boolean;
@@ -44,21 +42,6 @@ type UploadCatchFormProps = {
   onFormMessageAction: () => void;
 };
 
-const baseFieldClassName =
-  "w-full rounded-2xl border bg-white px-4 py-3 text-[#1f2937] outline-none transition";
-
-const defaultFieldClassName =
-  "border-[#d8d2c7] focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]";
-
-const errorFieldClassName =
-  "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100";
-
-function getFieldClassName(hasError: boolean) {
-  return `${baseFieldClassName} ${
-    hasError ? errorFieldClassName : defaultFieldClassName
-  }`;
-}
-
 export default function UploadCatchForm({
   members,
   caughtFor,
@@ -73,7 +56,6 @@ export default function UploadCatchForm({
   gpsLoading,
   gpsError,
   formMessage,
-  validationErrors,
   previewUrl,
   fileInputKey,
   loading,
@@ -106,7 +88,7 @@ export default function UploadCatchForm({
       <select
         value={caughtFor}
         onChange={(e) => onCaughtForChange(e.target.value)}
-        className={getFieldClassName(Boolean(validationErrors.caughtFor))}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
         required
       >
         <option value="">Välj vem som fångade fisken</option>
@@ -120,7 +102,7 @@ export default function UploadCatchForm({
       <select
         value={registeredBy}
         onChange={(e) => onRegisteredByChange(e.target.value)}
-        className={getFieldClassName(Boolean(validationErrors.registeredBy))}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
         required
       >
         <option value="">Välj vem som registrerar</option>
@@ -134,7 +116,7 @@ export default function UploadCatchForm({
       <select
         value={fishType}
         onChange={(e) => onFishTypeChange(e.target.value)}
-        className={getFieldClassName(Boolean(validationErrors.fishType))}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
         required
       >
         <option value="">Välj art</option>
@@ -149,7 +131,7 @@ export default function UploadCatchForm({
           value={fineFishType}
           onChange={(e) => onFineFishTypeChange(e.target.value)}
           placeholder="Art på fina fisken (t.ex. Gös)"
-          className={getFieldClassName(Boolean(validationErrors.fineFishType))}
+          className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
           required
         />
       ) : null}
@@ -160,14 +142,13 @@ export default function UploadCatchForm({
         value={weight}
         onChange={(e) => onWeightChange(e.target.value)}
         placeholder="Vikt (gram)"
-        className={getFieldClassName(Boolean(validationErrors.weight))}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
         required
       />
 
       <CatchDateField
         catchDate={catchDate}
         onCatchDateChange={onCatchDateChange}
-        hasError={Boolean(validationErrors.catchDate)}
       />
 
       <input
@@ -175,7 +156,7 @@ export default function UploadCatchForm({
         value={locationName}
         onChange={(e) => onLocationNameChange(e.target.value)}
         placeholder="Plats (valfritt)"
-        className={getFieldClassName(false)}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -214,7 +195,7 @@ export default function UploadCatchForm({
         type="file"
         accept="image/*"
         onChange={(e) => onImageChange(e.target.files?.[0] || null)}
-        className={getFieldClassName(Boolean(validationErrors.imageFile))}
+        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937]"
         required
       />
 

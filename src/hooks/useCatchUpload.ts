@@ -10,15 +10,12 @@ import {
 import type {
   GpsErrorState,
   UploadFeedbackMessage,
-  UploadValidationField,
 } from "@/components/home/upload/types";
 
 type UseCatchUploadOptions = {
   isLoggedIn: boolean;
   hasActiveMembership: boolean;
 };
-
-type ValidationErrors = Partial<Record<UploadValidationField, boolean>>;
 
 export function useCatchUpload({
   isLoggedIn,
@@ -46,7 +43,6 @@ export function useCatchUpload({
   const [formMessage, setFormMessage] = useState<UploadFeedbackMessage | null>(null);
   const [confirmMissingLocationOpen, setConfirmMissingLocationOpen] =
     useState(false);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
   const previewUrl = useMemo(() => {
     if (!imageFile) return null;
@@ -60,30 +56,6 @@ export function useCatchUpload({
       }
     };
   }, [previewUrl]);
-
-  const clearValidationError = useCallback((field: UploadValidationField) => {
-    setValidationErrors((prev) => {
-      if (!prev[field]) {
-        return prev;
-      }
-
-      const next = { ...prev };
-      delete next[field];
-      return next;
-    });
-  }, []);
-
-  const scrollToUploadSection = useCallback(() => {
-    if (typeof document === "undefined") {
-      return;
-    }
-
-    const uploadSection = document.getElementById("upload-section");
-    uploadSection?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }, []);
 
   const resetForm = useCallback(() => {
     setCaughtFor("");
@@ -99,7 +71,6 @@ export function useCatchUpload({
     setGpsError(null);
     setMapOpen(false);
     setConfirmMissingLocationOpen(false);
-    setValidationErrors({});
     setFileInputKey((prev) => prev + 1);
   }, []);
 
@@ -113,79 +84,49 @@ export function useCatchUpload({
     }
   }, [formMessage, router]);
 
-  const handleCaughtForChange = useCallback(
-    (value: string) => {
-      clearValidationError("caughtFor");
+  const handleCaughtForChange = useCallback((value: string) => {
+    setCaughtFor((prevCaughtFor) => {
+      setRegisteredBy((prevRegisteredBy) =>
+        prevRegisteredBy === "" || prevRegisteredBy === prevCaughtFor
+          ? value
+          : prevRegisteredBy
+      );
 
-      setCaughtFor((prevCaughtFor) => {
-        setRegisteredBy((prevRegisteredBy) =>
-          prevRegisteredBy === "" || prevRegisteredBy === prevCaughtFor
-            ? value
-            : prevRegisteredBy
-        );
+      return value;
+    });
+  }, []);
 
-        return value;
-      });
-    },
-    [clearValidationError]
-  );
+  const handleFishTypeChange = useCallback((value: string) => {
+    setFishType(value);
 
-  const handleFishTypeChange = useCallback(
-    (value: string) => {
-      clearValidationError("fishType");
-      setFishType(value);
+    if (value !== "Fina fisken") {
+      setFineFishType("");
+    }
+  }, []);
 
-      if (value !== "Fina fisken") {
-        setFineFishType("");
-        clearValidationError("fineFishType");
-      }
-    },
-    [clearValidationError]
-  );
+  const handleRegisteredByChange = useCallback((value: string) => {
+    setRegisteredBy(value);
+  }, []);
 
-  const handleRegisteredByChange = useCallback(
-    (value: string) => {
-      clearValidationError("registeredBy");
-      setRegisteredBy(value);
-    },
-    [clearValidationError]
-  );
+  const handleFineFishTypeChange = useCallback((value: string) => {
+    setFineFishType(normalizeFineFishTypeInput(value));
+  }, []);
 
-  const handleFineFishTypeChange = useCallback(
-    (value: string) => {
-      clearValidationError("fineFishType");
-      setFineFishType(normalizeFineFishTypeInput(value));
-    },
-    [clearValidationError]
-  );
+  const handleWeightChange = useCallback((value: string) => {
+    setWeight(value);
+  }, []);
 
-  const handleWeightChange = useCallback(
-    (value: string) => {
-      clearValidationError("weight");
-      setWeight(value);
-    },
-    [clearValidationError]
-  );
-
-  const handleCatchDateChange = useCallback(
-    (value: string) => {
-      clearValidationError("catchDate");
-      setCatchDate(value);
-    },
-    [clearValidationError]
-  );
+  const handleCatchDateChange = useCallback((value: string) => {
+    setCatchDate(value);
+  }, []);
 
   const handleLocationNameChange = useCallback((value: string) => {
     setLocationName(value);
   }, []);
 
-  const handleImageChange = useCallback(
-    (file: File | null) => {
-      clearValidationError("imageFile");
-      setImageFile(file);
-    },
-    [clearValidationError]
-  );
+  const handleImageChange = useCallback((file: File | null) => {
+    setImageFile(file);
+  }, []);
 
   const handleGetGps = useCallback(() => {
     if (!hasActiveMembership) {
@@ -266,7 +207,6 @@ export function useCatchUpload({
           actionLabel: "Logga in",
           actionType: "login",
         });
-        scrollToUploadSection();
         return;
       }
 
@@ -276,61 +216,38 @@ export function useCatchUpload({
           message:
             "Ditt medlemskap är under granskning, så snart vi fiskat klart kikar vi på din ansökan.",
         });
-        scrollToUploadSection();
+        return;
+      }
+
+      if (
+        !caughtFor.trim() ||
+        !registeredBy.trim() ||
+        !fishType.trim() ||
+        !weight.trim() ||
+        !catchDate
+      ) {
+        setFormMessage({
+          variant: "error",
+          message: "Fyll i alla obligatoriska fält.",
+        });
         return;
       }
 
       const normalizedFineFishType = normalizeFineFishTypeForSave(fineFishType);
-      const nextValidationErrors: ValidationErrors = {};
-
-      if (!caughtFor.trim()) {
-        nextValidationErrors.caughtFor = true;
-      }
-
-      if (!registeredBy.trim()) {
-        nextValidationErrors.registeredBy = true;
-      }
-
-      if (!fishType.trim()) {
-        nextValidationErrors.fishType = true;
-      }
-
-      if (!weight.trim()) {
-        nextValidationErrors.weight = true;
-      }
-
-      if (!catchDate) {
-        nextValidationErrors.catchDate = true;
-      }
 
       if (fishType === "Fina fisken" && !normalizedFineFishType) {
-        nextValidationErrors.fineFishType = true;
-      }
-
-      if (!imageFile) {
-        nextValidationErrors.imageFile = true;
-      }
-
-      if (Object.keys(nextValidationErrors).length > 0) {
-        setValidationErrors(nextValidationErrors);
         setFormMessage({
           variant: "error",
-          message: "Fyll i alla obligatoriska fält.",
+          message: "Fyll i art på fina fisken.",
         });
-        scrollToUploadSection();
         return;
       }
 
-            setValidationErrors({});
-
-      const selectedImageFile = imageFile;
-      if (!selectedImageFile) {
-        setValidationErrors({ imageFile: true });
+      if (!imageFile) {
         setFormMessage({
           variant: "error",
-          message: "Fyll i alla obligatoriska fält.",
+          message: "Välj en bild.",
         });
-        scrollToUploadSection();
         return;
       }
 
@@ -344,7 +261,7 @@ export function useCatchUpload({
       setConfirmMissingLocationOpen(false);
 
       try {
-        const uploadResult = await uploadCatchImage(selectedImageFile);
+        const uploadResult = await uploadCatchImage(imageFile);
 
         const { error } = await supabase.from("catches").insert([
           {
@@ -371,7 +288,6 @@ export function useCatchUpload({
             variant: "error",
             message: "Fel vid sparning.",
           });
-          scrollToUploadSection();
           setLoading(false);
           return;
         }
@@ -381,14 +297,12 @@ export function useCatchUpload({
           variant: "success",
           message: "Fångsten skickades in och väntar på godkännande.",
         });
-        scrollToUploadSection();
       } catch (error) {
         console.error(error);
         setFormMessage({
           variant: "error",
           message: "Fel vid bilduppladdning.",
         });
-        scrollToUploadSection();
       }
 
       setLoading(false);
@@ -407,7 +321,6 @@ export function useCatchUpload({
       latitude,
       longitude,
       resetForm,
-      scrollToUploadSection,
     ]
   );
 
@@ -440,7 +353,6 @@ export function useCatchUpload({
     gpsLoading,
     gpsError,
     formMessage,
-    validationErrors,
     confirmMissingLocationOpen,
     mapOpen,
     previewUrl,
