@@ -50,7 +50,7 @@ const sectionItems: NavItem[] = [
 
 const SLOT_ANIMATION_MS = 240;
 const SWIPE_THRESHOLD = 26;
-const MAX_DRAG_OFFSET = 72;
+const MAX_DRAG_OFFSET = 172;
 
 function getWrappedIndex(index: number, length: number) {
   return (index + length) % length;
