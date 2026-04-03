@@ -14,9 +14,6 @@ type NavItem = {
   type: "section" | "route" | "action";
 };
 
-type SlotDirection = "prev" | "next" | null;
-type SlotRole = "prev" | "current" | "next";
-
 const sectionItems: NavItem[] = [
   {
     id: "leaderboard",
@@ -48,33 +45,16 @@ const sectionItems: NavItem[] = [
   },
 ];
 
-const SLOT_ANIMATION_MS = 240;
-const SWIPE_THRESHOLD = 26;
-const MAX_DRAG_OFFSET = 172;
-
-function getWrappedIndex(index: number, length: number) {
-  return (index + length) % length;
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
-}
-
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const touchStartXRef = useRef<number | null>(null);
-  const animationTimeoutRef = useRef<number | null>(null);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   const [active, setActive] = useState("leaderboard");
-  const [slotIndex, setSlotIndex] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-
-  const [slotDirection, setSlotDirection] = useState<SlotDirection>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffsetX, setDragOffsetX] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -150,27 +130,47 @@ export default function Header() {
         "profile-image-updated",
         handleProfileImageUpdated
       );
-
-      if (animationTimeoutRef.current !== null) {
-        window.clearTimeout(animationTimeoutRef.current);
-      }
     };
   }, []);
 
   useEffect(() => {
     if (pathname === "/galleri") {
       setActive("gallery");
-      setSlotIndex(sectionItems.findIndex((item) => item.id === "gallery"));
+      setIsMobileMenuOpen(false);
       return;
     }
 
     if (pathname === "/") {
-      const currentIndex = sectionItems.findIndex((item) => item.id === active);
-      if (currentIndex >= 0) {
-        setSlotIndex(currentIndex);
+      setIsMobileMenuOpen(false);
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    function handlePointerDown(event: MouseEvent | TouchEvent) {
+      if (!mobileMenuRef.current) return;
+
+      const target = event.target as Node | null;
+      if (target && !mobileMenuRef.current.contains(target)) {
+        setIsMobileMenuOpen(false);
       }
     }
-  }, [pathname, active]);
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
 
   const navItems = useMemo<NavItem[]>(() => {
     return [
@@ -184,15 +184,13 @@ export default function Header() {
     ];
   }, [isLoggedIn]);
 
-  const previousSlotItem =
-    sectionItems[getWrappedIndex(slotIndex - 1, sectionItems.length)];
-  const currentSlotItem = sectionItems[slotIndex];
-  const nextSlotItem =
-    sectionItems[getWrappedIndex(slotIndex + 1, sectionItems.length)];
+  const activeMobileItem =
+    sectionItems.find((item) => item.id === active) ?? sectionItems[0];
 
   function performNavigation(item: NavItem) {
     if (item.type === "section" && item.section) {
       setActive(item.id);
+      setIsMobileMenuOpen(false);
 
       const nav = document.getElementById("site-nav");
 
@@ -217,133 +215,23 @@ export default function Header() {
 
     if (item.type === "route" && item.href) {
       setActive(item.id);
+      setIsMobileMenuOpen(false);
       router.push(item.href);
       return;
     }
 
     if (item.type === "action") {
+      setIsMobileMenuOpen(false);
       router.push(isLoggedIn ? "/min-sida" : "/login");
     }
   }
 
   function handleClick(item: NavItem) {
-    if (slotDirection) return;
     performNavigation(item);
   }
 
-  function cycleSlot(
-    direction: "prev" | "next",
-    options?: { navigateOnComplete?: boolean }
-  ) {
-    if (slotDirection) return;
-
-    const targetIndex =
-      direction === "prev"
-        ? getWrappedIndex(slotIndex - 1, sectionItems.length)
-        : getWrappedIndex(slotIndex + 1, sectionItems.length);
-
-    const targetItem = sectionItems[targetIndex];
-    const navigateOnComplete = options?.navigateOnComplete ?? false;
-
-    setDragOffsetX(0);
-    setIsDragging(false);
-    setSlotDirection(direction);
-
-    if (animationTimeoutRef.current !== null) {
-      window.clearTimeout(animationTimeoutRef.current);
-    }
-
-    animationTimeoutRef.current = window.setTimeout(() => {
-      setSlotIndex(targetIndex);
-      setSlotDirection(null);
-
-      if (navigateOnComplete) {
-        performNavigation(targetItem);
-      }
-    }, SLOT_ANIMATION_MS);
-  }
-
-  function handleSlotTouchStart(event: React.TouchEvent<HTMLDivElement>) {
-    if (slotDirection) return;
-    touchStartXRef.current = event.touches[0]?.clientX ?? null;
-    setIsDragging(true);
-  }
-
-  function handleSlotTouchMove(event: React.TouchEvent<HTMLDivElement>) {
-    if (touchStartXRef.current === null || slotDirection) return;
-
-    const currentX = event.touches[0]?.clientX ?? touchStartXRef.current;
-    const deltaX = currentX - touchStartXRef.current;
-
-    setDragOffsetX(clamp(deltaX, -MAX_DRAG_OFFSET, MAX_DRAG_OFFSET));
-  }
-
-  function handleSlotTouchEnd() {
-    if (slotDirection) return;
-
-    const deltaX = dragOffsetX;
-
-    touchStartXRef.current = null;
-    setIsDragging(false);
-
-    if (Math.abs(deltaX) >= SWIPE_THRESHOLD) {
-      setDragOffsetX(0);
-
-      if (deltaX > 0) {
-        cycleSlot("prev", { navigateOnComplete: true });
-        return;
-      }
-
-      cycleSlot("next", { navigateOnComplete: true });
-      return;
-    }
-
-    setDragOffsetX(0);
-  }
-
-  function getSlideTranslatePercent(role: SlotRole) {
-    const base = role === "prev" ? -64 : role === "next" ? 64 : 0;
-
-    const animatedShift =
-      slotDirection === "next" ? -64 : slotDirection === "prev" ? 64 : 0;
-
-    return base + animatedShift;
-  }
-
-  function getAnimatedInnerStyle(role: SlotRole) {
-    const translatePercent = getSlideTranslatePercent(role);
-    const dragPixels = slotDirection ? 0 : dragOffsetX;
-
-    return {
-      transform: `translateX(calc(${translatePercent}% + ${dragPixels}px))`,
-    };
-  }
-
-  function getOuterSlotClassName(role: SlotRole) {
-    const zIndexClass = role === "current" ? "z-20" : "z-10";
-
-    return [
-      "absolute inset-y-0 left-1/2 w-[86%] -translate-x-1/2",
-      "flex items-center justify-center",
-      zIndexClass,
-    ].join(" ");
-  }
-
-  function getAnimatedInnerClassName(role: SlotRole) {
-    const scaleClass = role === "current" ? "scale-100" : "scale-[0.96]";
-    const transitionClass = isDragging
-      ? ""
-      : "transition-transform duration-200 ease-out";
-
-    const slotAnimationClass = slotDirection
-      ? "transition-transform duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-      : transitionClass;
-
-    return [
-      "flex h-[48px] w-full items-center justify-center",
-      scaleClass,
-      slotAnimationClass,
-    ].join(" ");
+  function toggleMobileMenu() {
+    setIsMobileMenuOpen((prev) => !prev);
   }
 
   return (
@@ -364,108 +252,88 @@ export default function Header() {
         className="sticky top-0 z-50 border-b border-black/10 bg-[#e5dccd]/95 backdrop-blur-md"
       >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
-          <div className="flex items-center justify-center gap-3 sm:hidden">
-            <div
-              className="relative h-[48px] min-w-0 max-w-[360px] flex-1 overflow-hidden rounded-full"
-              onTouchStart={handleSlotTouchStart}
-              onTouchMove={handleSlotTouchMove}
-              onTouchEnd={handleSlotTouchEnd}
-            >
-              <div className="absolute inset-0 rounded-full bg-[#d8cfbf]" />
-
-              <button
-                type="button"
-                aria-label={`Visa föregående: ${previousSlotItem.alt}`}
-                onClick={() => cycleSlot("prev")}
-                disabled={!!slotDirection}
-                className="absolute inset-y-0 left-0 z-30 w-[26%]"
-              >
-                <span className="sr-only">Visa föregående</span>
-              </button>
-
-              <button
-                type="button"
-                aria-label={`Visa nästa: ${nextSlotItem.alt}`}
-                onClick={() => cycleSlot("next")}
-                disabled={!!slotDirection}
-                className="absolute inset-y-0 right-0 z-30 w-[26%]"
-              >
-                <span className="sr-only">Visa nästa</span>
-              </button>
-
-              <div
-                aria-hidden="true"
-                className={getOuterSlotClassName("prev")}
-              >
-                <div
-                  className={getAnimatedInnerClassName("prev")}
-                  style={getAnimatedInnerStyle("prev")}
+          <div
+            ref={mobileMenuRef}
+            className="relative sm:hidden"
+          >
+            <div className="flex items-center justify-center gap-3">
+              <div className="min-w-0 flex-1">
+                <button
+                  type="button"
+                  aria-expanded={isMobileMenuOpen}
+                  aria-controls="mobile-nav-dropdown"
+                  onClick={toggleMobileMenu}
+                  className="block w-full rounded-full bg-transparent transition-transform duration-200 active:scale-[0.99]"
                 >
                   <img
-                    src={previousSlotItem.src}
-                    alt=""
+                    src={activeMobileItem.src}
+                    alt={activeMobileItem.alt}
                     draggable={false}
-                    className="pointer-events-none block h-[48px] w-auto max-w-none object-contain"
+                    className="block h-[48px] w-full object-contain object-left"
                   />
-                </div>
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={() => handleClick(currentSlotItem)}
-                aria-label={currentSlotItem.alt}
-                className={getOuterSlotClassName("current")}
-                disabled={!!slotDirection}
-              >
-                <div
-                  className={getAnimatedInnerClassName("current")}
-                  style={getAnimatedInnerStyle("current")}
+              {isLoggedIn ? (
+                <div className="shrink-0">
+                  <MemberButton profileImage={profileImage} compact />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleClick(navItems[navItems.length - 1])}
+                  className="shrink-0 rounded-full bg-transparent transition-transform duration-300 hover:scale-105"
                 >
                   <img
-                    src={currentSlotItem.src}
-                    alt={currentSlotItem.alt}
+                    src="/nav/loggaIn.png"
+                    alt="Logga in"
                     draggable={false}
-                    className="pointer-events-none block h-[48px] w-auto max-w-none object-contain"
+                    className="block h-[48px] w-auto object-contain"
                   />
-                </div>
-              </button>
-
-              <div
-                aria-hidden="true"
-                className={getOuterSlotClassName("next")}
-              >
-                <div
-                  className={getAnimatedInnerClassName("next")}
-                  style={getAnimatedInnerStyle("next")}
-                >
-                  <img
-                    src={nextSlotItem.src}
-                    alt=""
-                    draggable={false}
-                    className="pointer-events-none block h-[48px] w-auto max-w-none object-contain"
-                  />
-                </div>
-              </div>
+                </button>
+              )}
             </div>
 
-            {isLoggedIn ? (
-              <div className="shrink-0">
-                <MemberButton profileImage={profileImage} compact />
+            <div
+              id="mobile-nav-dropdown"
+              className={[
+                "overflow-hidden transition-all duration-300 ease-out",
+                isMobileMenuOpen
+                  ? "mt-2 max-h-[320px] opacity-100"
+                  : "mt-0 max-h-0 opacity-0",
+              ].join(" ")}
+            >
+              <div className="space-y-2 pb-1">
+                {sectionItems.map((item) => {
+                  const isActive =
+                    (item.type === "route" && item.href === pathname) ||
+                    (item.type === "section" &&
+                      pathname === "/" &&
+                      active === item.id);
+
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => handleClick(item)}
+                      className={[
+                        "block w-full rounded-full bg-transparent transition-all duration-200",
+                        isActive
+                          ? "scale-[1.01] opacity-100"
+                          : "opacity-95 hover:scale-[1.01]",
+                      ].join(" ")}
+                    >
+                      <img
+                        src={item.src}
+                        alt={item.alt}
+                        draggable={false}
+                        className="block h-[48px] w-full object-contain object-left"
+                      />
+                    </button>
+                  );
+                })}
               </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => handleClick(navItems[navItems.length - 1])}
-                className="shrink-0 rounded-full bg-transparent transition-transform duration-300 hover:scale-105"
-              >
-                <img
-                  src="/nav/loggaIn.png"
-                  alt="Logga in"
-                  draggable={false}
-                  className="block h-[48px] w-auto object-contain"
-                />
-              </button>
-            )}
+            </div>
           </div>
 
           <div className="hidden flex-wrap items-center justify-center gap-3 sm:flex sm:gap-4 md:gap-5">
