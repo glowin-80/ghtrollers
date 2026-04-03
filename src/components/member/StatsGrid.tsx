@@ -43,21 +43,17 @@ function YearFilterControls({
   currentSwedenYear,
   availableYears,
   onChange,
-  compact = false,
 }: {
   selectedYear: CatchYearFilter;
   currentSwedenYear: string;
   availableYears: string[];
   onChange: (value: CatchYearFilter) => void;
-  compact?: boolean;
 }) {
   return (
-    <div className={compact ? "flex flex-wrap items-center gap-2" : ""}>
-      {!compact ? (
-        <div className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-[#7b7468]">
-          Filter
-        </div>
-      ) : null}
+    <div>
+      <div className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-[#7b7468]">
+        Filter
+      </div>
 
       <div className="flex flex-wrap items-center gap-2">
         <button
@@ -193,31 +189,19 @@ export default function StatsGrid({ catches }: Props) {
             </div>
 
             <div className="mt-5 rounded-[22px] border border-[#ddd8cf] bg-[#fffdfb] px-4 py-4">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                  <h3 className="text-[1.1rem] font-bold leading-tight text-[#1f2937]">
-                    Antal fångade fiskar och kilo fisk!
-                  </h3>
-                  <p className="mt-1 text-sm text-[#6b7280]">
-                    Se hur många fiskar du fångat och hur många kilo det blivit under valt år eller alla år.
-                  </p>
-                </div>
+              <div className="min-w-0">
+                <h3 className="text-[1.1rem] font-bold leading-tight text-[#1f2937]">
+                  Antal fångade fiskar och kilo fisk!
+                </h3>
+                <p className="mt-1 text-sm text-[#6b7280]">
+                  Se hur många fiskar du fångat och hur många kilo det blivit under valt år eller alla år.
+                </p>
 
-                <div className="shrink-0">
-                  <YearFilterControls
-                    selectedYear={selectedYear}
-                    currentSwedenYear={currentSwedenYear}
-                    availableYears={availableYears}
-                    onChange={setSelectedYear}
-                    compact
-                  />
+                <div className="mt-3">
+                  <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#5c4d3f]">
+                    {filterBadgeLabel}
+                  </span>
                 </div>
-              </div>
-
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#5c4d3f]">
-                  {filterBadgeLabel}
-                </span>
               </div>
 
               {stats.speciesAggregateStats.length > 0 ? (
