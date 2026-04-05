@@ -287,39 +287,41 @@ export default function Header() {
   function renderMobileMenuButton(item: NavItem) {
     if (item.src) {
       return (
-        <button
-          key={item.id}
-          type="button"
-          onClick={() => performNavigation(item)}
-          className="block w-[90%] rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
-        >
-          <img
-            src={item.src}
-            alt={item.alt}
-            draggable={false}
-            className="block h-[40px] w-full object-contain object-left"
-          />
-        </button>
+        <div key={item.id} className="w-full max-w-[360px]">
+          <button
+            type="button"
+            onClick={() => performNavigation(item)}
+            className="block w-full rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
+          >
+            <img
+              src={item.src}
+              alt={item.alt}
+              draggable={false}
+              className="block h-[40px] w-full object-contain object-left"
+            />
+          </button>
+        </div>
       );
     }
 
     return (
-      <button
-        key={item.id}
-        type="button"
-        onClick={() => performNavigation(item)}
-        className="flex w-[90%] items-center justify-between rounded-full border border-[#cfc4ae] bg-[#f8f4ea] px-4 py-3 text-left text-[#3f352b] shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-200 hover:scale-[1.01]"
-      >
-        <span className="text-[0.95rem] font-semibold leading-none">
-          {item.label}
-        </span>
-        <span
-          aria-hidden="true"
-          className="text-[0.95rem] font-semibold text-[#8b7355]"
+      <div key={item.id} className="w-full max-w-[360px]">
+        <button
+          type="button"
+          onClick={() => performNavigation(item)}
+          className="flex h-[40px] w-full items-center justify-between rounded-full border border-[#cfc4ae] bg-[#f8f4ea] px-4 text-left text-[#3f352b] shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-200 hover:scale-[1.01]"
         >
-          →
-        </span>
-      </button>
+          <span className="truncate text-[0.95rem] font-semibold leading-none">
+            {item.label}
+          </span>
+          <span
+            aria-hidden="true"
+            className="ml-3 shrink-0 text-[0.95rem] font-semibold text-[#8b7355]"
+          >
+            →
+          </span>
+        </button>
+      </div>
     );
   }
 
@@ -400,7 +402,7 @@ export default function Header() {
                   : "mt-0 max-h-0 opacity-0",
               ].join(" ")}
             >
-              <div className="space-y-2 pb-1">
+              <div className="flex flex-col items-start gap-2 pb-1">
                 {mobileMenuItems.map((item) => renderMobileMenuButton(item))}
               </div>
             </div>
