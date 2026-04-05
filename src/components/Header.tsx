@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthMember } from "@/hooks/useAuthMember";
 
-type NavItem = {
+type DesktopNavItem = {
   id: string;
   src: string;
   section?: string;
@@ -14,7 +14,14 @@ type NavItem = {
   type: "section" | "route" | "action";
 };
 
-const sectionItems: NavItem[] = [
+type MobileMenuItem = {
+  id: string;
+  label: string;
+  href: string;
+  kind: "section" | "route";
+};
+
+const desktopSectionItems: DesktopNavItem[] = [
   {
     id: "leaderboard",
     src: "/nav/leaderboard.png",
@@ -44,6 +51,77 @@ const sectionItems: NavItem[] = [
     type: "section",
   },
 ];
+
+const mobileMenuItems: MobileMenuItem[] = [
+  {
+    id: "home",
+    label: "Startsida",
+    href: "/",
+    kind: "route",
+  },
+  {
+    id: "leaderboard",
+    label: "Leaderboard",
+    href: "/#leaderboard-section",
+    kind: "section",
+  },
+  {
+    id: "upload",
+    label: "Ladda upp fångst",
+    href: "/#upload-section",
+    kind: "section",
+  },
+  {
+    id: "approved",
+    label: "Nya godkända fångster",
+    href: "/#approved-section",
+    kind: "section",
+  },
+  {
+    id: "map",
+    label: "Karta",
+    href: "/#map-section",
+    kind: "section",
+  },
+  {
+    id: "gallery",
+    label: "Galleri",
+    href: "/galleri",
+    kind: "route",
+  },
+  {
+    id: "all-time-high",
+    label: "All-time-high",
+    href: "/all-time-high",
+    kind: "route",
+  },
+];
+
+function getNavOffset() {
+  const nav = document.getElementById("site-nav");
+  return nav ? nav.offsetHeight + 20 : 20;
+}
+
+function scrollToSection(sectionId: string, attempt = 0) {
+  const element = document.getElementById(sectionId);
+
+  if (!element) {
+    if (attempt < 12) {
+      window.setTimeout(() => {
+        scrollToSection(sectionId, attempt + 1);
+      }, 80);
+    }
+    return;
+  }
+
+  const targetPosition =
+    element.getBoundingClientRect().top + window.scrollY - getNavOffset();
+
+  window.scrollTo({
+    top: Math.max(targetPosition, 0),
+    behavior: "smooth",
+  });
+}
 
 export default function Header() {
   const pathname = usePathname();
@@ -93,9 +171,26 @@ export default function Header() {
     };
   }, []);
 
-  const navItems = useMemo<NavItem[]>(() => {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (pathname !== "/") return;
+
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    const sectionId = hash.replace(/^#/, "");
+    const timer = window.setTimeout(() => {
+      scrollToSection(sectionId);
+    }, 60);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [pathname]);
+
+  const navItems = useMemo<DesktopNavItem[]>(() => {
     return [
-      ...sectionItems,
+      ...desktopSectionItems,
       {
         id: "account",
         src: "/nav/loggaIn.png",
@@ -105,54 +200,67 @@ export default function Header() {
     ];
   }, [isLoggedIn]);
 
-  const activeMobileItem =
-    sectionItems.find((item) => item.id === active) ?? sectionItems[0];
+  function navigateToHref(href: string) {
+    const [rawPath, rawHash] = href.split("#");
+    const targetPath = rawPath || "/";
+    const targetHash = rawHash ?? "";
 
-  const mobileDropdownItems = sectionItems.filter(
-    (item) => item.id !== activeMobileItem.id
-  );
+    if (pathname === targetPath && targetHash) {
+      window.history.replaceState(null, "", `${targetPath}#${targetHash}`);
+      scrollToSection(targetHash);
+      return;
+    }
 
-  function performNavigation(item: NavItem) {
+    if (pathname === targetPath && !targetHash) {
+      router.push(targetPath);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    router.push(targetHash ? `${targetPath}#${targetHash}` : targetPath);
+  }
+
+  function performDesktopNavigation(item: DesktopNavItem) {
     if (item.type === "section" && item.section) {
       setActive(item.id);
       setIsMobileMenuOpen(false);
-
-      const nav = document.getElementById("site-nav");
-
-      if (pathname !== "/") {
-        router.push(`/#${item.section}`);
-        return;
-      }
-
-      const el = document.getElementById(item.section);
-      if (!el) return;
-
-      const navHeight = nav ? nav.offsetHeight : 0;
-      const elementTop = el.getBoundingClientRect().top + window.scrollY;
-      const targetPosition = elementTop - navHeight - 20;
-
-      window.scrollTo({
-        top: targetPosition,
-        behavior: "smooth",
-      });
+      navigateToHref(`/#${item.section}`);
       return;
     }
 
     if (item.type === "route" && item.href) {
       setActive(item.id);
       setIsMobileMenuOpen(false);
-      router.push(item.href);
+      navigateToHref(item.href);
       return;
     }
 
     if (item.type === "action") {
       setIsMobileMenuOpen(false);
-      router.push(isLoggedIn ? "/min-sida" : "/login");
+      navigateToHref(isLoggedIn ? "/min-sida" : "/login");
     }
   }
 
-  function handleClick(item: NavItem) {
-    performNavigation(item);
+  function handleMobileMenuNavigation(item: MobileMenuItem) {
+    setIsMobileMenuOpen(false);
+
+    if (item.id === "leaderboard") {
+      setActive("leaderboard");
+    }
+
+    if (item.id === "upload") {
+      setActive("upload");
+    }
+
+    if (item.id === "gallery") {
+      setActive("gallery");
+    }
+
+    if (item.id === "map") {
+      setActive("map");
+    }
+
+    navigateToHref(item.href);
   }
 
   function toggleMobileMenu() {
@@ -178,26 +286,23 @@ export default function Header() {
       >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
           <div ref={mobileMenuRef} className="relative sm:hidden">
-            <div className="flex items-center gap-[6px]">
+            <div className="flex items-center gap-[8px]">
               <div className="min-w-0 flex-[0_1_54%]">
                 <button
                   type="button"
                   aria-expanded={isMobileMenuOpen}
                   aria-controls="mobile-nav-dropdown"
                   onClick={toggleMobileMenu}
-                  className="relative block w-full rounded-full bg-transparent transition-transform duration-200 active:scale-[0.99]"
+                  className="flex h-[47px] w-full items-center justify-between rounded-full border border-[#9d6f2f] bg-gradient-to-b from-[#b87526] to-[#8a561f] px-5 shadow-[0_8px_20px_rgba(0,0,0,0.16)] transition-transform duration-200 active:scale-[0.99]"
                 >
-                  <img
-                    src={activeMobileItem.src}
-                    alt={activeMobileItem.alt}
-                    draggable={false}
-                    className="block h-[44px] w-full object-contain object-left"
-                  />
+                  <span className="text-[15px] font-bold uppercase tracking-[0.16em] text-[#f7ead0]">
+                    Meny
+                  </span>
 
                   <span
                     aria-hidden="true"
                     className={[
-                      "pointer-events-none absolute right-[30px] top-[85%] z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-[11px] font-bold leading-none text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
+                      "flex h-6 w-6 items-center justify-center rounded-full bg-black/45 text-[11px] font-bold leading-none text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
                       isMobileMenuOpen ? "rotate-180" : "rotate-0",
                     ].join(" ")}
                   >
@@ -213,7 +318,9 @@ export default function Header() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => handleClick(navItems[navItems.length - 1])}
+                  onClick={() =>
+                    performDesktopNavigation(navItems[navItems.length - 1])
+                  }
                   className="shrink-0 rounded-full bg-transparent transition-transform duration-300 hover:scale-105"
                 >
                   <img
@@ -231,28 +338,38 @@ export default function Header() {
               className={[
                 "overflow-hidden transition-all duration-300 ease-out",
                 isMobileMenuOpen
-                  ? "mt-2 max-h-[260px] opacity-100"
+                  ? "mt-2 max-h-[420px] opacity-100"
                   : "mt-0 max-h-0 opacity-0",
               ].join(" ")}
             >
-              <div className="space-y-2 pb-1">
-                {mobileDropdownItems.map((item) => {
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleClick(item)}
-                      className="block w-[90%] rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
-                    >
-                      <img
-                        src={item.src}
-                        alt={item.alt}
-                        draggable={false}
-                        className="block h-[40px] w-full object-contain object-left"
-                      />
-                    </button>
-                  );
-                })}
+              <div className="rounded-[24px] border border-[#d8d2c7] bg-white/95 p-3 shadow-[0_12px_28px_rgba(18,35,28,0.10)] backdrop-blur-sm">
+                <div className="grid grid-cols-1 gap-2">
+                  {mobileMenuItems.map((item) => {
+                    const isCurrentPageRoute =
+                      item.kind === "route" &&
+                      item.href === pathname &&
+                      !item.href.includes("#");
+
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleMobileMenuNavigation(item)}
+                        className={[
+                          "flex min-h-[44px] w-full items-center justify-between rounded-[16px] border px-4 py-3 text-left transition",
+                          isCurrentPageRoute
+                            ? "border-[#cdbb93] bg-[#f5f0e5] text-[#3f352b]"
+                            : "border-[#e8e0d2] bg-[#fcfbf8] text-[#374151] hover:bg-[#f7f4ee]",
+                        ].join(" ")}
+                      >
+                        <span className="text-[0.95rem] font-semibold leading-tight">
+                          {item.label}
+                        </span>
+                        <span className="text-sm text-[#8b7355]">→</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -278,7 +395,7 @@ export default function Header() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => handleClick(item)}
+                    onClick={() => performDesktopNavigation(item)}
                     className="rounded-full bg-transparent opacity-95 transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]"
                   >
                     <img
@@ -295,7 +412,7 @@ export default function Header() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => handleClick(item)}
+                  onClick={() => performDesktopNavigation(item)}
                   className={[
                     "rounded-full bg-transparent transition-all duration-300",
                     "hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]",
