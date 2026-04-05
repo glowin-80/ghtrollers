@@ -67,7 +67,7 @@ function getCardCopy(item: AllTimeHighlight) {
   }
 
   if (item.filter === "fina" && item.detail) {
-    return item.detail;
+    return `Fina fisken med en ${item.detail}`;
   }
 
   return item.title;
