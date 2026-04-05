@@ -1,10 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { Catch } from "@/types/home";
+import type { Catch, FishingSpot } from "@/types/home";
+import type { FishingSpotMapFilter } from "@/types/fishing-spots";
 
 type CatchesMapProps = {
   catches: Catch[];
+  fishingSpots?: FishingSpot[];
+  filter?: FishingSpotMapFilter;
 };
 
 const LeafletCatchesMap = dynamic(() => import("./LeafletCatchesMap"), {
@@ -16,6 +19,16 @@ const LeafletCatchesMap = dynamic(() => import("./LeafletCatchesMap"), {
   ),
 });
 
-export default function CatchesMap({ catches }: CatchesMapProps) {
-  return <LeafletCatchesMap catches={catches} />;
+export default function CatchesMap({
+  catches,
+  fishingSpots = [],
+  filter = "all",
+}: CatchesMapProps) {
+  return (
+    <LeafletCatchesMap
+      catches={catches}
+      fishingSpots={fishingSpots}
+      filter={filter}
+    />
+  );
 }

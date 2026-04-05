@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 
 type MapPickerProps = {
   onSelect: (lat: number, lng: number) => void;
+  selectedPosition?: [number, number] | null;
 };
 
 const LeafletMapPicker = dynamic(() => import("./LeafletMapPicker"), {
@@ -15,6 +16,11 @@ const LeafletMapPicker = dynamic(() => import("./LeafletMapPicker"), {
   ),
 });
 
-export default function MapPicker({ onSelect }: MapPickerProps) {
-  return <LeafletMapPicker onSelect={onSelect} />;
+export default function MapPicker({
+  onSelect,
+  selectedPosition = null,
+}: MapPickerProps) {
+  return (
+    <LeafletMapPicker onSelect={onSelect} selectedPosition={selectedPosition} />
+  );
 }
