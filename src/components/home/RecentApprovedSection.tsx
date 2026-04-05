@@ -40,7 +40,7 @@ function RecentApprovedSectionComponent({
             🔥 Nya godkända fångster
           </h2>
           <p className="mt-1 text-sm text-[#5b6871]">
-            Senaste 6 godkända fångsterna.
+            Senaste 8 godkända fångsterna.
           </p>
         </div>
 
