@@ -353,8 +353,9 @@ export default function Header() {
         type="button"
         onClick={() => performNavigation(item)}
         className={[
-          "group relative flex w-full items-center gap-[10px] overflow-hidden rounded-full border px-[11px] py-[5px] text-left shadow-[0_7px_16px_rgba(0,0,0,0.13)] transition-all duration-200",
-          "min-h-[44px] active:scale-[0.99]",
+          "group relative flex w-full max-w-[calc(100%-36px)] items-center gap-[10px] overflow-visible rounded-full border px-[12px] py-[4px] text-left shadow-[0_7px_16px_rgba(0,0,0,0.13)] transition-all duration-200",
+          "min-h-[42px] active:scale-[0.99]",
+          "mx-auto",
           isActive ? "scale-[1.01]" : "hover:scale-[1.01]",
           theme.outer,
         ].join(" ")}
@@ -363,17 +364,17 @@ export default function Header() {
 
         <div
           className={[
-            "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full border shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]",
+            "relative -ml-[2px] flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full border shadow-[0_2px_6px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.24)]",
             theme.iconCircle,
           ].join(" ")}
           aria-hidden="true"
         >
-          <span className="text-[13px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.18)]">
+          <span className="text-[16px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.18)]">
             {getFallbackIcon()}
           </span>
         </div>
 
-        <div className="min-w-0 flex-1 pr-1">
+        <div className="min-w-0 flex-1 pr-[2px]">
           <div className="truncate text-[13px] font-semibold leading-[1.05] tracking-[0.01em]">
             {item.label}
           </div>
@@ -465,7 +466,7 @@ export default function Header() {
               className={[
                 "overflow-hidden transition-all duration-300 ease-out",
                 isMobileMenuOpen
-                  ? "mt-3 max-h-[560px] opacity-100"
+                  ? "mt-3 max-h-[520px] opacity-100"
                   : "mt-0 max-h-0 opacity-0",
               ].join(" ")}
             >
