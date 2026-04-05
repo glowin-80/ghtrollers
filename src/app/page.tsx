@@ -15,7 +15,7 @@ import RecentApprovedSection from "@/components/home/RecentApprovedSection";
 import MapPreviewSection from "@/components/home/MapPreviewSection";
 
 export default function Home() {
-  const { members, approvedCatches, isLoggedIn, hasActiveMembership } =
+  const { members, approvedCatches, isLoggedIn, hasActiveMembership, member } =
     useHomeData();
 
   const {
@@ -36,7 +36,6 @@ export default function Home() {
     previewUrl,
     fileInputKey,
     loading,
-    handleRegisteredByChange,
     handleFineFishTypeChange,
     handleWeightChange,
     handleCatchDateChange,
@@ -56,6 +55,7 @@ export default function Home() {
   } = useCatchUpload({
     isLoggedIn,
     hasActiveMembership,
+    registeredByDefault: member?.name ?? "",
   });
 
   const currentSwedenYear = useMemo(() => {
@@ -165,7 +165,6 @@ export default function Home() {
             loading={loading}
             onSubmit={handleSubmit}
             onCaughtForChange={handleCaughtForChange}
-            onRegisteredByChange={handleRegisteredByChange}
             onFishTypeChange={handleFishTypeChange}
             onFineFishTypeChange={handleFineFishTypeChange}
             onWeightChange={handleWeightChange}

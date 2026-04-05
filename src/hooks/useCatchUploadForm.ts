@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { normalizeFineFishTypeInput } from "@/lib/home-upload";
 
-export function useCatchUploadForm() {
+type UseCatchUploadFormOptions = {
+  registeredByDefault: string;
+};
+
+export function useCatchUploadForm({
+  registeredByDefault,
+}: UseCatchUploadFormOptions) {
   const [caughtFor, setCaughtFor] = useState("");
-  const [registeredBy, setRegisteredBy] = useState("");
+  const [registeredBy, setRegisteredBy] = useState(registeredByDefault);
   const [fishType, setFishType] = useState("");
   const [fineFishType, setFineFishType] = useState("");
   const [weight, setWeight] = useState("");
@@ -25,9 +31,13 @@ export function useCatchUploadForm() {
     };
   }, [previewUrl]);
 
+  useEffect(() => {
+    setRegisteredBy(registeredByDefault);
+  }, [registeredByDefault]);
+
   const resetForm = useCallback(() => {
     setCaughtFor("");
-    setRegisteredBy("");
+    setRegisteredBy(registeredByDefault);
     setFishType("");
     setFineFishType("");
     setWeight("");
@@ -35,18 +45,10 @@ export function useCatchUploadForm() {
     setLocationName("");
     setImageFile(null);
     setFileInputKey((prev) => prev + 1);
-  }, []);
+  }, [registeredByDefault]);
 
   const handleCaughtForChange = useCallback((value: string) => {
-    setCaughtFor((prevCaughtFor) => {
-      setRegisteredBy((prevRegisteredBy) =>
-        prevRegisteredBy === "" || prevRegisteredBy === prevCaughtFor
-          ? value
-          : prevRegisteredBy
-      );
-
-      return value;
-    });
+    setCaughtFor(value);
   }, []);
 
   const handleFishTypeChange = useCallback((value: string) => {
@@ -55,10 +57,6 @@ export function useCatchUploadForm() {
     if (value !== "Fina fisken") {
       setFineFishType("");
     }
-  }, []);
-
-  const handleRegisteredByChange = useCallback((value: string) => {
-    setRegisteredBy(value);
   }, []);
 
   const handleFineFishTypeChange = useCallback((value: string) => {
@@ -95,7 +93,6 @@ export function useCatchUploadForm() {
     resetForm,
     handleCaughtForChange,
     handleFishTypeChange,
-    handleRegisteredByChange,
     handleFineFishTypeChange,
     handleWeightChange,
     handleCatchDateChange,

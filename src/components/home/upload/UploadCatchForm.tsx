@@ -29,7 +29,6 @@ type UploadCatchFormProps = {
   loading: boolean;
   onSubmit: (e: FormEvent) => void;
   onCaughtForChange: (value: string) => void;
-  onRegisteredByChange: (value: string) => void;
   onFishTypeChange: (value: string) => void;
   onFineFishTypeChange: (value: string) => void;
   onWeightChange: (value: string) => void;
@@ -61,7 +60,6 @@ export default function UploadCatchForm({
   loading,
   onSubmit,
   onCaughtForChange,
-  onRegisteredByChange,
   onFishTypeChange,
   onFineFishTypeChange,
   onWeightChange,
@@ -99,19 +97,14 @@ export default function UploadCatchForm({
         ))}
       </select>
 
-      <select
-        value={registeredBy}
-        onChange={(e) => onRegisteredByChange(e.target.value)}
-        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
-        required
-      >
-        <option value="">Välj vem som registrerar</option>
-        {members.map((member) => (
-          <option key={member.id} value={member.name}>
-            {member.name}
-          </option>
-        ))}
-      </select>
+      <div className="w-full rounded-2xl border border-[#d8d2c7] bg-[#f8f5ef] px-4 py-3 text-[#1f2937]">
+        <div className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#6b7280]">
+          Registrerad av
+        </div>
+        <div className="text-sm font-medium">
+          {registeredBy || "Ingen inloggad registrerare"}
+        </div>
+      </div>
 
       <select
         value={fishType}

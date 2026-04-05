@@ -47,7 +47,6 @@ export type UploadCatchSectionProps = {
   loading: boolean;
   onSubmit: (e: FormEvent) => void;
   onCaughtForChange: (value: string) => void;
-  onRegisteredByChange: (value: string) => void;
   onFishTypeChange: (value: string) => void;
   onFineFishTypeChange: (value: string) => void;
   onWeightChange: (value: string) => void;
