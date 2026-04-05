@@ -71,7 +71,7 @@ export default function MemberCatchSpotlightModal({
         aria-label={`Fångstkort för ${displayFishName}`}
       >
         <div
-          className="relative w-full max-w-[360px] overflow-hidden rounded-[24px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_24px_60px_rgba(0,0,0,0.26)] sm:max-w-[390px]"
+          className="relative flex max-h-[70vh] w-full max-w-[360px] flex-col overflow-hidden rounded-[24px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_24px_60px_rgba(0,0,0,0.26)] sm:max-w-[390px]"
           onClick={(event) => event.stopPropagation()}
         >
           <div className="pointer-events-none absolute inset-x-0 top-0 h-[90px] bg-[radial-gradient(circle_at_top_left,rgba(228,209,165,0.38),transparent_44%),linear-gradient(180deg,rgba(244,236,221,0.72)_0%,rgba(252,251,248,0)_100%)]" />
@@ -85,7 +85,7 @@ export default function MemberCatchSpotlightModal({
             ×
           </button>
 
-          <div className="relative px-4 pb-4 pt-4 sm:px-4 sm:pb-4">
+          <div className="relative overflow-y-auto px-4 pb-4 pt-4 sm:px-4 sm:pb-4">
             <div className="inline-flex rounded-full border border-[#d8d2c7] bg-[#f2ede5] px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#5c4d3f] shadow-[0_4px_10px_rgba(0,0,0,0.04)]">
               Fångstkort
             </div>
@@ -110,7 +110,7 @@ export default function MemberCatchSpotlightModal({
                 <img
                   src={catchItem.image_url}
                   alt={`Fångstbild för ${displayFishName}`}
-                  className="h-40 w-full object-cover sm:h-44"
+                  className="h-36 w-full object-cover sm:h-40"
                   loading="lazy"
                   decoding="async"
                 />
