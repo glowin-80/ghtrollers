@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 
 type LeafletMapPickerProps = {
   onSelect: (lat: number, lng: number) => void;
+  selectedPosition?: [number, number] | null;
 };
 
 const defaultCenter: [number, number] = [59.3293, 18.0686];
@@ -46,13 +47,20 @@ function ClickHandler({
 
 export default function LeafletMapPicker({
   onSelect,
+  selectedPosition = null,
 }: LeafletMapPickerProps) {
-  const [position, setPosition] = useState<[number, number] | null>(null);
+  const [position, setPosition] = useState<[number, number] | null>(selectedPosition);
+
+  useEffect(() => {
+    setPosition(selectedPosition);
+  }, [selectedPosition]);
+
+  const center = position ?? defaultCenter;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-[#d8d2c7]">
       <MapContainer
-        center={defaultCenter}
+        center={center}
         zoom={6}
         scrollWheelZoom
         className="h-[420px] w-full"

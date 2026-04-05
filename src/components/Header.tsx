@@ -42,6 +42,13 @@ const desktopGraphicItems: NavItem[] = [
     alt: "Karta",
     type: "section",
   },
+  {
+    id: "markera-fiskeplats",
+    label: "Markera fiskeplats",
+    href: "/markera-fiskeplats",
+    alt: "Markera fiskeplats",
+    type: "route",
+  },
 ];
 
 const mobileMenuItems: NavItem[] = [
@@ -86,6 +93,13 @@ const mobileMenuItems: NavItem[] = [
     section: "map-section",
     alt: "Karta",
     type: "section",
+  },
+  {
+    id: "markera-fiskeplats",
+    label: "Markera fiskeplats",
+    href: "/markera-fiskeplats",
+    alt: "Markera fiskeplats",
+    type: "route",
   },
 ];
 
@@ -163,6 +177,14 @@ function getMobileCardTheme(itemId: string) {
           "border-[#c3a766] bg-[linear-gradient(180deg,#8b6aac_0%,#6d4f8f_100%)] text-[#f6e8c8]",
         iconCircle:
           "bg-[linear-gradient(180deg,#9d80bc_0%,#7b5c9c_100%)] text-[#f0ddb1]",
+        arrow: "text-[#f0ddb1]",
+      };
+    case "markera-fiskeplats":
+      return {
+        outer:
+          "border-[#c3a766] bg-[linear-gradient(180deg,#5f6f8f_0%,#42526f_100%)] text-[#f3e5c1]",
+        iconCircle:
+          "bg-[linear-gradient(180deg,#7b8aa8_0%,#596882_100%)] text-[#f0ddb1]",
         arrow: "text-[#f0ddb1]",
       };
     default:
@@ -282,7 +304,7 @@ export default function Header() {
       return;
     }
 
-    if (pathname === "/all-time-high") {
+    if (pathname === "/all-time-high" || pathname === "/markera-fiskeplats") {
       setIsMobileMenuOpen(false);
       return;
     }
@@ -387,6 +409,10 @@ export default function Header() {
 
       if (item.id === "gallery") {
         setActive("gallery");
+      }
+
+      if (item.id === "markera-fiskeplats") {
+        setActive("markera-fiskeplats");
       }
 
       navigateToHref(item.href);
@@ -575,6 +601,25 @@ export default function Header() {
                 gallery: "/nav/galleri.png",
                 map: "/nav/karta.png",
               };
+
+              if (item.id === "markera-fiskeplats") {
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => performNavigation(item)}
+                    className={[
+                      "inline-flex h-[34px] items-center rounded-full border border-[#c3a766] bg-[linear-gradient(180deg,#5f6f8f_0%,#42526f_100%)] px-4 text-[12px] font-semibold uppercase tracking-[0.04em] text-[#f3e5c1] transition-all duration-300 sm:h-[40px] md:h-[48px] md:px-5 md:text-[13px]",
+                      "hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]",
+                      isActive
+                        ? "scale-105 drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]"
+                        : "opacity-95",
+                    ].join(" ")}
+                  >
+                    Markera fiskeplats
+                  </button>
+                );
+              }
 
               return (
                 <button

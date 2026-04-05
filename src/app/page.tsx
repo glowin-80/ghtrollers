@@ -15,8 +15,14 @@ import RecentApprovedSection from "@/components/home/RecentApprovedSection";
 import MapPreviewSection from "@/components/home/MapPreviewSection";
 
 export default function Home() {
-  const { members, approvedCatches, isLoggedIn, hasActiveMembership, member } =
-    useHomeData();
+  const {
+    members,
+    approvedCatches,
+    approvedFishingSpots,
+    isLoggedIn,
+    hasActiveMembership,
+    member,
+  } = useHomeData();
 
   const {
     caughtFor,
@@ -199,6 +205,7 @@ export default function Home() {
             isLoggedIn={isLoggedIn}
             hasActiveMembership={hasActiveMembership}
             catches={approvedCatches}
+            fishingSpots={approvedFishingSpots}
           />
         </div>
 

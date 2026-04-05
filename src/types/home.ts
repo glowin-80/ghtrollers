@@ -1,3 +1,5 @@
+import type { FishingSpot } from "@/types/fishing-spots";
+
 export type Member = {
   id: string;
   name: string;
@@ -26,6 +28,8 @@ export type Catch = {
   status: "pending" | "approved" | "rejected" | string;
   created_at?: string;
 };
+
+export type { FishingSpot };
 
 export type LeaderboardFilter = "bigfive" | "abborre" | "gädda" | "fina";
 

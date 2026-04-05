@@ -4,10 +4,13 @@ import { useMemo } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { divIcon } from "leaflet";
-import type { Catch } from "@/types/home";
+import type { Catch, FishingSpot } from "@/types/home";
+import type { FishingSpotMapFilter } from "@/types/fishing-spots";
 
 type LeafletCatchesMapProps = {
   catches: Catch[];
+  fishingSpots?: FishingSpot[];
+  filter?: FishingSpotMapFilter;
 };
 
 const defaultCenter: [number, number] = [59.3293, 18.0686];
@@ -56,7 +59,7 @@ function getYearColor(year: number) {
   };
 }
 
-function createMarkerIcon(year: number) {
+function createCatchMarkerIcon(year: number) {
   const color = getYearColor(year);
 
   return divIcon({
@@ -77,7 +80,28 @@ function createMarkerIcon(year: number) {
   });
 }
 
-function createClusterCustomIcon(cluster: any) {
+function createFishingSpotMarkerIcon() {
+  return divIcon({
+    className: "custom-fishing-spot-marker",
+    html: `
+      <div style="position:relative;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">
+        <div style="
+          width: 16px;
+          height: 16px;
+          border-radius: 9999px;
+          background: #7c3aed;
+          border: 4px solid #ede9fe;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.22);
+        "></div>
+      </div>
+    `,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12],
+  });
+}
+
+function createClusterCustomIcon(cluster: { getChildCount: () => number }) {
   return divIcon({
     html: `
       <div style="
@@ -115,6 +139,8 @@ function getWeightLabel(weight: number) {
 
 export default function LeafletCatchesMap({
   catches,
+  fishingSpots = [],
+  filter = "all",
 }: LeafletCatchesMapProps) {
   const catchesWithCoords = useMemo(
     () =>
@@ -126,16 +152,33 @@ export default function LeafletCatchesMap({
     [catches]
   );
 
+  const spotsWithCoords = useMemo(
+    () =>
+      fishingSpots.filter(
+        (item) =>
+          typeof item.latitude === "number" &&
+          typeof item.longitude === "number"
+      ),
+    [fishingSpots]
+  );
+
+  const visibleCatches = filter === "spots" ? [] : catchesWithCoords;
+  const visibleSpots = filter === "catches" ? [] : spotsWithCoords;
+
   const center = useMemo<[number, number]>(() => {
-    if (catchesWithCoords.length > 0) {
+    if (visibleSpots.length > 0) {
+      return [visibleSpots[0].latitude, visibleSpots[0].longitude];
+    }
+
+    if (visibleCatches.length > 0) {
       return [
-        catchesWithCoords[0].latitude as number,
-        catchesWithCoords[0].longitude as number,
+        visibleCatches[0].latitude as number,
+        visibleCatches[0].longitude as number,
       ];
     }
 
     return defaultCenter;
-  }, [catchesWithCoords]);
+  }, [visibleCatches, visibleSpots]);
 
   return (
     <MapContainer
@@ -153,14 +196,14 @@ export default function LeafletCatchesMap({
         chunkedLoading
         iconCreateFunction={createClusterCustomIcon}
       >
-        {catchesWithCoords.map((item) => {
+        {visibleCatches.map((item) => {
           const year = getYearFromCatch(item);
 
           return (
             <Marker
-              key={item.id}
+              key={`catch-${item.id}`}
               position={[item.latitude as number, item.longitude as number]}
-              icon={createMarkerIcon(year)}
+              icon={createCatchMarkerIcon(year)}
             >
               <Popup>
                 <div className="min-w-[220px] max-w-[240px]">
@@ -181,18 +224,12 @@ export default function LeafletCatchesMap({
 
                   <div className="font-bold text-[#1f2937]">{item.caught_for}</div>
 
-                  <div className="text-sm text-[#4b5563]">
-                    {getFishLabel(item)}
-                  </div>
+                  <div className="text-sm text-[#4b5563]">{getFishLabel(item)}</div>
 
-                  <div className="text-sm text-[#4b5563]">
-                    {getWeightLabel(item.weight_g)}
-                  </div>
+                  <div className="text-sm text-[#4b5563]">{getWeightLabel(item.weight_g)}</div>
 
                   {item.location_name ? (
-                    <div className="text-sm text-[#6b7280]">
-                      {item.location_name}
-                    </div>
+                    <div className="text-sm text-[#6b7280]">{item.location_name}</div>
                   ) : null}
 
                   <div className="text-sm text-[#6b7280]">
@@ -213,6 +250,38 @@ export default function LeafletCatchesMap({
             </Marker>
           );
         })}
+
+        {visibleSpots.map((spot) => (
+          <Marker
+            key={`spot-${spot.id}`}
+            position={[spot.latitude, spot.longitude]}
+            icon={createFishingSpotMarkerIcon()}
+          >
+            <Popup>
+              <div className="min-w-[220px] max-w-[260px]">
+                <div className="font-bold text-[#1f2937]">
+                  {spot.title?.trim() || "Fiskeplats"}
+                </div>
+
+                <div className="mt-1 text-sm text-[#4b5563]">Markerad av {spot.created_by_name}</div>
+
+                {spot.notes?.trim() ? (
+                  <div className="mt-3 rounded-xl border border-[#e9e4dc] bg-[#faf8f4] px-3 py-2 text-sm text-[#4b5563]">
+                    {spot.notes}
+                  </div>
+                ) : null}
+
+                <div className="mt-3 text-sm text-[#6b7280]">
+                  {spot.latitude.toFixed(6)}, {spot.longitude.toFixed(6)}
+                </div>
+
+                <div className="mt-2 inline-flex rounded-full bg-[#ede9fe] px-2.5 py-1 text-xs font-semibold text-[#6d28d9]">
+                  Fiskeplats
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
       </MarkerClusterGroup>
     </MapContainer>
   );

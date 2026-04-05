@@ -1,9 +1,10 @@
 import { supabase } from "@/lib/supabase";
+import { fetchApprovedFishingSpots } from "@/lib/fishing-spots";
 import {
   HOME_ACTIVE_MEMBERS_SELECT,
   HOME_APPROVED_CATCHES_SELECT,
 } from "@/lib/home";
-import type { Catch, Member } from "@/types/home";
+import type { Catch, FishingSpot, Member } from "@/types/home";
 
 export async function fetchActiveMembers(): Promise<Member[]> {
   const { data, error } = await supabase
@@ -33,14 +34,21 @@ export async function fetchApprovedCatches(): Promise<Catch[]> {
   return data || [];
 }
 
-export async function fetchHomePageData(): Promise<{
+export async function fetchHomePageData(options?: {
+  includeFishingSpots?: boolean;
+}): Promise<{
   members: Member[];
   approvedCatches: Catch[];
+  approvedFishingSpots: FishingSpot[];
 }> {
-  const [membersResult, approvedCatchesResult] = await Promise.allSettled([
-    fetchActiveMembers(),
-    fetchApprovedCatches(),
-  ]);
+  const includeFishingSpots = options?.includeFishingSpots ?? false;
+
+  const [membersResult, approvedCatchesResult, approvedFishingSpotsResult] =
+    await Promise.allSettled([
+      fetchActiveMembers(),
+      fetchApprovedCatches(),
+      includeFishingSpots ? fetchApprovedFishingSpots() : Promise.resolve([]),
+    ]);
 
   const members =
     membersResult.status === "fulfilled" ? membersResult.value : [];
@@ -53,8 +61,19 @@ export async function fetchHomePageData(): Promise<{
     throw approvedCatchesResult.reason;
   }
 
+  if (approvedFishingSpotsResult.status === "rejected") {
+    console.warn(
+      "Could not load approved fishing spots for home data",
+      approvedFishingSpotsResult.reason
+    );
+  }
+
   return {
     members,
     approvedCatches: approvedCatchesResult.value,
+    approvedFishingSpots:
+      approvedFishingSpotsResult.status === "fulfilled"
+        ? approvedFishingSpotsResult.value
+        : [],
   };
 }
