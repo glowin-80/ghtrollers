@@ -4,6 +4,7 @@ export type CatchShareDetails = {
   shareText: string;
   shareTitle: string;
   yearlyRank: number | null;
+  yearlyRankYear: string | null;
   isCurrentAllTimeLeader: boolean;
   categoryLabel: string;
   fishLabel: string;
@@ -103,6 +104,58 @@ function isCurrentAllTimeLeader(target: Catch, approvedCatches: Catch[]) {
   });
 }
 
+function getFirstName(fullName: string) {
+  const trimmedName = fullName.trim();
+
+  if (!trimmedName) {
+    return fullName;
+  }
+
+  return trimmedName.split(/\s+/)[0] || trimmedName;
+}
+
+function getCurrentCompetitionYear() {
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Stockholm",
+    year: "numeric",
+  }).format(new Date());
+}
+
+function formatRankForSentence(rank: number) {
+  if (rank <= 0) {
+    return `${rank}`;
+  }
+
+  if (rank === 1 || rank === 2) {
+    return `${rank}:a`;
+  }
+
+  return `${rank}:e`;
+}
+
+function buildYearlyPlacementText(
+  fullName: string,
+  yearlyRank: number | null,
+  catchYear: string | null
+) {
+  if (!yearlyRank || !catchYear) {
+    return "";
+  }
+
+  const firstName = getFirstName(fullName);
+  const currentYear = getCurrentCompetitionYear();
+
+  if (catchYear === currentYear) {
+    return ` Fångsten placerar ${firstName} på plats ${yearlyRank} i årets tävling.`;
+  }
+
+  if (Number(catchYear) === Number(currentYear) - 1) {
+    return ` Förra året gav detta ${firstName} en ${formatRankForSentence(yearlyRank)} plats i tävlingen.`;
+  }
+
+  return ` År ${catchYear} gav detta ${firstName} en ${formatRankForSentence(yearlyRank)} plats i tävlingen.`;
+}
+
 export function buildCatchShareDetails(
   catchItem: Catch,
   approvedCatches: Catch[]
@@ -112,12 +165,10 @@ export function buildCatchShareDetails(
   const yearlyRank = getYearlyRank(catchItem, approvedCatches);
   const currentAllTimeLeader = isCurrentAllTimeLeader(catchItem, approvedCatches);
   const formattedDate = formatCatchDateForDisplay(catchItem.catch_date);
+  const catchYear = catchItem.catch_date?.slice(0, 4) ?? null;
 
   const baseText = `${catchItem.caught_for} drog upp en ${fishLabel} på ${catchItem.weight_g} g den ${formattedDate}.`;
-
-  const yearlyText = yearlyRank
-    ? ` Fångsten placerar ${catchItem.caught_for} på plats ${yearlyRank} i årets tävling.`
-    : "";
+  const yearlyText = buildYearlyPlacementText(catchItem.caught_for, yearlyRank, catchYear);
 
   const allTimeText = currentAllTimeLeader
     ? ` Fångsten tar även förstaplatsen i All-Time-High för ${categoryLabel}.`
@@ -127,6 +178,7 @@ export function buildCatchShareDetails(
     shareTitle: `${catchItem.caught_for} · ${fishLabel} · Gäddhäng Trollers`,
     shareText: `${baseText}${yearlyText}${allTimeText}`.trim(),
     yearlyRank,
+    yearlyRankYear: catchYear,
     isCurrentAllTimeLeader: currentAllTimeLeader,
     categoryLabel,
     fishLabel,

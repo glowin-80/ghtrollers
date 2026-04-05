@@ -30,7 +30,6 @@ export default function ShareCatchButton({
       if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
         await navigator.share({
           title: shareTitle,
-          text: shareText,
           url: shareUrl,
         });
         return;

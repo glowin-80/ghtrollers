@@ -49,13 +49,19 @@ export async function generateMetadata({ params }: CatchPageProps): Promise<Meta
   const { catchItem, shareDetails } = data;
   const title = `${catchItem.caught_for} · ${shareDetails.fishLabel} · Gäddhäng Trollers`;
   const description = shareDetails.shareText;
+  const catchUrl = `/fangst/${catchItem.id}`;
 
   return {
     title,
     description,
+    alternates: {
+      canonical: catchUrl,
+    },
     openGraph: {
       title,
       description,
+      url: catchUrl,
+      siteName: "Gäddhäng Trollers",
       type: "article",
       locale: "sv_SE",
       images: catchItem.image_url
@@ -85,6 +91,9 @@ export default async function CatchPage({ params }: CatchPageProps) {
   }
 
   const { catchItem, shareDetails } = data;
+  const yearlyRankLabel = shareDetails.yearlyRank
+    ? `Plats ${shareDetails.yearlyRank}${shareDetails.yearlyRankYear ? ` · ${shareDetails.yearlyRankYear}` : ""}`
+    : "Placering saknas";
 
   return (
     <main className="px-4 pb-10 pt-4">
@@ -136,11 +145,7 @@ export default async function CatchPage({ params }: CatchPageProps) {
                 <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#7a6540]">
                   Årsplacering
                 </div>
-                <div className="mt-2 text-[1rem] font-semibold text-[#1f2937]">
-                  {shareDetails.yearlyRank
-                    ? `Plats ${shareDetails.yearlyRank}`
-                    : "Placering saknas"}
-                </div>
+                <div className="mt-2 text-[1rem] font-semibold text-[#1f2937]">{yearlyRankLabel}</div>
               </div>
             </div>
 
