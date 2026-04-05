@@ -358,9 +358,29 @@ export default function Header() {
     };
   }, [pathname]);
 
+  const filteredDesktopItems = useMemo(() => {
+    if (isLoggedIn) {
+      return desktopGraphicItems;
+    }
+
+    return desktopGraphicItems.filter(
+      (item) => item.id !== "map" && item.id !== "markera-fiskeplats"
+    );
+  }, [isLoggedIn]);
+
+  const filteredMobileItems = useMemo(() => {
+    if (isLoggedIn) {
+      return mobileMenuItems;
+    }
+
+    return mobileMenuItems.filter(
+      (item) => item.id !== "map" && item.id !== "markera-fiskeplats"
+    );
+  }, [isLoggedIn]);
+
   const desktopNavItems = useMemo<NavItem[]>(() => {
     return [
-      ...desktopGraphicItems,
+      ...filteredDesktopItems,
       {
         id: "account",
         label: isLoggedIn ? "Min sida" : "Logga in",
@@ -368,7 +388,7 @@ export default function Header() {
         type: "action",
       },
     ];
-  }, [isLoggedIn]);
+  }, [filteredDesktopItems, isLoggedIn]);
 
   function navigateToHref(href: string) {
     const [rawPath, rawHash] = href.split("#");
@@ -545,7 +565,7 @@ export default function Header() {
             >
               <div className="rounded-[22px] border border-[#cbb489] bg-[linear-gradient(180deg,rgba(252,246,235,0.96)_0%,rgba(235,224,202,0.93)_100%)] p-[7px] shadow-[0_16px_34px_rgba(0,0,0,0.16)]">
                 <div className="flex flex-col gap-[7px]">
-                  {mobileMenuItems.map((item) => renderMobileMenuButton(item))}
+                  {filteredMobileItems.map((item) => renderMobileMenuButton(item))}
                 </div>
               </div>
             </div>
