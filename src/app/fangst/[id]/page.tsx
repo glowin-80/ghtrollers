@@ -50,6 +50,7 @@ export async function generateMetadata({ params }: CatchPageProps): Promise<Meta
   const title = `${catchItem.caught_for} · ${shareDetails.fishLabel} · Gäddhäng Trollers`;
   const description = shareDetails.shareText;
   const catchUrl = `/fangst/${catchItem.id}`;
+  const openGraphImageUrl = `/fangst/${catchItem.id}/opengraph-image`;
 
   return {
     title,
@@ -64,20 +65,20 @@ export async function generateMetadata({ params }: CatchPageProps): Promise<Meta
       siteName: "Gäddhäng Trollers",
       type: "article",
       locale: "sv_SE",
-      images: catchItem.image_url
-        ? [
-            {
-              url: catchItem.image_url,
-              alt: `${catchItem.caught_for} med ${shareDetails.fishLabel}`,
-            },
-          ]
-        : undefined,
+      images: [
+        {
+          url: openGraphImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${catchItem.caught_for} med ${shareDetails.fishLabel}`,
+        },
+      ],
     },
     twitter: {
-      card: catchItem.image_url ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title,
       description,
-      images: catchItem.image_url ? [catchItem.image_url] : undefined,
+      images: [openGraphImageUrl],
     },
   };
 }
