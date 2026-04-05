@@ -7,7 +7,6 @@ import { useAuthMember } from "@/hooks/useAuthMember";
 
 type NavItem = {
   id: string;
-  src?: string;
   label?: string;
   section?: string;
   href?: string;
@@ -18,7 +17,6 @@ type NavItem = {
 const desktopGraphicItems: NavItem[] = [
   {
     id: "leaderboard",
-    src: "/nav/leaderboard.png",
     label: "Leaderboard",
     section: "leaderboard-section",
     alt: "Leaderboard",
@@ -26,7 +24,6 @@ const desktopGraphicItems: NavItem[] = [
   },
   {
     id: "upload",
-    src: "/nav/laddaUpp.png",
     label: "Ladda upp fångst",
     section: "upload-section",
     alt: "Ladda upp fångst",
@@ -34,7 +31,6 @@ const desktopGraphicItems: NavItem[] = [
   },
   {
     id: "gallery",
-    src: "/nav/galleri.png",
     label: "Galleri",
     href: "/galleri",
     alt: "Galleri",
@@ -42,7 +38,6 @@ const desktopGraphicItems: NavItem[] = [
   },
   {
     id: "map",
-    src: "/nav/karta.png",
     label: "Karta",
     section: "map-section",
     alt: "Karta",
@@ -70,13 +65,6 @@ const mobileMenuItems: NavItem[] = [
     label: "Ladda upp fångst",
     section: "upload-section",
     alt: "Ladda upp fångst",
-    type: "section",
-  },
-  {
-    id: "approved",
-    label: "Nya godkända fångster",
-    section: "approved-section",
-    alt: "Nya godkända fångster",
     type: "section",
   },
   {
@@ -133,74 +121,58 @@ function getMobileCardTheme(itemId: string) {
     case "home":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#f4e7ca_0%,#e2cfab_100%)] text-[#35291b]",
+          "border-[#c6ab68] bg-[linear-gradient(180deg,#f7edd9_0%,#e9dbbd_100%)] text-[#342719]",
         iconCircle:
-          "border-[#ccb175] bg-[linear-gradient(180deg,#fff5de_0%,#ecd8b3_100%)] text-[#5e4829]",
-        arrow:
-          "text-[#5c472a]",
+          "border-[#d2b77a] bg-[linear-gradient(180deg,#fff7e6_0%,#efdfbf_100%)] text-[#6a5230]",
+        arrow: "text-[#6a5230]",
       };
     case "leaderboard":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#40596d_0%,#283946_100%)] text-[#f7e8c3]",
+          "border-[#c3a766] bg-[linear-gradient(180deg,#3f6079_0%,#28435a_100%)] text-[#f5e6bf]",
         iconCircle:
-          "border-[#8ba0b1] bg-[linear-gradient(180deg,#5a7488_0%,#334957_100%)] text-[#f3ddb0]",
-        arrow:
-          "text-[#ecd8a5]",
+          "border-[#91a9bb] bg-[linear-gradient(180deg,#5b7a96_0%,#38546b_100%)] text-[#f4ddab]",
+        arrow: "text-[#f4ddab]",
       };
     case "upload":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#445842_0%,#293622_100%)] text-[#f1e2bb]",
+          "border-[#c3a766] bg-[linear-gradient(180deg,#536a40_0%,#344628_100%)] text-[#f3e2b6]",
         iconCircle:
-          "border-[#7f916f] bg-[linear-gradient(180deg,#566c52_0%,#37442f_100%)] text-[#ecd8a5]",
-        arrow:
-          "text-[#ecd8a5]",
-      };
-    case "approved":
-      return {
-        outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#f6eee0_0%,#e8dbc3_100%)] text-[#3c2f22]",
-        iconCircle:
-          "border-[#ccb175] bg-[linear-gradient(180deg,#fff8eb_0%,#eee0c6_100%)] text-[#654f31]",
-        arrow:
-          "text-[#654f31]",
+          "border-[#8ca178] bg-[linear-gradient(180deg,#6a8254_0%,#455c34_100%)] text-[#f1dca7]",
+        arrow: "text-[#f1dca7]",
       };
     case "gallery":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#876138_0%,#614122_100%)] text-[#f8e9c6]",
+          "border-[#c3a766] bg-[linear-gradient(180deg,#8a6237_0%,#65431f_100%)] text-[#f6e5c0]",
         iconCircle:
-          "border-[#b88c57] bg-[linear-gradient(180deg,#9d7750_0%,#734c2a_100%)] text-[#f4ddb2]",
-        arrow:
-          "text-[#f4ddb2]",
+          "border-[#bb905f] bg-[linear-gradient(180deg,#a17849_0%,#784f28_100%)] text-[#f0d8a8]",
+        arrow: "text-[#f0d8a8]",
       };
     case "map":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#567a75_0%,#375552_100%)] text-[#f2e3bf]",
+          "border-[#c3a766] bg-[linear-gradient(180deg,#5c837f_0%,#3d615d_100%)] text-[#f2e1b9]",
         iconCircle:
-          "border-[#88a79f] bg-[linear-gradient(180deg,#72958f_0%,#4a6964_100%)] text-[#f0ddb1]",
-        arrow:
-          "text-[#f0ddb1]",
+          "border-[#95b2aa] bg-[linear-gradient(180deg,#78a09a_0%,#537874_100%)] text-[#efdbab]",
+        arrow: "text-[#efdbab]",
       };
     case "all-time-high":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#ede2cb_0%,#d8c8a7_100%)] text-[#372b1d]",
+          "border-[#c3a766] bg-[linear-gradient(180deg,#f1e6cf_0%,#dfcdab_100%)] text-[#34281a]",
         iconCircle:
-          "border-[#ccb175] bg-[linear-gradient(180deg,#f8efd9_0%,#e6d3ae_100%)] text-[#5d4727]",
-        arrow:
-          "text-[#5d4727]",
+          "border-[#d2b77a] bg-[linear-gradient(180deg,#fbf1dc_0%,#e8d5b0_100%)] text-[#6a512c]",
+        arrow: "text-[#6a512c]",
       };
     default:
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#f6eee0_0%,#e8dbc3_100%)] text-[#3c2f22]",
+          "border-[#c3a766] bg-[linear-gradient(180deg,#f6eee0_0%,#e8dbc3_100%)] text-[#3c2f22]",
         iconCircle:
           "border-[#ccb175] bg-[linear-gradient(180deg,#fff8eb_0%,#eee0c6_100%)] text-[#654f31]",
-        arrow:
-          "text-[#654f31]",
+        arrow: "text-[#654f31]",
       };
   }
 }
@@ -284,7 +256,6 @@ export default function Header() {
       ...desktopGraphicItems,
       {
         id: "account",
-        src: "/nav/loggaIn.png",
         label: isLoggedIn ? "Min sida" : "Logga in",
         alt: isLoggedIn ? "Min sida" : "Logga in",
         type: "action",
@@ -382,8 +353,8 @@ export default function Header() {
         type="button"
         onClick={() => performNavigation(item)}
         className={[
-          "group relative flex w-full items-center gap-3 overflow-hidden rounded-full border px-3 py-[7px] text-left shadow-[0_8px_18px_rgba(0,0,0,0.14)] transition-all duration-200",
-          "min-h-[48px] active:scale-[0.99]",
+          "group relative flex w-full items-center gap-[10px] overflow-hidden rounded-full border px-[11px] py-[5px] text-left shadow-[0_7px_16px_rgba(0,0,0,0.13)] transition-all duration-200",
+          "min-h-[44px] active:scale-[0.99]",
           isActive ? "scale-[1.01]" : "hover:scale-[1.01]",
           theme.outer,
         ].join(" ")}
@@ -392,30 +363,30 @@ export default function Header() {
 
         <div
           className={[
-            "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]",
+            "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full border shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]",
             theme.iconCircle,
           ].join(" ")}
           aria-hidden="true"
         >
-          <span className="text-[14px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.18)]">
+          <span className="text-[13px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.18)]">
             {getFallbackIcon()}
           </span>
         </div>
 
         <div className="min-w-0 flex-1 pr-1">
-          <div className="truncate text-[14px] font-semibold leading-[1.05] tracking-[0.01em]">
+          <div className="truncate text-[13px] font-semibold leading-[1.05] tracking-[0.01em]">
             {item.label}
           </div>
         </div>
 
         <div
           className={[
-            "flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-[1px]",
+            "flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-[1px]",
             theme.arrow,
           ].join(" ")}
           aria-hidden="true"
         >
-          <span className="text-[18px] leading-none">›</span>
+          <span className="text-[17px] leading-none">›</span>
         </div>
       </button>
     );
@@ -494,12 +465,12 @@ export default function Header() {
               className={[
                 "overflow-hidden transition-all duration-300 ease-out",
                 isMobileMenuOpen
-                  ? "mt-3 max-h-[640px] opacity-100"
+                  ? "mt-3 max-h-[560px] opacity-100"
                   : "mt-0 max-h-0 opacity-0",
               ].join(" ")}
             >
-              <div className="rounded-[22px] border border-[#c7b28a] bg-[linear-gradient(180deg,rgba(255,248,235,0.94)_0%,rgba(234,222,200,0.92)_100%)] p-[8px] shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-                <div className="flex flex-col gap-[8px]">
+              <div className="rounded-[22px] border border-[#cbb489] bg-[linear-gradient(180deg,rgba(252,246,235,0.96)_0%,rgba(235,224,202,0.93)_100%)] p-[7px] shadow-[0_16px_34px_rgba(0,0,0,0.16)]">
+                <div className="flex flex-col gap-[7px]">
                   {mobileMenuItems.map((item) => renderMobileMenuButton(item))}
                 </div>
               </div>
@@ -531,14 +502,21 @@ export default function Header() {
                     className="rounded-full bg-transparent opacity-95 transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]"
                   >
                     <img
-                      src={item.src}
-                      alt={item.alt}
+                      src="/nav/loggaIn.png"
+                      alt="Logga in"
                       draggable={false}
                       className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]"
                     />
                   </button>
                 );
               }
+
+              const srcMap: Record<string, string> = {
+                leaderboard: "/nav/leaderboard.png",
+                upload: "/nav/laddaUpp.png",
+                gallery: "/nav/galleri.png",
+                map: "/nav/karta.png",
+              };
 
               return (
                 <button
@@ -554,7 +532,7 @@ export default function Header() {
                   ].join(" ")}
                 >
                   <img
-                    src={item.src}
+                    src={srcMap[item.id]}
                     alt={item.alt}
                     draggable={false}
                     className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]"
