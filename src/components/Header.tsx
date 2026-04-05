@@ -287,41 +287,39 @@ export default function Header() {
   function renderMobileMenuButton(item: NavItem) {
     if (item.src) {
       return (
-        <div key={item.id} className="w-full max-w-[360px]">
-          <button
-            type="button"
-            onClick={() => performNavigation(item)}
-            className="block w-full rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
-          >
-            <img
-              src={item.src}
-              alt={item.alt}
-              draggable={false}
-              className="block h-[40px] w-full object-contain object-left"
-            />
-          </button>
-        </div>
+        <button
+          key={item.id}
+          type="button"
+          onClick={() => performNavigation(item)}
+          className="block w-fit rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
+        >
+          <img
+            src={item.src}
+            alt={item.alt}
+            draggable={false}
+            className="block h-[40px] w-auto object-contain"
+          />
+        </button>
       );
     }
 
     return (
-      <div key={item.id} className="w-full max-w-[360px]">
-        <button
-          type="button"
-          onClick={() => performNavigation(item)}
-          className="flex h-[40px] w-full items-center justify-between rounded-full border border-[#cfc4ae] bg-[#f8f4ea] px-4 text-left text-[#3f352b] shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-200 hover:scale-[1.01]"
+      <button
+        key={item.id}
+        type="button"
+        onClick={() => performNavigation(item)}
+        className="flex h-[40px] w-[330px] max-w-[calc(100vw-48px)] items-center justify-between rounded-full border border-[#cfc4ae] bg-[#f8f4ea] px-4 text-left text-[#3f352b] shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-200 hover:scale-[1.01]"
+      >
+        <span className="truncate text-[0.95rem] font-semibold leading-none">
+          {item.label}
+        </span>
+        <span
+          aria-hidden="true"
+          className="ml-3 shrink-0 text-[0.95rem] font-semibold text-[#8b7355]"
         >
-          <span className="truncate text-[0.95rem] font-semibold leading-none">
-            {item.label}
-          </span>
-          <span
-            aria-hidden="true"
-            className="ml-3 shrink-0 text-[0.95rem] font-semibold text-[#8b7355]"
-          >
-            →
-          </span>
-        </button>
-      </div>
+          →
+        </span>
+      </button>
     );
   }
 
