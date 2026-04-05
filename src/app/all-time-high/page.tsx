@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useHomeData } from "@/hooks/useHomeData";
-import { buildAllTimeHighlights } from "@/lib/home";
-import type { AllTimeHighlight, LeaderboardFilter } from "@/types/home";
+import { buildAllTimeHighlights, buildBigFiveBreakdowns } from "@/lib/home";
+import type {
+  AllTimeHighlight,
+  BigFiveBreakdown,
+  LeaderboardFilter,
+} from "@/types/home";
 
 const sections: { label: string; value: LeaderboardFilter }[] = [
   { label: "Abborre", value: "abborre" },
@@ -34,6 +38,14 @@ function formatWeight(filter: LeaderboardFilter, total: number) {
   return `${total} g`;
 }
 
+function formatWeightFromGrams(weight: number) {
+  if (weight >= 1000) {
+    return `${(weight / 1000).toFixed(2)} kg`;
+  }
+
+  return `${weight} g`;
+}
+
 function formatDate(dateString?: string | null) {
   if (!dateString) {
     return "Saknas";
@@ -56,6 +68,58 @@ function getCardCopy(item: AllTimeHighlight) {
   }
 
   return item.title;
+}
+
+function BigFiveBreakdownPanel({
+  breakdown,
+}: {
+  breakdown: BigFiveBreakdown;
+}) {
+  return (
+    <div className="mt-4 rounded-[22px] border border-[#dccb97] bg-white/72 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#7a6540]">
+          Underlag för Big Five
+        </div>
+        <div className="text-[0.78rem] font-semibold text-[#6c5b3d]">
+          Total: {formatWeightFromGrams(breakdown.total)}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {breakdown.items.map((item) => (
+          <div
+            key={item.catchId}
+            className="rounded-[16px] border border-[#eadfbe] bg-[#fffdf7] px-3 py-2.5"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[0.95rem] font-bold leading-tight text-[#1f2937]">
+                  {item.fishLabel}
+                </div>
+                <div className="mt-1 text-[0.8rem] text-[#6b7280]">
+                  {formatDate(item.catchDate)}
+                </div>
+              </div>
+
+              <div className="shrink-0 text-right">
+                <div className="text-[0.92rem] font-bold leading-tight text-[#1f2937]">
+                  {item.usesMultiplier
+                    ? `${formatWeightFromGrams(item.originalWeight)} ×4`
+                    : formatWeightFromGrams(item.originalWeight)}
+                </div>
+                <div className="mt-1 text-[0.78rem] font-semibold text-[#7a6540]">
+                  {item.usesMultiplier
+                    ? `Räknas som ${formatWeightFromGrams(item.adjustedWeight)}`
+                    : "Ingen justering"}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function EmptyAllTimeCard({ filter }: { filter: LeaderboardFilter }) {
@@ -87,10 +151,21 @@ function EmptyAllTimeCard({ filter }: { filter: LeaderboardFilter }) {
 function AllTimeCard({
   item,
   profileImage,
+  bigFiveBreakdown,
+  isExpanded,
+  onToggleExpanded,
+  onImageClick,
 }: {
   item: AllTimeHighlight;
   profileImage: string | null;
+  bigFiveBreakdown?: BigFiveBreakdown;
+  isExpanded: boolean;
+  onToggleExpanded?: () => void;
+  onImageClick: (imageUrl: string) => void;
 }) {
+  const isBigFiveCard =
+    item.filter === "bigfive" && bigFiveBreakdown && onToggleExpanded;
+
   return (
     <section id={getSectionId(item.filter)} className="scroll-mt-[360px]">
       <div className="relative overflow-visible rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_12px_36px_rgba(18,35,28,0.08)]">
@@ -133,6 +208,17 @@ function AllTimeCard({
                 <div className="mt-2 text-[1.2rem] font-medium leading-tight text-[#74685a] sm:text-[1.35rem]">
                   {getCardCopy(item)}
                 </div>
+
+                {isBigFiveCard ? (
+                  <button
+                    type="button"
+                    onClick={onToggleExpanded}
+                    className="mt-3 inline-flex rounded-full border border-[#d8d2c7] bg-white px-3 py-1.5 text-[0.82rem] font-semibold text-[#5c4d3f] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
+                    aria-expanded={isExpanded}
+                  >
+                    {isExpanded ? "Dölj underlag" : "Visa underlag"}
+                  </button>
+                ) : null}
               </div>
             </div>
           </div>
@@ -147,7 +233,12 @@ function AllTimeCard({
           </div>
 
           {item.catchImageUrl ? (
-            <div className="mt-8 overflow-hidden rounded-[24px] border border-[#e5ddd0] bg-[#fffdf9] shadow-[0_8px_18px_rgba(18,35,28,0.06)]">
+            <button
+              type="button"
+              onClick={() => onImageClick(item.catchImageUrl as string)}
+              className="mt-8 block w-full overflow-hidden rounded-[24px] border border-[#e5ddd0] bg-[#fffdf9] text-left shadow-[0_8px_18px_rgba(18,35,28,0.06)] transition hover:brightness-[1.02]"
+              aria-label={`Öppna fångstbild för ${item.winnerName}`}
+            >
               <img
                 src={item.catchImageUrl}
                 alt={`Fångstbild för ${item.winnerName}`}
@@ -155,7 +246,11 @@ function AllTimeCard({
                 loading="lazy"
                 decoding="async"
               />
-            </div>
+            </button>
+          ) : null}
+
+          {isBigFiveCard && isExpanded ? (
+            <BigFiveBreakdownPanel breakdown={bigFiveBreakdown} />
           ) : null}
 
           <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -185,9 +280,15 @@ function AllTimeCard({
 
 export default function AllTimeHighPage() {
   const { approvedCatches, members } = useHomeData();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [expandedBigFive, setExpandedBigFive] = useState(false);
 
   const allTimeHighlights = useMemo(() => {
     return buildAllTimeHighlights(approvedCatches);
+  }, [approvedCatches]);
+
+  const bigFiveBreakdowns = useMemo(() => {
+    return buildBigFiveBreakdowns(approvedCatches);
   }, [approvedCatches]);
 
   const memberImageMap = useMemo(() => {
@@ -205,6 +306,11 @@ export default function AllTimeHighPage() {
       return acc;
     }, {});
   }, [allTimeHighlights]);
+
+  const allTimeBigFiveWinner = highlightMap.bigfive?.winnerName ?? null;
+  const allTimeBigFiveBreakdown = allTimeBigFiveWinner
+    ? bigFiveBreakdowns[allTimeBigFiveWinner]
+    : undefined;
 
   return (
     <main className="px-4 pb-10 pt-4">
@@ -254,10 +360,34 @@ export default function AllTimeHighPage() {
                 key={section.value}
                 item={highlight}
                 profileImage={memberImageMap[highlight.winnerName] || null}
+                bigFiveBreakdown={
+                  section.value === "bigfive" ? allTimeBigFiveBreakdown : undefined
+                }
+                isExpanded={section.value === "bigfive" ? expandedBigFive : false}
+                onToggleExpanded={
+                  section.value === "bigfive"
+                    ? () => setExpandedBigFive((current) => !current)
+                    : undefined
+                }
+                onImageClick={setSelectedImage}
               />
             );
           })}
         </div>
+
+        {selectedImage ? (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+            onClick={() => setSelectedImage(null)}
+          >
+            <img
+              src={selectedImage}
+              alt="Förstorad fångstbild"
+              className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
+              decoding="async"
+            />
+          </div>
+        ) : null}
       </div>
     </main>
   );

@@ -180,6 +180,7 @@ function LeaderboardRow({
   bigFiveBreakdown,
   isExpanded,
   onToggleExpanded,
+  onImageClick,
 }: {
   entry: LeaderboardEntry;
   index: number;
@@ -188,6 +189,7 @@ function LeaderboardRow({
   bigFiveBreakdown?: BigFiveBreakdown;
   isExpanded: boolean;
   onToggleExpanded?: () => void;
+  onImageClick: (imageUrl: string) => void;
 }) {
   const styles = getPlacementBadge(index);
   const secondaryText =
@@ -309,11 +311,14 @@ function LeaderboardRow({
       )}
 
       {entry.catchImageUrl ? (
-        <div
+        <button
+          type="button"
+          onClick={() => onImageClick(entry.catchImageUrl as string)}
           className={[
-            "mt-3 overflow-hidden rounded-[18px] border",
+            "mt-3 block w-full overflow-hidden rounded-[18px] border text-left transition hover:brightness-[1.02]",
             styles.catchImageWrapClass,
           ].join(" ")}
+          aria-label={`Öppna fångstbild för ${entry.name}`}
         >
           <img
             src={entry.catchImageUrl}
@@ -322,7 +327,7 @@ function LeaderboardRow({
             loading="lazy"
             decoding="async"
           />
-        </div>
+        </button>
       ) : null}
 
       {isBigFiveRow && isExpanded ? (
@@ -347,6 +352,7 @@ function LeaderboardSectionComponent({
   const [expandedBigFiveName, setExpandedBigFiveName] = useState<string | null>(
     null
   );
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const memberImageMap = useMemo(() => {
     return members.reduce<Record<string, string | null>>((acc, member) => {
@@ -460,11 +466,26 @@ function LeaderboardSectionComponent({
                     ? () => handleToggleExpanded(entry.name)
                     : undefined
                 }
+                onImageClick={setSelectedImage}
               />
             ))}
           </div>
         )}
       </div>
+
+      {selectedImage ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <img
+            src={selectedImage}
+            alt="Förstorad fångstbild"
+            className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
+            decoding="async"
+          />
+        </div>
+      ) : null}
     </section>
   );
 }
