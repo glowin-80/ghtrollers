@@ -1,13 +1,11 @@
 "use client";
 
-import MemberButton from "@/components/shared/MemberButton";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthMember } from "@/hooks/useAuthMember";
 
 type NavItem = {
   id: string;
-  src?: string;
   label?: string;
   section?: string;
   href?: string;
@@ -15,12 +13,9 @@ type NavItem = {
   type: "section" | "route" | "action";
 };
 
-const MOBILE_MENU_BUTTON_WIDTH = 164;
-
 const desktopGraphicItems: NavItem[] = [
   {
     id: "leaderboard",
-    src: "/nav/leaderboard.png",
     label: "Leaderboard",
     section: "leaderboard-section",
     alt: "Leaderboard",
@@ -28,7 +23,6 @@ const desktopGraphicItems: NavItem[] = [
   },
   {
     id: "upload",
-    src: "/nav/laddaUpp.png",
     label: "Ladda upp fångst",
     section: "upload-section",
     alt: "Ladda upp fångst",
@@ -36,7 +30,6 @@ const desktopGraphicItems: NavItem[] = [
   },
   {
     id: "gallery",
-    src: "/nav/galleri.png",
     label: "Galleri",
     href: "/galleri",
     alt: "Galleri",
@@ -44,7 +37,6 @@ const desktopGraphicItems: NavItem[] = [
   },
   {
     id: "map",
-    src: "/nav/karta.png",
     label: "Karta",
     section: "map-section",
     alt: "Karta",
@@ -61,42 +53,17 @@ const mobileMenuItems: NavItem[] = [
     type: "route",
   },
   {
-    id: "leaderboard",
-    src: "/nav/leaderboard.png",
-    label: "Leaderboard",
-    section: "leaderboard-section",
-    alt: "Leaderboard",
-    type: "section",
-  },
-  {
     id: "upload",
-    src: "/nav/laddaUpp.png",
     label: "Ladda upp fångst",
     section: "upload-section",
     alt: "Ladda upp fångst",
     type: "section",
   },
   {
-    id: "approved",
-    label: "Nya godkända fångster",
-    section: "approved-section",
-    alt: "Nya godkända fångster",
-    type: "section",
-  },
-  {
-    id: "gallery",
-    src: "/nav/galleri.png",
-    label: "Galleri",
-    href: "/galleri",
-    alt: "Galleri",
-    type: "route",
-  },
-  {
-    id: "map",
-    src: "/nav/karta.png",
-    label: "Karta",
-    section: "map-section",
-    alt: "Karta",
+    id: "leaderboard",
+    label: "Leaderboard",
+    section: "leaderboard-section",
+    alt: "Leaderboard",
     type: "section",
   },
   {
@@ -105,6 +72,20 @@ const mobileMenuItems: NavItem[] = [
     href: "/all-time-high",
     alt: "All-time-high",
     type: "route",
+  },
+  {
+    id: "gallery",
+    label: "Galleri",
+    href: "/galleri",
+    alt: "Galleri",
+    type: "route",
+  },
+  {
+    id: "map",
+    label: "Karta",
+    section: "map-section",
+    alt: "Karta",
+    type: "section",
   },
 ];
 
@@ -132,6 +113,157 @@ function scrollToSection(sectionId: string, attempt = 0) {
     top: Math.max(targetPosition, 0),
     behavior: "smooth",
   });
+}
+
+function getMobileCardTheme(itemId: string) {
+  switch (itemId) {
+    case "home":
+      return {
+        outer:
+          "border-[#c6ab68] bg-[linear-gradient(180deg,#f7edd9_0%,#e9dbbd_100%)] text-[#342719]",
+        iconCircle:
+          "bg-[linear-gradient(180deg,#fff7e6_0%,#efdfbf_100%)] text-[#6a5230]",
+        arrow: "text-[#6a5230]",
+      };
+    case "leaderboard":
+      return {
+        outer:
+          "border-[#c3a766] bg-[linear-gradient(180deg,#3f6079_0%,#28435a_100%)] text-[#f5e6bf]",
+        iconCircle:
+          "bg-[linear-gradient(180deg,#5b7a96_0%,#38546b_100%)] text-[#f4ddab]",
+        arrow: "text-[#f4ddab]",
+      };
+    case "upload":
+      return {
+        outer:
+          "border-[#c3a766] bg-[linear-gradient(180deg,#536a40_0%,#344628_100%)] text-[#f3e2b6]",
+        iconCircle:
+          "bg-[linear-gradient(180deg,#6a8254_0%,#455c34_100%)] text-[#f1dca7]",
+        arrow: "text-[#f1dca7]",
+      };
+    case "gallery":
+      return {
+        outer:
+          "border-[#c3a766] bg-[linear-gradient(180deg,#8a6237_0%,#65431f_100%)] text-[#f6e5c0]",
+        iconCircle:
+          "bg-[linear-gradient(180deg,#a17849_0%,#784f28_100%)] text-[#f0d8a8]",
+        arrow: "text-[#f0d8a8]",
+      };
+    case "map":
+      return {
+        outer:
+          "border-[#c3a766] bg-[linear-gradient(180deg,#5c837f_0%,#3d615d_100%)] text-[#f2e1b9]",
+        iconCircle:
+          "bg-[linear-gradient(180deg,#78a09a_0%,#537874_100%)] text-[#efdbab]",
+        arrow: "text-[#efdbab]",
+      };
+    case "all-time-high":
+      return {
+        outer:
+          "border-[#c3a766] bg-[linear-gradient(180deg,#8b6aac_0%,#6d4f8f_100%)] text-[#f6e8c8]",
+        iconCircle:
+          "bg-[linear-gradient(180deg,#9d80bc_0%,#7b5c9c_100%)] text-[#f0ddb1]",
+        arrow: "text-[#f0ddb1]",
+      };
+    default:
+      return {
+        outer:
+          "border-[#c3a766] bg-[linear-gradient(180deg,#f6eee0_0%,#e8dbc3_100%)] text-[#3c2f22]",
+        iconCircle:
+          "bg-[linear-gradient(180deg,#fff8eb_0%,#eee0c6_100%)] text-[#654f31]",
+        arrow: "text-[#654f31]",
+      };
+  }
+}
+
+function getFallbackIcon() {
+  return "★";
+}
+
+function TopBubble({
+  imageUrl,
+  alt,
+}: {
+  imageUrl?: string | null;
+  alt: string;
+}) {
+  if (imageUrl) {
+    return (
+      <div className="absolute left-0 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#d2b77a] bg-[#29441f] shadow-[0_2px_7px_rgba(0,0,0,0.16),inset_0_1px_0_rgba(255,255,255,0.22)]">
+        <img
+          src={imageUrl}
+          alt={alt}
+          draggable={false}
+          className="h-[46px] w-[46px] rounded-full object-cover"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="absolute left-0 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#d2b77a] bg-[linear-gradient(180deg,#6c8655_0%,#466233_100%)] text-[#f3ddb0] shadow-[0_2px_7px_rgba(0,0,0,0.16),inset_0_1px_0_rgba(255,255,255,0.24)]">
+      <span className="text-[24px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.20)]">
+        {getFallbackIcon()}
+      </span>
+    </div>
+  );
+}
+
+function SmallMenuBubble({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={[
+        "absolute left-0 top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#d2b77a]",
+        "shadow-[0_2px_6px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.24)]",
+        className,
+      ].join(" ")}
+      aria-hidden="true"
+    >
+      <span className="text-[16px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.18)]">
+        {getFallbackIcon()}
+      </span>
+    </div>
+  );
+}
+
+function MobileTopButton({
+  label,
+  onClick,
+  imageUrl,
+  showArrow = false,
+  isExpanded = false,
+}: {
+  label: string;
+  onClick: () => void;
+  imageUrl?: string | null;
+  showArrow?: boolean;
+  isExpanded?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative flex h-[52px] w-full items-center overflow-visible rounded-full border border-[#bfa76a] bg-[linear-gradient(180deg,#2b4c20_0%,#183417_100%)] pr-[12px] pl-[64px] shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition-transform duration-200 active:scale-[0.99]"
+    >
+      <TopBubble imageUrl={imageUrl} alt={label} />
+
+      <span className="truncate text-[15px] font-semibold uppercase tracking-[0.04em] text-[#ead8ab]">
+        {label}
+      </span>
+
+      {showArrow ? (
+        <span
+          aria-hidden="true"
+          className={[
+            "ml-auto flex h-8 w-8 items-center justify-center rounded-full bg-black/55 text-[14px] font-bold leading-none text-[#ead8ab] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
+            isExpanded ? "rotate-180" : "rotate-0",
+          ].join(" ")}
+        >
+          ▼
+        </span>
+      ) : null}
+    </button>
+  );
 }
 
 export default function Header() {
@@ -209,7 +341,6 @@ export default function Header() {
       ...desktopGraphicItems,
       {
         id: "account",
-        src: "/nav/loggaIn.png",
         label: isLoggedIn ? "Min sida" : "Logga in",
         alt: isLoggedIn ? "Min sida" : "Logga in",
         type: "action",
@@ -287,52 +418,52 @@ export default function Header() {
   }
 
   function renderMobileMenuButton(item: NavItem) {
-    if (item.src) {
-      return (
-        <div
-          key={item.id}
-          className="flex justify-start"
-          style={{ width: `${MOBILE_MENU_BUTTON_WIDTH}px` }}
-        >
-          <button
-            type="button"
-            onClick={() => performNavigation(item)}
-            className="block w-full rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
-          >
-            <img
-              src={item.src}
-              alt={item.alt}
-              draggable={false}
-              className="block h-[40px] w-full object-contain object-left"
-            />
-          </button>
-        </div>
-      );
-    }
+    const theme = getMobileCardTheme(item.id);
+    const isCurrentRoute =
+      item.type === "route" &&
+      ((item.href === "/" && pathname === "/") || item.href === pathname);
+
+    const isCurrentSection =
+      pathname === "/" &&
+      item.type === "section" &&
+      ((item.id === "leaderboard" && active === "leaderboard") ||
+        (item.id === "upload" && active === "upload") ||
+        (item.id === "map" && active === "map"));
+
+    const isActive = isCurrentRoute || isCurrentSection;
 
     return (
-      <div
+      <button
         key={item.id}
-        className="flex justify-start"
-        style={{ width: `${MOBILE_MENU_BUTTON_WIDTH}px` }}
+        type="button"
+        onClick={() => performNavigation(item)}
+        className={[
+          "group relative mx-auto flex w-full max-w-[calc(100%-36px)] items-center overflow-visible rounded-full border pr-[12px] pl-[54px] py-[4px] text-left shadow-[0_7px_16px_rgba(0,0,0,0.13)] transition-all duration-200",
+          "min-h-[42px] active:scale-[0.99]",
+          isActive ? "scale-[1.01]" : "hover:scale-[1.01]",
+          theme.outer,
+        ].join(" ")}
       >
-        <button
-          type="button"
-          onClick={() => performNavigation(item)}
-          className="flex min-h-[40px] w-full items-center justify-between rounded-full border border-[#cfc4ae] bg-[#f8f4ea] px-4 py-[7px] text-left text-[#3f352b] shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-200 hover:scale-[1.01]"
-        >
-          <span className="pr-2 text-[0.92rem] font-semibold leading-[1.05rem]">
-            {item.label}
-          </span>
+        <div className="pointer-events-none absolute inset-[1px] rounded-full border border-white/10" />
 
-          <span
-            aria-hidden="true"
-            className="ml-2 shrink-0 text-[0.95rem] font-semibold text-[#8b7355]"
-          >
-            →
-          </span>
-        </button>
-      </div>
+        <SmallMenuBubble className={theme.iconCircle} />
+
+        <div className="min-w-0 flex-1 pr-[2px]">
+          <div className="truncate text-[13px] font-semibold leading-[1.05] tracking-[0.01em]">
+            {item.label}
+          </div>
+        </div>
+
+        <div
+          className={[
+            "flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-[1px]",
+            theme.arrow,
+          ].join(" ")}
+          aria-hidden="true"
+        >
+          <span className="text-[17px] leading-none">›</span>
+        </div>
+      </button>
     );
   }
 
@@ -355,53 +486,26 @@ export default function Header() {
       >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
           <div ref={mobileMenuRef} className="relative sm:hidden">
-            <div className="flex items-center gap-[6px]">
-              <div className="min-w-0 flex-[0_1_54%]">
-                <button
-                  type="button"
-                  aria-expanded={isMobileMenuOpen}
-                  aria-controls="mobile-nav-dropdown"
-                  onClick={toggleMobileMenu}
-                  className="relative flex h-[47px] w-full items-center justify-between overflow-hidden rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] px-5 shadow-md transition-transform duration-200 active:scale-[0.99]"
-                >
-                  <span className="text-[15px] font-semibold uppercase tracking-wide text-[#e5d3a3]">
-                    Meny
-                  </span>
+            <div className="grid grid-cols-2 gap-[10px]">
+              <MobileTopButton
+                label="Meny"
+                onClick={toggleMobileMenu}
+                showArrow
+                isExpanded={isMobileMenuOpen}
+              />
 
-                  <span
-                    aria-hidden="true"
-                    className={[
-                      "pointer-events-none flex h-5 w-5 items-center justify-center rounded-full bg-black/55 text-[11px] font-bold leading-none text-[#e5d3a3] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
-                      isMobileMenuOpen ? "rotate-180" : "rotate-0",
-                    ].join(" ")}
-                  >
-                    ▼
-                  </span>
-                </button>
-              </div>
-
-              {isLoggedIn ? (
-                <div className="shrink-0">
-                  <MemberButton profileImage={profileImageUrl} compact />
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() =>
-                    performNavigation(
-                      desktopNavItems[desktopNavItems.length - 1]
-                    )
-                  }
-                  className="shrink-0 rounded-full bg-transparent transition-transform duration-300 hover:scale-105"
-                >
-                  <img
-                    src="/nav/loggaIn.png"
-                    alt="Logga in"
-                    draggable={false}
-                    className="block h-[44px] w-auto object-contain"
-                  />
-                </button>
-              )}
+              <MobileTopButton
+                label={isLoggedIn ? "Min sida" : "Logga in"}
+                onClick={() =>
+                  performNavigation({
+                    id: "account",
+                    label: isLoggedIn ? "Min sida" : "Logga in",
+                    alt: isLoggedIn ? "Min sida" : "Logga in",
+                    type: "action",
+                  })
+                }
+                imageUrl={isLoggedIn ? profileImageUrl : null}
+              />
             </div>
 
             <div
@@ -409,12 +513,14 @@ export default function Header() {
               className={[
                 "overflow-hidden transition-all duration-300 ease-out",
                 isMobileMenuOpen
-                  ? "mt-2 max-h-[520px] opacity-100"
+                  ? "mt-3 max-h-[520px] opacity-100"
                   : "mt-0 max-h-0 opacity-0",
               ].join(" ")}
             >
-              <div className="flex flex-col items-start gap-2 pb-1">
-                {mobileMenuItems.map((item) => renderMobileMenuButton(item))}
+              <div className="rounded-[22px] border border-[#cbb489] bg-[linear-gradient(180deg,rgba(252,246,235,0.96)_0%,rgba(235,224,202,0.93)_100%)] p-[7px] shadow-[0_16px_34px_rgba(0,0,0,0.16)]">
+                <div className="flex flex-col gap-[7px]">
+                  {mobileMenuItems.map((item) => renderMobileMenuButton(item))}
+                </div>
               </div>
             </div>
           </div>
@@ -433,9 +539,19 @@ export default function Header() {
 
               if (item.id === "account") {
                 return isLoggedIn ? (
-                  <div key={item.id} className="flex items-center">
-                    <MemberButton profileImage={profileImageUrl} />
-                  </div>
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => performNavigation(item)}
+                    className="rounded-full bg-transparent transition-all duration-300 hover:scale-105"
+                  >
+                    <img
+                      src="/nav/minSida.png"
+                      alt="Min sida"
+                      draggable={false}
+                      className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]"
+                    />
+                  </button>
                 ) : (
                   <button
                     key={item.id}
@@ -453,6 +569,13 @@ export default function Header() {
                 );
               }
 
+              const srcMap: Record<string, string> = {
+                leaderboard: "/nav/leaderboard.png",
+                upload: "/nav/laddaUpp.png",
+                gallery: "/nav/galleri.png",
+                map: "/nav/karta.png",
+              };
+
               return (
                 <button
                   key={item.id}
@@ -467,7 +590,7 @@ export default function Header() {
                   ].join(" ")}
                 >
                   <img
-                    src={item.src}
+                    src={srcMap[item.id]}
                     alt={item.alt}
                     draggable={false}
                     className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]"
