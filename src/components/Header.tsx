@@ -15,7 +15,7 @@ type NavItem = {
   type: "section" | "route" | "action";
 };
 
-const graphicNavItems: NavItem[] = [
+const desktopGraphicItems: NavItem[] = [
   {
     id: "leaderboard",
     src: "/nav/leaderboard.png",
@@ -115,7 +115,7 @@ function scrollToSection(sectionId: string, attempt = 0) {
   const element = document.getElementById(sectionId);
 
   if (!element) {
-    if (attempt < 12) {
+    if (attempt < 14) {
       window.setTimeout(() => {
         scrollToSection(sectionId, attempt + 1);
       }, 80);
@@ -144,6 +144,11 @@ export default function Header() {
   useEffect(() => {
     if (pathname === "/galleri") {
       setActive("gallery");
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
+    if (pathname === "/all-time-high") {
       setIsMobileMenuOpen(false);
       return;
     }
@@ -199,7 +204,7 @@ export default function Header() {
 
   const desktopNavItems = useMemo<NavItem[]>(() => {
     return [
-      ...graphicNavItems,
+      ...desktopGraphicItems,
       {
         id: "account",
         src: "/nav/loggaIn.png",
@@ -222,8 +227,10 @@ export default function Header() {
     }
 
     if (pathname === targetPath && !targetHash) {
-      router.push(targetPath);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
       return;
     }
 
@@ -255,7 +262,21 @@ export default function Header() {
 
     if (item.type === "action") {
       setIsMobileMenuOpen(false);
-      navigateToHref(isLoggedIn ? "/min-sida" : "/login");
+
+      if (isLoggedIn) {
+        if (pathname === "/min-sida") {
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+          return;
+        }
+
+        router.push("/min-sida");
+        return;
+      }
+
+      router.push("/login");
     }
   }
 
@@ -328,16 +349,16 @@ export default function Header() {
                   aria-expanded={isMobileMenuOpen}
                   aria-controls="mobile-nav-dropdown"
                   onClick={toggleMobileMenu}
-                  className="relative flex h-[44px] w-full items-center justify-between rounded-full border border-[#9d6f2f] bg-gradient-to-b from-[#b87526] to-[#8a561f] px-5 shadow-[0_8px_20px_rgba(0,0,0,0.16)] transition-transform duration-200 active:scale-[0.99]"
+                  className="relative flex h-[47px] w-full items-center justify-between overflow-hidden rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] px-5 shadow-md transition-transform duration-200 active:scale-[0.99]"
                 >
-                  <span className="text-[15px] font-bold uppercase tracking-[0.16em] text-[#f7ead0]">
+                  <span className="text-[15px] font-semibold uppercase tracking-wide text-[#e5d3a3]">
                     Meny
                   </span>
 
                   <span
                     aria-hidden="true"
                     className={[
-                      "pointer-events-none flex h-5 w-5 items-center justify-center rounded-full bg-black/65 text-[11px] font-bold leading-none text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
+                      "pointer-events-none flex h-5 w-5 items-center justify-center rounded-full bg-black/55 text-[11px] font-bold leading-none text-[#e5d3a3] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
                       isMobileMenuOpen ? "rotate-180" : "rotate-0",
                     ].join(" ")}
                   >
