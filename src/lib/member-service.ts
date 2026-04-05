@@ -16,7 +16,7 @@ export async function fetchMemberCatchesByName(
   const { data, error } = await supabase
     .from("catches")
     .select(MEMBER_CATCHES_SELECT)
-    .or(`caught_for.eq.${memberName},registered_by.eq.${memberName}`)
+    .eq("caught_for", memberName)
     .order("catch_date", { ascending: false });
 
   if (error) {

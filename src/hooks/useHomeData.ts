@@ -8,7 +8,7 @@ export { type MembershipStatus } from "@/lib/auth-member";
 export function useHomeData() {
   const [members, setMembers] = useState<Member[]>([]);
   const [approvedCatches, setApprovedCatches] = useState<Catch[]>([]);
-  const { isLoggedIn, membershipStatus, hasActiveMembership } = useAuthMember();
+  const { isLoggedIn, membershipStatus, hasActiveMembership, member } = useAuthMember();
 
   const loadInitialData = useCallback(async () => {
     try {
@@ -30,5 +30,6 @@ export function useHomeData() {
     isLoggedIn,
     membershipStatus,
     hasActiveMembership,
+    member,
   };
 }

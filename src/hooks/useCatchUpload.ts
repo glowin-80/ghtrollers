@@ -15,11 +15,13 @@ import type {
 type UseCatchUploadOptions = {
   isLoggedIn: boolean;
   hasActiveMembership: boolean;
+  registeredByDefault: string;
 };
 
 export function useCatchUpload({
   isLoggedIn,
   hasActiveMembership,
+  registeredByDefault,
 }: UseCatchUploadOptions) {
   const router = useRouter();
 
@@ -37,13 +39,14 @@ export function useCatchUpload({
     resetForm,
     handleCaughtForChange,
     handleFishTypeChange,
-    handleRegisteredByChange,
     handleFineFishTypeChange,
     handleWeightChange,
     handleCatchDateChange,
     handleLocationNameChange,
     handleImageChange,
-  } = useCatchUploadForm();
+  } = useCatchUploadForm({
+    registeredByDefault,
+  });
 
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
@@ -261,7 +264,6 @@ export function useCatchUpload({
     previewUrl,
     fileInputKey,
     loading,
-    handleRegisteredByChange,
     handleFineFishTypeChange,
     handleWeightChange,
     handleCatchDateChange,
