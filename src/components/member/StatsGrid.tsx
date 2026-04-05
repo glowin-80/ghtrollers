@@ -63,6 +63,39 @@ function StatCard({ title, value, onClick }: ClickableStatCardProps) {
   );
 }
 
+function BigFiveStatCard({
+  value,
+  expanded,
+  onToggle,
+}: {
+  value: string;
+  expanded: boolean;
+  onToggle?: () => void;
+}) {
+  return (
+    <div className="rounded-[20px] border border-[#ddd8cf] bg-[#fffdfb] px-3.5 py-3 shadow-sm text-left">
+      <div className="text-[0.85rem] font-semibold leading-snug text-[#6f685d]">
+        Min bästa Big Five
+      </div>
+
+      <div className="mt-2 break-words text-[1.2rem] font-bold leading-tight text-[#1f2937]">
+        {value}
+      </div>
+
+      {onToggle ? (
+        <button
+          type="button"
+          onClick={onToggle}
+          className="mt-3 inline-flex rounded-full border border-[#d8d2c7] bg-white px-3 py-1.5 text-[0.82rem] font-semibold text-[#5c4d3f] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
+          aria-expanded={expanded}
+        >
+          {expanded ? "Dölj underlag" : "Visa underlag"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function getFilterBadgeLabel(selectedYear: CatchYearFilter): string {
   if (selectedYear === "all") {
     return "Alla år";
@@ -294,25 +327,28 @@ export default function StatsGrid({ catches, onSelectCatch }: Props) {
         ) : (
           <>
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <StatCard
-                title="Min bästa Big Five"
+              <BigFiveStatCard
                 value={stats.bestBigFive}
-                onClick={
+                expanded={bigFiveExpanded}
+                onToggle={
                   bestBigFiveBreakdown
                     ? () => setBigFiveExpanded((current) => !current)
                     : undefined
                 }
               />
+
               <StatCard
                 title="Min bästa Fina Fisken"
                 value={stats.bestFineFish}
                 onClick={bestFineCatch ? () => onSelectCatch?.(bestFineCatch.id) : undefined}
               />
+
               <StatCard
                 title="Min bästa Gädda"
                 value={stats.biggestPike}
                 onClick={bestPikeCatch ? () => onSelectCatch?.(bestPikeCatch.id) : undefined}
               />
+
               <StatCard
                 title="Min bästa Abborre"
                 value={stats.biggestPerch}

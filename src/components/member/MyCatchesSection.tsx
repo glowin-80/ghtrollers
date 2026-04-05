@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   formatDate,
   formatWeight,
+  getCatchReportAnchorId,
   getDisplayFishName,
   getStatusClasses,
   getStatusLabel,
@@ -12,15 +13,11 @@ import type { MemberCatch } from "@/types/member-page";
 
 type MyCatchesSectionProps = {
   catches: MemberCatch[];
-  highlightedCatchId?: string | null;
 };
 
 type CatchYearFilter = "all" | string;
 
-export default function MyCatchesSection({
-  catches,
-  highlightedCatchId,
-}: MyCatchesSectionProps) {
+export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
   const currentSwedenYear = useMemo(() => {
     const formatter = new Intl.DateTimeFormat("sv-SE", {
       timeZone: "Europe/Stockholm",
@@ -30,10 +27,7 @@ export default function MyCatchesSection({
     return formatter.format(new Date());
   }, []);
 
-  const [selectedYear, setSelectedYear] =
-    useState<CatchYearFilter>(currentSwedenYear);
-
-  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [selectedYear, setSelectedYear] = useState<CatchYearFilter>(currentSwedenYear);
 
   const availableYears = useMemo(() => {
     const startYear = 2016;
@@ -48,24 +42,6 @@ export default function MyCatchesSection({
     return years;
   }, [currentSwedenYear]);
 
-  useEffect(() => {
-    if (!highlightedCatchId) {
-      return;
-    }
-
-    const targetCatch = catches.find((item) => item.id === highlightedCatchId);
-
-    if (!targetCatch?.catch_date) {
-      return;
-    }
-
-    const targetYear = targetCatch.catch_date.slice(0, 4);
-
-    if (targetYear) {
-      setSelectedYear(targetYear);
-    }
-  }, [highlightedCatchId, catches]);
-
   const filteredCatches = useMemo(() => {
     if (selectedYear === "all") {
       return catches;
@@ -73,24 +49,6 @@ export default function MyCatchesSection({
 
     return catches.filter((item) => item.catch_date?.startsWith(selectedYear));
   }, [catches, selectedYear]);
-
-  useEffect(() => {
-    if (!highlightedCatchId) {
-      return;
-    }
-
-    const node = cardRefs.current[highlightedCatchId];
-
-    if (!node) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      node.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 120);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [highlightedCatchId, filteredCatches]);
 
   return (
     <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
@@ -152,50 +110,39 @@ export default function MyCatchesSection({
         </div>
       ) : (
         <div className="mt-4 space-y-3">
-          {filteredCatches.map((item) => {
-            const isHighlighted = highlightedCatchId === item.id;
-
-            return (
-              <div
-                key={item.id}
-                ref={(node) => {
-                  cardRefs.current[item.id] = node;
-                }}
-                className={[
-                  "rounded-[22px] border px-4 py-4 shadow-sm transition",
-                  isHighlighted
-                    ? "border-[#d7b75a] bg-[#fff9e9] shadow-[0_10px_20px_rgba(183,141,40,0.16)]"
-                    : "border-[#ddd8cf] bg-[#fffdfb]",
-                ].join(" ")}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[1.65rem] font-bold leading-none text-[#1f2937]">
-                      {getDisplayFishName(item)}
-                    </div>
-
-                    <div className="mt-2 text-sm leading-6 text-[#6b7280]">
-                      {formatWeight(item.weight_g)} • {formatDate(item.catch_date)}
-                      {item.location_name ? ` • ${item.location_name}` : ""}
-                    </div>
-
-                    <div className="mt-1 text-sm leading-6 text-[#6b7280]">
-                      Fångad av: {item.caught_for} • Registrerad av:{" "}
-                      {item.registered_by}
-                    </div>
+          {filteredCatches.map((item) => (
+            <div
+              key={item.id}
+              id={getCatchReportAnchorId(item.id)}
+              className="rounded-[22px] border border-[#ddd8cf] bg-[#fffdfb] px-4 py-4 shadow-sm transition"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[1.65rem] font-bold leading-none text-[#1f2937]">
+                    {getDisplayFishName(item)}
                   </div>
 
-                  <span
-                    className={`inline-flex shrink-0 rounded-full px-3 py-1 text-sm font-semibold ${getStatusClasses(
-                      item.status
-                    )}`}
-                  >
-                    {getStatusLabel(item.status)}
-                  </span>
+                  <div className="mt-2 text-sm leading-6 text-[#6b7280]">
+                    {formatWeight(item.weight_g)} • {formatDate(item.catch_date)}
+                    {item.location_name ? ` • ${item.location_name}` : ""}
+                  </div>
+
+                  <div className="mt-1 text-sm leading-6 text-[#6b7280]">
+                    Fångad av: {item.caught_for} • Registrerad av:{" "}
+                    {item.registered_by}
+                  </div>
                 </div>
+
+                <span
+                  className={`inline-flex shrink-0 rounded-full px-3 py-1 text-sm font-semibold ${getStatusClasses(
+                    item.status
+                  )}`}
+                >
+                  {getStatusLabel(item.status)}
+                </span>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </section>

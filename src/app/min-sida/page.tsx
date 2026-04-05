@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ProfileCard from "@/components/member/ProfileCard";
 import StatsGrid from "@/components/member/StatsGrid";
 import MyCatchesSection from "@/components/member/MyCatchesSection";
 import AdminToolsCard from "@/components/member/AdminToolsCard";
 import PendingApprovalCard from "@/components/member/PendingApprovalCard";
+import MemberCatchSpotlightModal from "@/components/member/MemberCatchSpotlightModal";
 import { useMemberPageData } from "@/hooks/useMemberPageData";
 import { signOutMember } from "@/lib/member-service";
 
 export default function MinSidaPage() {
-  const [highlightedCatchId, setHighlightedCatchId] = useState<string | null>(null);
+  const [selectedCatchId, setSelectedCatchId] = useState<string | null>(null);
 
   const {
     pageLoading,
@@ -23,6 +24,11 @@ export default function MinSidaPage() {
     loadMemberCatches,
     handleProfileImageUploaded,
   } = useMemberPageData();
+
+  const selectedCatch = useMemo(
+    () => catches.find((item) => item.id === selectedCatchId) || null,
+    [catches, selectedCatchId]
+  );
 
   async function handleLogout() {
     await signOutMember();
@@ -96,50 +102,54 @@ export default function MinSidaPage() {
   }
 
   return (
-    <main className="px-4 pb-8 pt-4">
-      <div className="mx-auto max-w-5xl space-y-4">
-        <ProfileCard
-          member={member}
-          catchCount={catches.length}
-          onLogout={handleLogout}
-          onProfileImageUploaded={handleProfileImageUploaded}
-        />
+    <>
+      <main className="px-4 pb-8 pt-4">
+        <div className="mx-auto max-w-5xl space-y-4">
+          <ProfileCard
+            member={member}
+            catchCount={catches.length}
+            onLogout={handleLogout}
+            onProfileImageUploaded={handleProfileImageUploaded}
+          />
 
-        {member.is_admin ? <AdminToolsCard /> : null}
+          {member.is_admin ? <AdminToolsCard /> : null}
 
-        {catchesLoading ? (
-          <section className="rounded-[26px] border border-[#d8d2c7] bg-white/95 px-5 py-5 text-sm text-[#4b5563] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
-            Laddar dina fångster...
-          </section>
-        ) : null}
+          {catchesLoading ? (
+            <section className="rounded-[26px] border border-[#d8d2c7] bg-white/95 px-5 py-5 text-sm text-[#4b5563] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+              Laddar dina fångster...
+            </section>
+          ) : null}
 
-        {catchesError ? (
-          <section className="rounded-[26px] border border-amber-200 bg-white/95 p-5 text-[#7a4b00] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
-            <div className="text-sm font-semibold">{catchesError}</div>
-            <p className="mt-2 text-sm text-[#8a5a00]">
-              Resten av sidan fungerar, men fångstdelen kunde inte hämtas just nu.
-            </p>
+          {catchesError ? (
+            <section className="rounded-[26px] border border-amber-200 bg-white/95 p-5 text-[#7a4b00] shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+              <div className="text-sm font-semibold">{catchesError}</div>
+              <p className="mt-2 text-sm text-[#8a5a00]">
+                Resten av sidan fungerar, men fångstdelen kunde inte hämtas just nu.
+              </p>
 
-            <button
-              type="button"
-              onClick={() => loadMemberCatches(member.name || "")}
-              className="mt-4 rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
-            >
-              Försök igen
-            </button>
-          </section>
-        ) : null}
+              <button
+                type="button"
+                onClick={() => loadMemberCatches(member.name || "")}
+                className="mt-4 rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
+              >
+                Försök igen
+              </button>
+            </section>
+          ) : null}
 
-        {!catchesLoading && !catchesError ? (
-          <>
-            <StatsGrid catches={catches} onSelectCatch={setHighlightedCatchId} />
-            <MyCatchesSection
-              catches={catches}
-              highlightedCatchId={highlightedCatchId}
-            />
-          </>
-        ) : null}
-      </div>
-    </main>
+          {!catchesLoading && !catchesError ? (
+            <>
+              <StatsGrid catches={catches} onSelectCatch={setSelectedCatchId} />
+              <MyCatchesSection catches={catches} />
+            </>
+          ) : null}
+        </div>
+      </main>
+
+      <MemberCatchSpotlightModal
+        catchItem={selectedCatch}
+        onClose={() => setSelectedCatchId(null)}
+      />
+    </>
   );
 }

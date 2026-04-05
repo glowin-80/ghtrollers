@@ -26,6 +26,10 @@ export function getDisplayFishName(catchItem: MemberCatch): string {
   return catchItem.fish_type;
 }
 
+export function getCatchReportAnchorId(catchId: string): string {
+  return `catch-report-${catchId}`;
+}
+
 export function getStatusLabel(status: string): string {
   if (status === "approved") return "Godkänd";
   if (status === "pending") return "Väntar";
