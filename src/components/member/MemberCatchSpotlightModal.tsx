@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   formatDate,
   formatWeight,
-  getCatchReportAnchorId,
   getDisplayFishName,
 } from "@/lib/member-page";
 import type { MemberCatch } from "@/types/member-page";
@@ -13,11 +11,13 @@ import type { MemberCatch } from "@/types/member-page";
 type MemberCatchSpotlightModalProps = {
   catchItem: MemberCatch | null;
   onClose: () => void;
+  onNavigateToCatchReport: (catchId: string) => void;
 };
 
 export default function MemberCatchSpotlightModal({
   catchItem,
   onClose,
+  onNavigateToCatchReport,
 }: MemberCatchSpotlightModalProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -59,7 +59,6 @@ export default function MemberCatchSpotlightModal({
   }
 
   const displayFishName = getDisplayFishName(catchItem);
-  const anchorId = getCatchReportAnchorId(catchItem.id);
 
   return (
     <>
@@ -172,13 +171,13 @@ export default function MemberCatchSpotlightModal({
             </div>
 
             <div className="mt-4 flex flex-col gap-2">
-              <Link
-                href={`#${anchorId}`}
-                onClick={onClose}
+              <button
+                type="button"
+                onClick={() => onNavigateToCatchReport(catchItem.id)}
                 className="inline-flex items-center justify-center rounded-full border border-[#d8d2c7] bg-white px-4 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
               >
                 Till fångstrapporten
-              </Link>
+              </button>
 
               <button
                 type="button"
@@ -200,10 +199,7 @@ export default function MemberCatchSpotlightModal({
           aria-modal="true"
           aria-label="Förstorad fångstbild"
         >
-          <div
-            className="relative"
-            onClick={(event) => event.stopPropagation()}
-          >
+          <div className="relative" onClick={(event) => event.stopPropagation()}>
             <button
               type="button"
               onClick={() => setSelectedImage(null)}

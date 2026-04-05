@@ -13,6 +13,7 @@ import { signOutMember } from "@/lib/member-service";
 
 export default function MinSidaPage() {
   const [selectedCatchId, setSelectedCatchId] = useState<string | null>(null);
+  const [reportTargetCatchId, setReportTargetCatchId] = useState<string | null>(null);
 
   const {
     pageLoading,
@@ -140,7 +141,11 @@ export default function MinSidaPage() {
           {!catchesLoading && !catchesError ? (
             <>
               <StatsGrid catches={catches} onSelectCatch={setSelectedCatchId} />
-              <MyCatchesSection catches={catches} />
+              <MyCatchesSection
+                catches={catches}
+                targetCatchId={reportTargetCatchId}
+                onTargetHandled={() => setReportTargetCatchId(null)}
+              />
             </>
           ) : null}
         </div>
@@ -149,6 +154,10 @@ export default function MinSidaPage() {
       <MemberCatchSpotlightModal
         catchItem={selectedCatch}
         onClose={() => setSelectedCatchId(null)}
+        onNavigateToCatchReport={(catchId) => {
+          setSelectedCatchId(null);
+          setReportTargetCatchId(catchId);
+        }}
       />
     </>
   );

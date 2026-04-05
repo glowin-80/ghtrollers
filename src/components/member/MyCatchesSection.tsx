@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   formatDate,
   formatWeight,
@@ -13,11 +13,19 @@ import type { MemberCatch } from "@/types/member-page";
 
 type MyCatchesSectionProps = {
   catches: MemberCatch[];
+  targetCatchId?: string | null;
+  onTargetHandled?: () => void;
 };
 
 type CatchYearFilter = "all" | string;
 
-export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
+export default function MyCatchesSection({
+  catches,
+  targetCatchId = null,
+  onTargetHandled,
+}: MyCatchesSectionProps) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+
   const currentSwedenYear = useMemo(() => {
     const formatter = new Intl.DateTimeFormat("sv-SE", {
       timeZone: "Europe/Stockholm",
@@ -28,6 +36,7 @@ export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
   }, []);
 
   const [selectedYear, setSelectedYear] = useState<CatchYearFilter>(currentSwedenYear);
+  const [highlightedCatchId, setHighlightedCatchId] = useState<string | null>(null);
 
   const availableYears = useMemo(() => {
     const startYear = 2016;
@@ -42,6 +51,61 @@ export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
     return years;
   }, [currentSwedenYear]);
 
+  useEffect(() => {
+    if (!targetCatchId) {
+      return;
+    }
+
+    const targetCatch = catches.find((item) => item.id === targetCatchId);
+
+    if (!targetCatch) {
+      onTargetHandled?.();
+      return;
+    }
+
+    const targetYear = targetCatch.catch_date?.slice(0, 4) || "all";
+
+    setSelectedYear(targetYear);
+    setHighlightedCatchId(targetCatchId);
+
+    const sectionTimer = window.setTimeout(() => {
+      sectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 40);
+
+    const catchTimer = window.setTimeout(() => {
+      const element = document.getElementById(getCatchReportAnchorId(targetCatchId));
+
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+
+      onTargetHandled?.();
+    }, 280);
+
+    return () => {
+      window.clearTimeout(sectionTimer);
+      window.clearTimeout(catchTimer);
+    };
+  }, [targetCatchId, catches, onTargetHandled]);
+
+  useEffect(() => {
+    if (!highlightedCatchId) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setHighlightedCatchId(null);
+    }, 2600);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [highlightedCatchId]);
+
   const filteredCatches = useMemo(() => {
     if (selectedYear === "all") {
       return catches;
@@ -51,7 +115,10 @@ export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
   }, [catches, selectedYear]);
 
   return (
-    <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
+    <section
+      ref={sectionRef}
+      className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]"
+    >
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-[2rem] font-bold leading-none text-[#1f2937]">
           🎣 Mina fångster
@@ -110,39 +177,48 @@ export default function MyCatchesSection({ catches }: MyCatchesSectionProps) {
         </div>
       ) : (
         <div className="mt-4 space-y-3">
-          {filteredCatches.map((item) => (
-            <div
-              key={item.id}
-              id={getCatchReportAnchorId(item.id)}
-              className="rounded-[22px] border border-[#ddd8cf] bg-[#fffdfb] px-4 py-4 shadow-sm transition"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <div className="text-[1.65rem] font-bold leading-none text-[#1f2937]">
-                    {getDisplayFishName(item)}
+          {filteredCatches.map((item) => {
+            const isHighlighted = highlightedCatchId === item.id;
+
+            return (
+              <div
+                key={item.id}
+                id={getCatchReportAnchorId(item.id)}
+                className={[
+                  "rounded-[22px] border bg-[#fffdfb] px-4 py-4 shadow-sm transition",
+                  isHighlighted
+                    ? "border-[#d6c08a] ring-2 ring-[#ead9ab] shadow-[0_10px_24px_rgba(214,192,138,0.24)]"
+                    : "border-[#ddd8cf]",
+                ].join(" ")}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[1.65rem] font-bold leading-none text-[#1f2937]">
+                      {getDisplayFishName(item)}
+                    </div>
+
+                    <div className="mt-2 text-sm leading-6 text-[#6b7280]">
+                      {formatWeight(item.weight_g)} • {formatDate(item.catch_date)}
+                      {item.location_name ? ` • ${item.location_name}` : ""}
+                    </div>
+
+                    <div className="mt-1 text-sm leading-6 text-[#6b7280]">
+                      Fångad av: {item.caught_for} • Registrerad av:{" "}
+                      {item.registered_by}
+                    </div>
                   </div>
 
-                  <div className="mt-2 text-sm leading-6 text-[#6b7280]">
-                    {formatWeight(item.weight_g)} • {formatDate(item.catch_date)}
-                    {item.location_name ? ` • ${item.location_name}` : ""}
-                  </div>
-
-                  <div className="mt-1 text-sm leading-6 text-[#6b7280]">
-                    Fångad av: {item.caught_for} • Registrerad av:{" "}
-                    {item.registered_by}
-                  </div>
+                  <span
+                    className={`inline-flex shrink-0 rounded-full px-3 py-1 text-sm font-semibold ${getStatusClasses(
+                      item.status
+                    )}`}
+                  >
+                    {getStatusLabel(item.status)}
+                  </span>
                 </div>
-
-                <span
-                  className={`inline-flex shrink-0 rounded-full px-3 py-1 text-sm font-semibold ${getStatusClasses(
-                    item.status
-                  )}`}
-                >
-                  {getStatusLabel(item.status)}
-                </span>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>
