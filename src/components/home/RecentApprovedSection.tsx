@@ -36,7 +36,7 @@ function formatDate(dateString: string) {
 
 function getLocationLine(item: Catch, isLoggedIn: boolean) {
   if (!isLoggedIn) {
-    return `Plats dold · ${formatDate(item.catch_date)}`;
+    return `Logga in för att se plats · ${formatDate(item.catch_date)}`;
   }
 
   return `${item.location_name || "Plats ej angiven"} · ${formatDate(item.catch_date)}`;
