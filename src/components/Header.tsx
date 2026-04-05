@@ -8,12 +8,14 @@ import { useAuthMember } from "@/hooks/useAuthMember";
 type NavItem = {
   id: string;
   src?: string;
-  label: string;
+  label?: string;
   section?: string;
   href?: string;
   alt: string;
   type: "section" | "route" | "action";
 };
+
+const MOBILE_MENU_BUTTON_WIDTH = 164;
 
 const desktopGraphicItems: NavItem[] = [
   {
@@ -287,39 +289,50 @@ export default function Header() {
   function renderMobileMenuButton(item: NavItem) {
     if (item.src) {
       return (
-        <button
+        <div
           key={item.id}
-          type="button"
-          onClick={() => performNavigation(item)}
-          className="block w-fit rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
+          className="flex justify-start"
+          style={{ width: `${MOBILE_MENU_BUTTON_WIDTH}px` }}
         >
-          <img
-            src={item.src}
-            alt={item.alt}
-            draggable={false}
-            className="block h-[40px] w-auto object-contain"
-          />
-        </button>
+          <button
+            type="button"
+            onClick={() => performNavigation(item)}
+            className="block w-full rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
+          >
+            <img
+              src={item.src}
+              alt={item.alt}
+              draggable={false}
+              className="block h-[40px] w-full object-contain object-left"
+            />
+          </button>
+        </div>
       );
     }
 
     return (
-      <button
+      <div
         key={item.id}
-        type="button"
-        onClick={() => performNavigation(item)}
-        className="flex h-[40px] w-[330px] max-w-[calc(100vw-48px)] items-center justify-between rounded-full border border-[#cfc4ae] bg-[#f8f4ea] px-4 text-left text-[#3f352b] shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-200 hover:scale-[1.01]"
+        className="flex justify-start"
+        style={{ width: `${MOBILE_MENU_BUTTON_WIDTH}px` }}
       >
-        <span className="truncate text-[0.95rem] font-semibold leading-none">
-          {item.label}
-        </span>
-        <span
-          aria-hidden="true"
-          className="ml-3 shrink-0 text-[0.95rem] font-semibold text-[#8b7355]"
+        <button
+          type="button"
+          onClick={() => performNavigation(item)}
+          className="flex min-h-[40px] w-full items-center justify-between rounded-full border border-[#cfc4ae] bg-[#f8f4ea] px-4 py-[7px] text-left text-[#3f352b] shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-200 hover:scale-[1.01]"
         >
-          →
-        </span>
-      </button>
+          <span className="pr-2 text-[0.92rem] font-semibold leading-[1.05rem]">
+            {item.label}
+          </span>
+
+          <span
+            aria-hidden="true"
+            className="ml-2 shrink-0 text-[0.95rem] font-semibold text-[#8b7355]"
+          >
+            →
+          </span>
+        </button>
+      </div>
     );
   }
 
