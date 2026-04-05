@@ -1,5 +1,6 @@
 import type {
   BestFineFishBySpecies,
+  MemberBigFiveBreakdown,
   MemberCatch,
   MemberStats,
   SpeciesAggregateStat,
@@ -48,7 +49,9 @@ export function getStatusClasses(status: string): string {
   return "bg-[#eef2f3] text-[#4b5563]";
 }
 
-function normalizeFineFishSpeciesName(value: string | null | undefined): string {
+export function normalizeFineFishSpeciesName(
+  value: string | null | undefined
+): string {
   const raw = (value || "Okänd").trim();
 
   if (!raw) {
@@ -58,6 +61,114 @@ function normalizeFineFishSpeciesName(value: string | null | undefined): string 
   const normalized = raw.toLowerCase();
 
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
+function getBigFiveScore(catchItem: MemberCatch) {
+  return catchItem.fish_type === "Abborre"
+    ? catchItem.weight_g * 4
+    : catchItem.weight_g;
+}
+
+function getCatchYear(catchItem: MemberCatch) {
+  return catchItem.catch_date?.slice(0, 4) || null;
+}
+
+function getApprovedCatches(catches: MemberCatch[]) {
+  return catches.filter((c) => c.status === "approved");
+}
+
+export function findBestCatchByFishType(
+  catches: MemberCatch[],
+  fishType: "Gädda" | "Abborre" | "Fina fisken"
+): MemberCatch | null {
+  const approved = getApprovedCatches(catches)
+    .filter((catchItem) => catchItem.fish_type === fishType)
+    .sort((a, b) => b.weight_g - a.weight_g);
+
+  return approved[0] || null;
+}
+
+export function findBestFineFishBySpeciesCatchMap(
+  catches: MemberCatch[]
+): Record<string, MemberCatch> {
+  const approvedFineFish = getApprovedCatches(catches).filter(
+    (catchItem) => catchItem.fish_type === "Fina fisken"
+  );
+
+  const bestBySpecies: Record<string, MemberCatch> = {};
+
+  approvedFineFish.forEach((catchItem) => {
+    const species = normalizeFineFishSpeciesName(catchItem.fine_fish_type);
+    const existing = bestBySpecies[species];
+
+    if (!existing || catchItem.weight_g > existing.weight_g) {
+      bestBySpecies[species] = catchItem;
+    }
+  });
+
+  return bestBySpecies;
+}
+
+function buildBigFiveBreakdownForCatches(
+  catches: MemberCatch[],
+  year: string | null
+): MemberBigFiveBreakdown {
+  const topFiveCatches = [...catches]
+    .sort((a, b) => getBigFiveScore(b) - getBigFiveScore(a))
+    .slice(0, 5);
+
+  const items = topFiveCatches.map((catchItem) => ({
+    catchId: catchItem.id,
+    fishLabel:
+      catchItem.fish_type === "Fina fisken" && catchItem.fine_fish_type
+        ? normalizeFineFishSpeciesName(catchItem.fine_fish_type)
+        : catchItem.fish_type,
+    originalWeight: catchItem.weight_g,
+    adjustedWeight: getBigFiveScore(catchItem),
+    catchDate: catchItem.catch_date || null,
+    usesMultiplier: catchItem.fish_type === "Abborre",
+  }));
+
+  const totalWeightG = items.reduce((sum, item) => sum + item.adjustedWeight, 0);
+
+  return {
+    year,
+    totalWeightG,
+    totalWeight: formatWeight(totalWeightG),
+    items,
+  };
+}
+
+export function buildMemberBestBigFiveBreakdown(
+  catches: MemberCatch[]
+): MemberBigFiveBreakdown | null {
+  const approved = getApprovedCatches(catches);
+
+  if (!approved.length) {
+    return null;
+  }
+
+  const groupedByYear: Record<string, MemberCatch[]> = {};
+
+  approved.forEach((catchItem) => {
+    const year = getCatchYear(catchItem);
+
+    if (!year) {
+      return;
+    }
+
+    if (!groupedByYear[year]) {
+      groupedByYear[year] = [];
+    }
+
+    groupedByYear[year].push(catchItem);
+  });
+
+  const bestPerYear = Object.entries(groupedByYear)
+    .map(([year, yearCatches]) => buildBigFiveBreakdownForCatches(yearCatches, year))
+    .sort((a, b) => b.totalWeightG - a.totalWeightG);
+
+  return bestPerYear[0] || null;
 }
 
 export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
@@ -79,14 +190,7 @@ export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
       ? [...fine].sort((a, b) => b.weight_g - a.weight_g)[0]
       : null;
 
-  const scores = approved.map((c) =>
-    c.fish_type === "Abborre" ? c.weight_g * 4 : c.weight_g
-  );
-
-  const bestBigFive = [...scores]
-    .sort((a, b) => b - a)
-    .slice(0, 5)
-    .reduce((sum, value) => sum + value, 0);
+  const bestBigFiveBreakdown = buildMemberBestBigFiveBreakdown(catches);
 
   const sum = (arr: MemberCatch[]) => arr.reduce((s, c) => s + c.weight_g, 0);
 
@@ -196,7 +300,7 @@ export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
           bestFine.weight_g
         )}`
       : "-",
-    bestBigFive: formatWeight(bestBigFive),
+    bestBigFive: bestBigFiveBreakdown?.totalWeight || "-",
 
     totalPerchCount: perch.length,
     totalPikeCount: pike.length,

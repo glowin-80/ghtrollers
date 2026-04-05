@@ -1,24 +1,57 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { calculateMemberStats } from "@/lib/member-page";
-import type { MemberCatch, MemberStats } from "@/types/member-page";
+import {
+  buildMemberBestBigFiveBreakdown,
+  calculateMemberStats,
+  findBestCatchByFishType,
+  findBestFineFishBySpeciesCatchMap,
+  formatDate,
+  formatWeight,
+} from "@/lib/member-page";
+import type {
+  MemberBigFiveBreakdown,
+  MemberCatch,
+  MemberStats,
+} from "@/types/member-page";
 
 type Props = {
   catches: MemberCatch[];
+  onSelectCatch?: (catchId: string) => void;
 };
 
 type CatchYearFilter = "all" | string;
 
-function StatCard({
-  title,
-  value,
-}: {
+type ClickableStatCardProps = {
   title: string;
   value: string | number;
-}) {
+  onClick?: () => void;
+};
+
+function StatCard({ title, value, onClick }: ClickableStatCardProps) {
+  const className = [
+    "rounded-[20px] border border-[#ddd8cf] bg-[#fffdfb] px-3.5 py-3 shadow-sm text-left transition",
+    onClick ? "hover:bg-[#faf7f2] hover:border-[#d0c6b8] cursor-pointer" : "",
+  ]
+    .join(" ")
+    .trim();
+
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={className}>
+        <div className="text-[0.85rem] font-semibold leading-snug text-[#6f685d]">
+          {title}
+        </div>
+
+        <div className="mt-2 break-words text-[1.2rem] font-bold leading-tight text-[#1f2937]">
+          {value}
+        </div>
+      </button>
+    );
+  }
+
   return (
-    <div className="rounded-[20px] border border-[#ddd8cf] bg-[#fffdfb] px-3.5 py-3 shadow-sm">
+    <div className={className}>
       <div className="text-[0.85rem] font-semibold leading-snug text-[#6f685d]">
         {title}
       </div>
@@ -92,7 +125,69 @@ function YearFilterControls({
   );
 }
 
-export default function StatsGrid({ catches }: Props) {
+function BigFiveBreakdownPanel({
+  breakdown,
+  onSelectCatch,
+}: {
+  breakdown: MemberBigFiveBreakdown;
+  onSelectCatch?: (catchId: string) => void;
+}) {
+  return (
+    <div className="mt-4 rounded-[22px] border border-[#d8d2c7] bg-[#fffdfb] px-4 py-4 shadow-sm">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#7a6540]">
+            Underlag för Big Five
+          </div>
+          <div className="mt-1 text-sm text-[#6b7280]">
+            År: {breakdown.year || "Saknas"}
+          </div>
+        </div>
+
+        <div className="text-[0.82rem] font-semibold text-[#6c5b3d]">
+          Total: {breakdown.totalWeight}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {breakdown.items.map((item) => (
+          <button
+            key={item.catchId}
+            type="button"
+            onClick={() => onSelectCatch?.(item.catchId)}
+            className="w-full rounded-[16px] border border-[#eadfbe] bg-[#fffdf7] px-3 py-2.5 text-left transition hover:bg-[#fff8ec]"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[0.95rem] font-bold leading-tight text-[#1f2937]">
+                  {item.fishLabel}
+                </div>
+                <div className="mt-1 text-[0.8rem] text-[#6b7280]">
+                  {item.catchDate ? formatDate(item.catchDate) : "Saknas"}
+                </div>
+              </div>
+
+              <div className="shrink-0 text-right">
+                <div className="text-[0.92rem] font-bold leading-tight text-[#1f2937]">
+                  {item.usesMultiplier
+                    ? `${formatWeight(item.originalWeight)} ×4`
+                    : formatWeight(item.originalWeight)}
+                </div>
+                <div className="mt-1 text-[0.78rem] font-semibold text-[#7a6540]">
+                  {item.usesMultiplier
+                    ? `Räknas som ${formatWeight(item.adjustedWeight)}`
+                    : "Ingen justering"}
+                </div>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function StatsGrid({ catches, onSelectCatch }: Props) {
   const currentSwedenYear = useMemo(() => {
     const formatter = new Intl.DateTimeFormat("sv-SE", {
       timeZone: "Europe/Stockholm",
@@ -103,6 +198,7 @@ export default function StatsGrid({ catches }: Props) {
   }, []);
 
   const [selectedYear, setSelectedYear] = useState<CatchYearFilter>("all");
+  const [bigFiveExpanded, setBigFiveExpanded] = useState(false);
 
   const availableYears = useMemo(() => {
     const startYear = 2016;
@@ -130,6 +226,27 @@ export default function StatsGrid({ catches }: Props) {
     [filteredCatches]
   );
 
+  const bestPikeCatch = useMemo(
+    () => findBestCatchByFishType(filteredCatches, "Gädda"),
+    [filteredCatches]
+  );
+  const bestPerchCatch = useMemo(
+    () => findBestCatchByFishType(filteredCatches, "Abborre"),
+    [filteredCatches]
+  );
+  const bestFineCatch = useMemo(
+    () => findBestCatchByFishType(filteredCatches, "Fina fisken"),
+    [filteredCatches]
+  );
+  const bestFineFishBySpeciesCatchMap = useMemo(
+    () => findBestFineFishBySpeciesCatchMap(filteredCatches),
+    [filteredCatches]
+  );
+  const bestBigFiveBreakdown = useMemo(
+    () => buildMemberBestBigFiveBreakdown(filteredCatches),
+    [filteredCatches]
+  );
+
   const filterBadgeLabel = getFilterBadgeLabel(selectedYear);
 
   return (
@@ -150,7 +267,10 @@ export default function StatsGrid({ catches }: Props) {
               selectedYear={selectedYear}
               currentSwedenYear={currentSwedenYear}
               availableYears={availableYears}
-              onChange={setSelectedYear}
+              onChange={(value) => {
+                setSelectedYear(value);
+                setBigFiveExpanded(false);
+              }}
             />
           </div>
         </div>
@@ -174,19 +294,51 @@ export default function StatsGrid({ catches }: Props) {
         ) : (
           <>
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <StatCard title="Min bästa Big Five" value={stats.bestBigFive} />
-              <StatCard title="Min bästa Fina Fisken" value={stats.bestFineFish} />
-              <StatCard title="Min bästa Gädda" value={stats.biggestPike} />
-              <StatCard title="Min bästa Abborre" value={stats.biggestPerch} />
+              <StatCard
+                title="Min bästa Big Five"
+                value={stats.bestBigFive}
+                onClick={
+                  bestBigFiveBreakdown
+                    ? () => setBigFiveExpanded((current) => !current)
+                    : undefined
+                }
+              />
+              <StatCard
+                title="Min bästa Fina Fisken"
+                value={stats.bestFineFish}
+                onClick={bestFineCatch ? () => onSelectCatch?.(bestFineCatch.id) : undefined}
+              />
+              <StatCard
+                title="Min bästa Gädda"
+                value={stats.biggestPike}
+                onClick={bestPikeCatch ? () => onSelectCatch?.(bestPikeCatch.id) : undefined}
+              />
+              <StatCard
+                title="Min bästa Abborre"
+                value={stats.biggestPerch}
+                onClick={bestPerchCatch ? () => onSelectCatch?.(bestPerchCatch.id) : undefined}
+              />
 
               {stats.bestFineFishBySpecies.map((item) => (
                 <StatCard
                   key={item.species}
                   title={`Min bästa ${item.species}`}
                   value={item.weight}
+                  onClick={
+                    bestFineFishBySpeciesCatchMap[item.species]
+                      ? () => onSelectCatch?.(bestFineFishBySpeciesCatchMap[item.species].id)
+                      : undefined
+                  }
                 />
               ))}
             </div>
+
+            {bigFiveExpanded && bestBigFiveBreakdown ? (
+              <BigFiveBreakdownPanel
+                breakdown={bestBigFiveBreakdown}
+                onSelectCatch={onSelectCatch}
+              />
+            ) : null}
 
             <div className="mt-5 rounded-[22px] border border-[#ddd8cf] bg-[#fffdfb] px-4 py-4">
               <div className="min-w-0">

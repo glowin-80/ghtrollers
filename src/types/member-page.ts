@@ -40,6 +40,22 @@ export type MemberCatch = {
   created_at?: string | null;
 };
 
+export type MemberBigFiveBreakdownItem = {
+  catchId: string;
+  fishLabel: string;
+  originalWeight: number;
+  adjustedWeight: number;
+  catchDate: string | null;
+  usesMultiplier: boolean;
+};
+
+export type MemberBigFiveBreakdown = {
+  year: string | null;
+  totalWeightG: number;
+  totalWeight: string;
+  items: MemberBigFiveBreakdownItem[];
+};
+
 export type MemberStats = {
   totalCatches: number;
   approvedCatches: number;

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import ProfileCard from "@/components/member/ProfileCard";
 import StatsGrid from "@/components/member/StatsGrid";
 import MyCatchesSection from "@/components/member/MyCatchesSection";
@@ -10,6 +11,8 @@ import { useMemberPageData } from "@/hooks/useMemberPageData";
 import { signOutMember } from "@/lib/member-service";
 
 export default function MinSidaPage() {
+  const [highlightedCatchId, setHighlightedCatchId] = useState<string | null>(null);
+
   const {
     pageLoading,
     catchesLoading,
@@ -129,8 +132,11 @@ export default function MinSidaPage() {
 
         {!catchesLoading && !catchesError ? (
           <>
-            <StatsGrid catches={catches} />
-            <MyCatchesSection catches={catches} />
+            <StatsGrid catches={catches} onSelectCatch={setHighlightedCatchId} />
+            <MyCatchesSection
+              catches={catches}
+              highlightedCatchId={highlightedCatchId}
+            />
           </>
         ) : null}
       </div>
