@@ -122,7 +122,7 @@ function getMobileCardTheme(itemId: string) {
         outer:
           "border-[#c6ab68] bg-[linear-gradient(180deg,#f7edd9_0%,#e9dbbd_100%)] text-[#342719]",
         iconCircle:
-          "border-[#d2b77a] bg-[linear-gradient(180deg,#fff7e6_0%,#efdfbf_100%)] text-[#6a5230]",
+          "bg-[linear-gradient(180deg,#fff7e6_0%,#efdfbf_100%)] text-[#6a5230]",
         arrow: "text-[#6a5230]",
       };
     case "leaderboard":
@@ -130,7 +130,7 @@ function getMobileCardTheme(itemId: string) {
         outer:
           "border-[#c3a766] bg-[linear-gradient(180deg,#3f6079_0%,#28435a_100%)] text-[#f5e6bf]",
         iconCircle:
-          "border-[#d2b77a] bg-[linear-gradient(180deg,#5b7a96_0%,#38546b_100%)] text-[#f4ddab]",
+          "bg-[linear-gradient(180deg,#5b7a96_0%,#38546b_100%)] text-[#f4ddab]",
         arrow: "text-[#f4ddab]",
       };
     case "upload":
@@ -138,7 +138,7 @@ function getMobileCardTheme(itemId: string) {
         outer:
           "border-[#c3a766] bg-[linear-gradient(180deg,#536a40_0%,#344628_100%)] text-[#f3e2b6]",
         iconCircle:
-          "border-[#d2b77a] bg-[linear-gradient(180deg,#6a8254_0%,#455c34_100%)] text-[#f1dca7]",
+          "bg-[linear-gradient(180deg,#6a8254_0%,#455c34_100%)] text-[#f1dca7]",
         arrow: "text-[#f1dca7]",
       };
     case "gallery":
@@ -146,7 +146,7 @@ function getMobileCardTheme(itemId: string) {
         outer:
           "border-[#c3a766] bg-[linear-gradient(180deg,#8a6237_0%,#65431f_100%)] text-[#f6e5c0]",
         iconCircle:
-          "border-[#d2b77a] bg-[linear-gradient(180deg,#a17849_0%,#784f28_100%)] text-[#f0d8a8]",
+          "bg-[linear-gradient(180deg,#a17849_0%,#784f28_100%)] text-[#f0d8a8]",
         arrow: "text-[#f0d8a8]",
       };
     case "map":
@@ -154,7 +154,7 @@ function getMobileCardTheme(itemId: string) {
         outer:
           "border-[#c3a766] bg-[linear-gradient(180deg,#5c837f_0%,#3d615d_100%)] text-[#f2e1b9]",
         iconCircle:
-          "border-[#d2b77a] bg-[linear-gradient(180deg,#78a09a_0%,#537874_100%)] text-[#efdbab]",
+          "bg-[linear-gradient(180deg,#78a09a_0%,#537874_100%)] text-[#efdbab]",
         arrow: "text-[#efdbab]",
       };
     case "all-time-high":
@@ -162,7 +162,7 @@ function getMobileCardTheme(itemId: string) {
         outer:
           "border-[#c3a766] bg-[linear-gradient(180deg,#8b6aac_0%,#6d4f8f_100%)] text-[#f6e8c8]",
         iconCircle:
-          "border-[#d2b77a] bg-[linear-gradient(180deg,#9d80bc_0%,#7b5c9c_100%)] text-[#f0ddb1]",
+          "bg-[linear-gradient(180deg,#9d80bc_0%,#7b5c9c_100%)] text-[#f0ddb1]",
         arrow: "text-[#f0ddb1]",
       };
     default:
@@ -170,7 +170,7 @@ function getMobileCardTheme(itemId: string) {
         outer:
           "border-[#c3a766] bg-[linear-gradient(180deg,#f6eee0_0%,#e8dbc3_100%)] text-[#3c2f22]",
         iconCircle:
-          "border-[#d2b77a] bg-[linear-gradient(180deg,#fff8eb_0%,#eee0c6_100%)] text-[#654f31]",
+          "bg-[linear-gradient(180deg,#fff8eb_0%,#eee0c6_100%)] text-[#654f31]",
         arrow: "text-[#654f31]",
       };
   }
@@ -189,7 +189,7 @@ function TopBubble({
 }) {
   if (imageUrl) {
     return (
-      <div className="relative -ml-[6px] flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 border-[#d2b77a] bg-[#29441f] shadow-[0_2px_7px_rgba(0,0,0,0.16),inset_0_1px_0_rgba(255,255,255,0.22)]">
+      <div className="absolute left-0 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#d2b77a] bg-[#29441f] shadow-[0_2px_7px_rgba(0,0,0,0.16),inset_0_1px_0_rgba(255,255,255,0.22)]">
         <img
           src={imageUrl}
           alt={alt}
@@ -201,7 +201,7 @@ function TopBubble({
   }
 
   return (
-    <div className="relative -ml-[6px] flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 border-[#d2b77a] bg-[linear-gradient(180deg,#6c8655_0%,#466233_100%)] text-[#f3ddb0] shadow-[0_2px_7px_rgba(0,0,0,0.16),inset_0_1px_0_rgba(255,255,255,0.24)]">
+    <div className="absolute left-0 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#d2b77a] bg-[linear-gradient(180deg,#6c8655_0%,#466233_100%)] text-[#f3ddb0] shadow-[0_2px_7px_rgba(0,0,0,0.16),inset_0_1px_0_rgba(255,255,255,0.24)]">
       <span className="text-[24px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.20)]">
         {getFallbackIcon()}
       </span>
@@ -213,8 +213,7 @@ function SmallMenuBubble({ className = "" }: { className?: string }) {
   return (
     <div
       className={[
-        "relative flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full border-2",
-        "border-[#d2b77a]",
+        "absolute left-0 top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#d2b77a]",
         "shadow-[0_2px_6px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.24)]",
         className,
       ].join(" ")}
@@ -244,11 +243,11 @@ function MobileTopButton({
     <button
       type="button"
       onClick={onClick}
-      className="relative flex h-[52px] w-full items-center overflow-visible rounded-full border border-[#bfa76a] bg-[linear-gradient(180deg,#2b4c20_0%,#183417_100%)] px-[14px] shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition-transform duration-200 active:scale-[0.99]"
+      className="relative flex h-[52px] w-full items-center overflow-visible rounded-full border border-[#bfa76a] bg-[linear-gradient(180deg,#2b4c20_0%,#183417_100%)] pr-[12px] pl-[64px] shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition-transform duration-200 active:scale-[0.99]"
     >
       <TopBubble imageUrl={imageUrl} alt={label} />
 
-      <span className="ml-[10px] truncate text-[15px] font-semibold uppercase tracking-[0.04em] text-[#ead8ab]">
+      <span className="truncate text-[15px] font-semibold uppercase tracking-[0.04em] text-[#ead8ab]">
         {label}
       </span>
 
@@ -439,8 +438,8 @@ export default function Header() {
         type="button"
         onClick={() => performNavigation(item)}
         className={[
-          "group relative flex w-full max-w-[calc(100%-36px)] items-center gap-[10px] overflow-visible rounded-full border px-[12px] py-[4px] text-left shadow-[0_7px_16px_rgba(0,0,0,0.13)] transition-all duration-200",
-          "mx-auto min-h-[42px] active:scale-[0.99]",
+          "group relative mx-auto flex w-full max-w-[calc(100%-36px)] items-center overflow-visible rounded-full border pr-[12px] pl-[54px] py-[4px] text-left shadow-[0_7px_16px_rgba(0,0,0,0.13)] transition-all duration-200",
+          "min-h-[42px] active:scale-[0.99]",
           isActive ? "scale-[1.01]" : "hover:scale-[1.01]",
           theme.outer,
         ].join(" ")}
