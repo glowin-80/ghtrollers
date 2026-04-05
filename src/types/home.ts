@@ -34,6 +34,7 @@ export type LeaderboardEntry = {
   total: number;
   detail?: string | null;
   sourceCount?: number;
+  catchImageUrl?: string | null;
 };
 
 export type BigFiveBreakdownItem = {
@@ -60,6 +61,7 @@ export type AllTimeHighlight = {
   catchDate?: string | null;
   locationName?: string | null;
   sourceCount?: number;
+  catchImageUrl?: string | null;
 };
 
 export type UploadImageResult = {

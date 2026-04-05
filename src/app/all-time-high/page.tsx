@@ -76,7 +76,8 @@ function EmptyAllTimeCard({ filter }: { filter: LeaderboardFilter }) {
           Ingen highscore ännu
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6b7280]">
-          Så fort det finns godkända catches för {titleMap[filter].toLowerCase()} i databasen visas rekordet här.
+          Så fort det finns godkända catches för{" "}
+          {titleMap[filter].toLowerCase()} i databasen visas rekordet här.
         </p>
       </div>
     </section>
@@ -145,6 +146,18 @@ function AllTimeCard({
             </div>
           </div>
 
+          {item.catchImageUrl ? (
+            <div className="mt-8 overflow-hidden rounded-[24px] border border-[#e5ddd0] bg-[#fffdf9] shadow-[0_8px_18px_rgba(18,35,28,0.06)]">
+              <img
+                src={item.catchImageUrl}
+                alt={`Fångstbild för ${item.winnerName}`}
+                className="h-56 w-full object-cover sm:h-72"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ) : null}
+
           <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="rounded-[22px] border border-[#e5ddd0] bg-white/82 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:col-span-2">
               <div className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#8b7460]">
@@ -185,13 +198,12 @@ export default function AllTimeHighPage() {
   }, [members]);
 
   const highlightMap = useMemo(() => {
-    return allTimeHighlights.reduce<Partial<Record<LeaderboardFilter, AllTimeHighlight>>>(
-      (acc, item) => {
-        acc[item.filter] = item;
-        return acc;
-      },
-      {}
-    );
+    return allTimeHighlights.reduce<
+      Partial<Record<LeaderboardFilter, AllTimeHighlight>>
+    >((acc, item) => {
+      acc[item.filter] = item;
+      return acc;
+    }, {});
   }, [allTimeHighlights]);
 
   return (
