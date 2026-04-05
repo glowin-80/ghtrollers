@@ -28,8 +28,16 @@ function formatDate(dateString: string) {
   return new Intl.DateTimeFormat("sv-SE").format(new Date(dateString));
 }
 
+function getLocationLabel(item: Catch, isLoggedIn: boolean) {
+  if (!isLoggedIn) {
+    return "Logga in för att se plats";
+  }
+
+  return item.location_name || "Plats ej angiven";
+}
+
 export default function GalleriPage() {
-  const { approvedCatches } = useHomeData();
+  const { approvedCatches, isLoggedIn } = useHomeData();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const currentSwedenYear = useMemo(() => {
@@ -163,7 +171,7 @@ export default function GalleriPage() {
                       {formatWeight(item.weight_g)}
                     </div>
                     <div className="line-clamp-1 text-[0.76rem] text-[#6b7280]">
-                      {item.location_name || "Plats ej angiven"}
+                      {getLocationLabel(item, isLoggedIn)}
                     </div>
                     <div className="text-[0.76rem] text-[#6b7280]">
                       {formatDate(item.catch_date)}

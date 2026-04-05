@@ -6,6 +6,7 @@ import type { Catch } from "@/types/home";
 
 type RecentApprovedSectionProps = {
   catches: Catch[];
+  isLoggedIn: boolean;
   onImageClick: (imageUrl: string) => void;
 };
 
@@ -33,8 +34,17 @@ function formatDate(dateString: string) {
   return new Intl.DateTimeFormat("sv-SE").format(new Date(dateString));
 }
 
+function getLocationLine(item: Catch, isLoggedIn: boolean) {
+  if (!isLoggedIn) {
+    return `Logga in för att se plats · ${formatDate(item.catch_date)}`;
+  }
+
+  return `${item.location_name || "Plats ej angiven"} · ${formatDate(item.catch_date)}`;
+}
+
 function RecentApprovedSectionComponent({
   catches,
+  isLoggedIn,
   onImageClick,
 }: RecentApprovedSectionProps) {
   return (
@@ -99,7 +109,7 @@ function RecentApprovedSectionComponent({
                   </div>
 
                   <div className="mt-1.5 text-[0.78rem] leading-snug text-[#687780]">
-                    {(item.location_name || "Plats ej angiven") + " · " + formatDate(item.catch_date)}
+                    {getLocationLine(item, isLoggedIn)}
                   </div>
                 </div>
               </div>
