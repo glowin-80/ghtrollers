@@ -7,6 +7,7 @@ import { useAuthMember } from "@/hooks/useAuthMember";
 
 type NavItem = {
   id: string;
+  src?: string;
   label?: string;
   section?: string;
   href?: string;
@@ -17,6 +18,7 @@ type NavItem = {
 const desktopGraphicItems: NavItem[] = [
   {
     id: "leaderboard",
+    src: "/nav/leaderboard.png",
     label: "Leaderboard",
     section: "leaderboard-section",
     alt: "Leaderboard",
@@ -24,6 +26,7 @@ const desktopGraphicItems: NavItem[] = [
   },
   {
     id: "upload",
+    src: "/nav/laddaUpp.png",
     label: "Ladda upp fångst",
     section: "upload-section",
     alt: "Ladda upp fångst",
@@ -31,6 +34,7 @@ const desktopGraphicItems: NavItem[] = [
   },
   {
     id: "gallery",
+    src: "/nav/galleri.png",
     label: "Galleri",
     href: "/galleri",
     alt: "Galleri",
@@ -38,6 +42,7 @@ const desktopGraphicItems: NavItem[] = [
   },
   {
     id: "map",
+    src: "/nav/karta.png",
     label: "Karta",
     section: "map-section",
     alt: "Karta",
@@ -54,6 +59,13 @@ const mobileMenuItems: NavItem[] = [
     type: "route",
   },
   {
+    id: "upload",
+    label: "Ladda upp fångst",
+    section: "upload-section",
+    alt: "Ladda upp fångst",
+    type: "section",
+  },
+  {
     id: "leaderboard",
     label: "Leaderboard",
     section: "leaderboard-section",
@@ -61,11 +73,11 @@ const mobileMenuItems: NavItem[] = [
     type: "section",
   },
   {
-    id: "upload",
-    label: "Ladda upp fångst",
-    section: "upload-section",
-    alt: "Ladda upp fångst",
-    type: "section",
+    id: "all-time-high",
+    label: "All-time-high",
+    href: "/all-time-high",
+    alt: "All-time-high",
+    type: "route",
   },
   {
     id: "gallery",
@@ -80,13 +92,6 @@ const mobileMenuItems: NavItem[] = [
     section: "map-section",
     alt: "Karta",
     type: "section",
-  },
-  {
-    id: "all-time-high",
-    label: "All-time-high",
-    href: "/all-time-high",
-    alt: "All-time-high",
-    type: "route",
   },
 ];
 
@@ -126,6 +131,14 @@ function getMobileCardTheme(itemId: string) {
           "border-[#d2b77a] bg-[linear-gradient(180deg,#fff7e6_0%,#efdfbf_100%)] text-[#6a5230]",
         arrow: "text-[#6a5230]",
       };
+    case "upload":
+      return {
+        outer:
+          "border-[#c3a766] bg-[linear-gradient(180deg,#536a40_0%,#344628_100%)] text-[#f3e2b6]",
+        iconCircle:
+          "border-[#8ca178] bg-[linear-gradient(180deg,#6a8254_0%,#455c34_100%)] text-[#f1dca7]",
+        arrow: "text-[#f1dca7]",
+      };
     case "leaderboard":
       return {
         outer:
@@ -134,13 +147,13 @@ function getMobileCardTheme(itemId: string) {
           "border-[#91a9bb] bg-[linear-gradient(180deg,#5b7a96_0%,#38546b_100%)] text-[#f4ddab]",
         arrow: "text-[#f4ddab]",
       };
-    case "upload":
+    case "all-time-high":
       return {
         outer:
-          "border-[#c3a766] bg-[linear-gradient(180deg,#536a40_0%,#344628_100%)] text-[#f3e2b6]",
+          "border-[#c3a766] bg-[linear-gradient(180deg,#7b5f8f_0%,#544064_100%)] text-[#f5e7c8]",
         iconCircle:
-          "border-[#8ca178] bg-[linear-gradient(180deg,#6a8254_0%,#455c34_100%)] text-[#f1dca7]",
-        arrow: "text-[#f1dca7]",
+          "border-[#a991b8] bg-[linear-gradient(180deg,#9578a8_0%,#6b537d_100%)] text-[#f0dcba]",
+        arrow: "text-[#f0dcba]",
       };
     case "gallery":
       return {
@@ -158,14 +171,6 @@ function getMobileCardTheme(itemId: string) {
           "border-[#95b2aa] bg-[linear-gradient(180deg,#78a09a_0%,#537874_100%)] text-[#efdbab]",
         arrow: "text-[#efdbab]",
       };
-    case "all-time-high":
-      return {
-        outer:
-          "border-[#c3a766] bg-[linear-gradient(180deg,#f1e6cf_0%,#dfcdab_100%)] text-[#34281a]",
-        iconCircle:
-          "border-[#d2b77a] bg-[linear-gradient(180deg,#fbf1dc_0%,#e8d5b0_100%)] text-[#6a512c]",
-        arrow: "text-[#6a512c]",
-      };
     default:
       return {
         outer:
@@ -175,6 +180,29 @@ function getMobileCardTheme(itemId: string) {
         arrow: "text-[#654f31]",
       };
   }
+}
+
+function getTopButtonTheme(kind: "menu" | "account") {
+  if (kind === "menu") {
+    return {
+      outer:
+        "border-[#bfa76a] bg-gradient-to-b from-[#2e4a27] to-[#1d3119] text-[#e5d3a3]",
+      iconCircle:
+        "border-[#8ca178] bg-[linear-gradient(180deg,#59724e_0%,#33432d_100%)] text-[#ecd8a5]",
+      iconInner: "★",
+      rightAccent:
+        "bg-black/55 text-[#e5d3a3] shadow-[0_1px_2px_rgba(0,0,0,0.28)]",
+    };
+  }
+
+  return {
+    outer:
+      "border-[#bfa76a] bg-gradient-to-b from-[#2e4a27] to-[#1d3119] text-[#e5d3a3]",
+    iconCircle:
+      "border-[#8ca178] bg-[linear-gradient(180deg,#59724e_0%,#33432d_100%)] text-[#ecd8a5]",
+    iconInner: "★",
+    rightAccent: "",
+  };
 }
 
 function getFallbackIcon() {
@@ -256,6 +284,7 @@ export default function Header() {
       ...desktopGraphicItems,
       {
         id: "account",
+        src: "/nav/loggaIn.png",
         label: isLoggedIn ? "Min sida" : "Logga in",
         alt: isLoggedIn ? "Min sida" : "Logga in",
         type: "action",
@@ -332,6 +361,67 @@ export default function Header() {
     setIsMobileMenuOpen((prev) => !prev);
   }
 
+  function renderMobileTopButton(kind: "menu" | "account") {
+    const theme = getTopButtonTheme(kind);
+    const isMenu = kind === "menu";
+    const accountItem = desktopNavItems[desktopNavItems.length - 1];
+
+    return (
+      <button
+        type="button"
+        aria-expanded={isMenu ? isMobileMenuOpen : undefined}
+        aria-controls={isMenu ? "mobile-nav-dropdown" : undefined}
+        onClick={() =>
+          isMenu ? toggleMobileMenu() : performNavigation(accountItem)
+        }
+        className={[
+          "relative flex h-[47px] w-full items-center overflow-visible rounded-full border px-4 shadow-md transition-transform duration-200 active:scale-[0.99]",
+          theme.outer,
+        ].join(" ")}
+      >
+        <div className="pointer-events-none absolute inset-[1px] rounded-full border border-white/10" />
+
+        <div
+          className={[
+            "absolute left-[-2px] top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-full border shadow-[0_2px_6px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.24)]",
+            theme.iconCircle,
+          ].join(" ")}
+          aria-hidden="true"
+        >
+          {kind === "account" && isLoggedIn && profileImageUrl ? (
+            <img
+              src={profileImageUrl}
+              alt=""
+              draggable={false}
+              className="h-full w-full rounded-full object-cover"
+            />
+          ) : (
+            <span className="text-[16px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.18)]">
+              {theme.iconInner}
+            </span>
+          )}
+        </div>
+
+        <span className="ml-[30px] text-[15px] font-semibold uppercase tracking-wide">
+          {isMenu ? "Meny" : isLoggedIn ? "Min sida" : "Logga in"}
+        </span>
+
+        {isMenu ? (
+          <span
+            aria-hidden="true"
+            className={[
+              "pointer-events-none absolute right-4 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-[11px] font-bold leading-none transition-transform duration-200",
+              theme.rightAccent,
+              isMobileMenuOpen ? "rotate-180" : "rotate-0",
+            ].join(" ")}
+          >
+            ▼
+          </span>
+        ) : null}
+      </button>
+    );
+  }
+
   function renderMobileMenuButton(item: NavItem) {
     const theme = getMobileCardTheme(item.id);
     const isCurrentRoute =
@@ -355,7 +445,7 @@ export default function Header() {
         className={[
           "group relative flex w-full max-w-[calc(100%-36px)] items-center gap-[10px] overflow-visible rounded-full border px-[12px] py-[4px] text-left shadow-[0_7px_16px_rgba(0,0,0,0.13)] transition-all duration-200",
           "min-h-[42px] active:scale-[0.99]",
-          "mx-auto",
+          "mr-auto",
           isActive ? "scale-[1.01]" : "hover:scale-[1.01]",
           theme.outer,
         ].join(" ")}
@@ -364,7 +454,7 @@ export default function Header() {
 
         <div
           className={[
-            "relative -ml-[2px] flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full border shadow-[0_2px_6px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.24)]",
+            "absolute left-[-2px] top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-full border shadow-[0_2px_6px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.24)]",
             theme.iconCircle,
           ].join(" ")}
           aria-hidden="true"
@@ -374,7 +464,7 @@ export default function Header() {
           </span>
         </div>
 
-        <div className="min-w-0 flex-1 pr-[2px]">
+        <div className="min-w-0 flex-1 pl-[30px] pr-[2px]">
           <div className="truncate text-[13px] font-semibold leading-[1.05] tracking-[0.01em]">
             {item.label}
           </div>
@@ -412,53 +502,11 @@ export default function Header() {
       >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
           <div ref={mobileMenuRef} className="relative sm:hidden">
-            <div className="flex items-center gap-[6px]">
-              <div className="min-w-0 flex-[0_1_54%]">
-                <button
-                  type="button"
-                  aria-expanded={isMobileMenuOpen}
-                  aria-controls="mobile-nav-dropdown"
-                  onClick={toggleMobileMenu}
-                  className="relative flex h-[47px] w-full items-center justify-between overflow-hidden rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] px-5 shadow-md transition-transform duration-200 active:scale-[0.99]"
-                >
-                  <span className="text-[15px] font-semibold uppercase tracking-wide text-[#e5d3a3]">
-                    Meny
-                  </span>
-
-                  <span
-                    aria-hidden="true"
-                    className={[
-                      "pointer-events-none flex h-5 w-5 items-center justify-center rounded-full bg-black/55 text-[11px] font-bold leading-none text-[#e5d3a3] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
-                      isMobileMenuOpen ? "rotate-180" : "rotate-0",
-                    ].join(" ")}
-                  >
-                    ▼
-                  </span>
-                </button>
+            <div className="flex items-center gap-[10px]">
+              <div className="min-w-0 flex-1">{renderMobileTopButton("menu")}</div>
+              <div className="min-w-0 flex-1">
+                {renderMobileTopButton("account")}
               </div>
-
-              {isLoggedIn ? (
-                <div className="shrink-0">
-                  <MemberButton profileImage={profileImageUrl} compact />
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() =>
-                    performNavigation(
-                      desktopNavItems[desktopNavItems.length - 1]
-                    )
-                  }
-                  className="shrink-0 rounded-full bg-transparent transition-transform duration-300 hover:scale-105"
-                >
-                  <img
-                    src="/nav/loggaIn.png"
-                    alt="Logga in"
-                    draggable={false}
-                    className="block h-[44px] w-auto object-contain"
-                  />
-                </button>
-              )}
             </div>
 
             <div
@@ -503,21 +551,14 @@ export default function Header() {
                     className="rounded-full bg-transparent opacity-95 transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]"
                   >
                     <img
-                      src="/nav/loggaIn.png"
-                      alt="Logga in"
+                      src={item.src}
+                      alt={item.alt}
                       draggable={false}
                       className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]"
                     />
                   </button>
                 );
               }
-
-              const srcMap: Record<string, string> = {
-                leaderboard: "/nav/leaderboard.png",
-                upload: "/nav/laddaUpp.png",
-                gallery: "/nav/galleri.png",
-                map: "/nav/karta.png",
-              };
 
               return (
                 <button
@@ -533,7 +574,7 @@ export default function Header() {
                   ].join(" ")}
                 >
                   <img
-                    src={srcMap[item.id]}
+                    src={item.src}
                     alt={item.alt}
                     draggable={false}
                     className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]"
