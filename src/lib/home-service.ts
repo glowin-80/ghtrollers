@@ -37,13 +37,24 @@ export async function fetchHomePageData(): Promise<{
   members: Member[];
   approvedCatches: Catch[];
 }> {
-  const [members, approvedCatches] = await Promise.all([
+  const [membersResult, approvedCatchesResult] = await Promise.allSettled([
     fetchActiveMembers(),
     fetchApprovedCatches(),
   ]);
 
+  const members =
+    membersResult.status === "fulfilled" ? membersResult.value : [];
+
+  if (membersResult.status === "rejected") {
+    console.warn("Could not load active members for home data", membersResult.reason);
+  }
+
+  if (approvedCatchesResult.status === "rejected") {
+    throw approvedCatchesResult.reason;
+  }
+
   return {
     members,
-    approvedCatches,
+    approvedCatches: approvedCatchesResult.value,
   };
 }

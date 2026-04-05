@@ -187,6 +187,7 @@ export default function Home() {
         <div id="approved-section" className="scroll-mt-[360px]">
           <RecentApprovedSection
             catches={recentApprovedCatches}
+            isLoggedIn={isLoggedIn}
             onImageClick={handleImageClick}
           />
         </div>
