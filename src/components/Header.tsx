@@ -60,7 +60,6 @@ const mobileMenuItems: NavItem[] = [
   },
   {
     id: "leaderboard",
-    src: "/nav/leaderboard.png",
     label: "Leaderboard",
     section: "leaderboard-section",
     alt: "Leaderboard",
@@ -68,7 +67,6 @@ const mobileMenuItems: NavItem[] = [
   },
   {
     id: "upload",
-    src: "/nav/laddaUpp.png",
     label: "Ladda upp fångst",
     section: "upload-section",
     alt: "Ladda upp fångst",
@@ -83,7 +81,6 @@ const mobileMenuItems: NavItem[] = [
   },
   {
     id: "gallery",
-    src: "/nav/galleri.png",
     label: "Galleri",
     href: "/galleri",
     alt: "Galleri",
@@ -91,7 +88,6 @@ const mobileMenuItems: NavItem[] = [
   },
   {
     id: "map",
-    src: "/nav/karta.png",
     label: "Karta",
     section: "map-section",
     alt: "Karta",
@@ -137,89 +133,80 @@ function getMobileCardTheme(itemId: string) {
     case "home":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#f5e7c9_0%,#e3cfaa_100%)] text-[#35291b]",
-        iconPanel:
-          "border-[#ccb175] bg-[linear-gradient(180deg,#fbf1dc_0%,#ead8b6_100%)]",
+          "border-[#bfa76a] bg-[linear-gradient(180deg,#f4e7ca_0%,#e2cfab_100%)] text-[#35291b]",
+        iconCircle:
+          "border-[#ccb175] bg-[linear-gradient(180deg,#fff5de_0%,#ecd8b3_100%)] text-[#5e4829]",
         arrow:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#fff4db_0%,#ecd5a5_100%)] text-[#5c472a]",
+          "text-[#5c472a]",
       };
     case "leaderboard":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#3e5669_0%,#253744_100%)] text-[#f7e8c3]",
-        iconPanel:
-          "border-[#8ba0b1] bg-[linear-gradient(180deg,#577287_0%,#324856_100%)]",
+          "border-[#bfa76a] bg-[linear-gradient(180deg,#40596d_0%,#283946_100%)] text-[#f7e8c3]",
+        iconCircle:
+          "border-[#8ba0b1] bg-[linear-gradient(180deg,#5a7488_0%,#334957_100%)] text-[#f3ddb0]",
         arrow:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#566f83_0%,#314654_100%)] text-[#f3ddb0]",
+          "text-[#ecd8a5]",
       };
     case "upload":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#41543d_0%,#283521_100%)] text-[#f1e2bb]",
-        iconPanel:
-          "border-[#7f916f] bg-[linear-gradient(180deg,#51674d_0%,#34422e_100%)]",
+          "border-[#bfa76a] bg-[linear-gradient(180deg,#445842_0%,#293622_100%)] text-[#f1e2bb]",
+        iconCircle:
+          "border-[#7f916f] bg-[linear-gradient(180deg,#566c52_0%,#37442f_100%)] text-[#ecd8a5]",
         arrow:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#50654a_0%,#33402d_100%)] text-[#ecd8a5]",
+          "text-[#ecd8a5]",
       };
     case "approved":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#f7efe0_0%,#eadcc3_100%)] text-[#3c2f22]",
-        iconPanel:
-          "border-[#ccb175] bg-[linear-gradient(180deg,#fff8eb_0%,#eee0c6_100%)]",
+          "border-[#bfa76a] bg-[linear-gradient(180deg,#f6eee0_0%,#e8dbc3_100%)] text-[#3c2f22]",
+        iconCircle:
+          "border-[#ccb175] bg-[linear-gradient(180deg,#fff8eb_0%,#eee0c6_100%)] text-[#654f31]",
         arrow:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#fbf3df_0%,#ead8b6_100%)] text-[#654f31]",
+          "text-[#654f31]",
       };
     case "gallery":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#845f35_0%,#5f3f21_100%)] text-[#f8e9c6]",
-        iconPanel:
-          "border-[#b88c57] bg-[linear-gradient(180deg,#9a7448_0%,#6f4a27_100%)]",
+          "border-[#bfa76a] bg-[linear-gradient(180deg,#876138_0%,#614122_100%)] text-[#f8e9c6]",
+        iconCircle:
+          "border-[#b88c57] bg-[linear-gradient(180deg,#9d7750_0%,#734c2a_100%)] text-[#f4ddb2]",
         arrow:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#8f6940_0%,#684725_100%)] text-[#f4ddb2]",
+          "text-[#f4ddb2]",
       };
     case "map":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#547772_0%,#35524f_100%)] text-[#f2e3bf]",
-        iconPanel:
-          "border-[#88a79f] bg-[linear-gradient(180deg,#6e918b_0%,#466662_100%)]",
+          "border-[#bfa76a] bg-[linear-gradient(180deg,#567a75_0%,#375552_100%)] text-[#f2e3bf]",
+        iconCircle:
+          "border-[#88a79f] bg-[linear-gradient(180deg,#72958f_0%,#4a6964_100%)] text-[#f0ddb1]",
         arrow:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#688b85_0%,#44635f_100%)] text-[#f0ddb1]",
+          "text-[#f0ddb1]",
       };
     case "all-time-high":
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#ede2cb_0%,#d9c9a8_100%)] text-[#372b1d]",
-        iconPanel:
-          "border-[#ccb175] bg-[linear-gradient(180deg,#f8efd9_0%,#e6d2ad_100%)]",
+          "border-[#bfa76a] bg-[linear-gradient(180deg,#ede2cb_0%,#d8c8a7_100%)] text-[#372b1d]",
+        iconCircle:
+          "border-[#ccb175] bg-[linear-gradient(180deg,#f8efd9_0%,#e6d3ae_100%)] text-[#5d4727]",
         arrow:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#f4e7ca_0%,#dfc38a_100%)] text-[#5d4727]",
+          "text-[#5d4727]",
       };
     default:
       return {
         outer:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#f7efe0_0%,#eadcc3_100%)] text-[#3c2f22]",
-        iconPanel:
-          "border-[#ccb175] bg-[linear-gradient(180deg,#fff8eb_0%,#eee0c6_100%)]",
+          "border-[#bfa76a] bg-[linear-gradient(180deg,#f6eee0_0%,#e8dbc3_100%)] text-[#3c2f22]",
+        iconCircle:
+          "border-[#ccb175] bg-[linear-gradient(180deg,#fff8eb_0%,#eee0c6_100%)] text-[#654f31]",
         arrow:
-          "border-[#bfa76a] bg-[linear-gradient(180deg,#fbf3df_0%,#ead8b6_100%)] text-[#654f31]",
+          "text-[#654f31]",
       };
   }
 }
 
-function getFallbackIcon(itemId: string) {
-  switch (itemId) {
-    case "home":
-      return "⌂";
-    case "approved":
-      return "★";
-    case "all-time-high":
-      return "🏆";
-    default:
-      return "•";
-  }
+function getFallbackIcon() {
+  return "★";
 }
 
 export default function Header() {
@@ -395,48 +382,40 @@ export default function Header() {
         type="button"
         onClick={() => performNavigation(item)}
         className={[
-          "group relative flex w-full items-center gap-3 overflow-hidden rounded-[22px] border px-[10px] py-[9px] text-left shadow-[0_10px_24px_rgba(0,0,0,0.16)] transition-all duration-200",
-          "active:scale-[0.99]",
+          "group relative flex w-full items-center gap-3 overflow-hidden rounded-full border px-3 py-[7px] text-left shadow-[0_8px_18px_rgba(0,0,0,0.14)] transition-all duration-200",
+          "min-h-[48px] active:scale-[0.99]",
           isActive ? "scale-[1.01]" : "hover:scale-[1.01]",
           theme.outer,
         ].join(" ")}
       >
-        <div className="pointer-events-none absolute inset-[1px] rounded-[21px] border border-white/10" />
+        <div className="pointer-events-none absolute inset-[1px] rounded-full border border-white/10" />
 
         <div
           className={[
-            "relative flex h-[54px] w-[68px] shrink-0 items-center justify-center overflow-hidden rounded-[16px] border shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]",
-            theme.iconPanel,
+            "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]",
+            theme.iconCircle,
           ].join(" ")}
+          aria-hidden="true"
         >
-          {item.src ? (
-            <img
-              src={item.src}
-              alt={item.alt}
-              draggable={false}
-              className="max-h-[42px] w-auto object-contain"
-            />
-          ) : (
-            <span className="text-[23px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.18)]">
-              {getFallbackIcon(item.id)}
-            </span>
-          )}
+          <span className="text-[14px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.18)]">
+            {getFallbackIcon()}
+          </span>
         </div>
 
         <div className="min-w-0 flex-1 pr-1">
-          <div className="truncate text-[15px] font-semibold leading-[1.1] tracking-[0.01em]">
+          <div className="truncate text-[14px] font-semibold leading-[1.05] tracking-[0.01em]">
             {item.label}
           </div>
         </div>
 
         <div
           className={[
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-[20px] shadow-[0_2px_6px_rgba(0,0,0,0.14)] transition-transform duration-200 group-hover:translate-x-[1px]",
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-[1px]",
             theme.arrow,
           ].join(" ")}
           aria-hidden="true"
         >
-          ›
+          <span className="text-[18px] leading-none">›</span>
         </div>
       </button>
     );
@@ -515,12 +494,12 @@ export default function Header() {
               className={[
                 "overflow-hidden transition-all duration-300 ease-out",
                 isMobileMenuOpen
-                  ? "mt-3 max-h-[720px] opacity-100"
+                  ? "mt-3 max-h-[640px] opacity-100"
                   : "mt-0 max-h-0 opacity-0",
               ].join(" ")}
             >
-              <div className="rounded-[24px] border border-[#c7b28a] bg-[linear-gradient(180deg,rgba(255,248,235,0.94)_0%,rgba(234,222,200,0.92)_100%)] p-[10px] shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-                <div className="flex flex-col gap-[10px]">
+              <div className="rounded-[22px] border border-[#c7b28a] bg-[linear-gradient(180deg,rgba(255,248,235,0.94)_0%,rgba(234,222,200,0.92)_100%)] p-[8px] shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+                <div className="flex flex-col gap-[8px]">
                   {mobileMenuItems.map((item) => renderMobileMenuButton(item))}
                 </div>
               </div>
