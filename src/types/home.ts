@@ -62,6 +62,7 @@ export type AllTimeHighlight = {
   locationName?: string | null;
   sourceCount?: number;
   catchImageUrl?: string | null;
+  bestYear?: string | null;
 };
 
 export type UploadImageResult = {

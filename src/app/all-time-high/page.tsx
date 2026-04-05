@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useHomeData } from "@/hooks/useHomeData";
-import { buildAllTimeHighlights, buildBigFiveBreakdowns } from "@/lib/home";
+import {
+  buildAllTimeBigFiveLeader,
+  buildAllTimeHighlights,
+} from "@/lib/home";
 import type {
   AllTimeHighlight,
   BigFiveBreakdown,
@@ -60,7 +63,7 @@ function getSectionId(filter: LeaderboardFilter) {
 
 function getCardCopy(item: AllTimeHighlight) {
   if (item.filter === "bigfive") {
-    return "Big Five";
+    return item.bestYear ? `Big Five · ${item.bestYear}` : "Big Five";
   }
 
   if (item.filter === "fina" && item.detail) {
@@ -287,8 +290,8 @@ export default function AllTimeHighPage() {
     return buildAllTimeHighlights(approvedCatches);
   }, [approvedCatches]);
 
-  const bigFiveBreakdowns = useMemo(() => {
-    return buildBigFiveBreakdowns(approvedCatches);
+  const allTimeBigFiveLeader = useMemo(() => {
+    return buildAllTimeBigFiveLeader(approvedCatches);
   }, [approvedCatches]);
 
   const memberImageMap = useMemo(() => {
@@ -306,11 +309,6 @@ export default function AllTimeHighPage() {
       return acc;
     }, {});
   }, [allTimeHighlights]);
-
-  const allTimeBigFiveWinner = highlightMap.bigfive?.winnerName ?? null;
-  const allTimeBigFiveBreakdown = allTimeBigFiveWinner
-    ? bigFiveBreakdowns[allTimeBigFiveWinner]
-    : undefined;
 
   return (
     <main className="px-4 pb-10 pt-4">
@@ -361,7 +359,9 @@ export default function AllTimeHighPage() {
                 item={highlight}
                 profileImage={memberImageMap[highlight.winnerName] || null}
                 bigFiveBreakdown={
-                  section.value === "bigfive" ? allTimeBigFiveBreakdown : undefined
+                  section.value === "bigfive"
+                    ? allTimeBigFiveLeader?.breakdown
+                    : undefined
                 }
                 isExpanded={section.value === "bigfive" ? expandedBigFive : false}
                 onToggleExpanded={
