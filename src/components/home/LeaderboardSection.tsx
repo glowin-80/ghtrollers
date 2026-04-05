@@ -90,6 +90,7 @@ function getPlacementBadge(index: number) {
         "border-[#d7b75a] bg-gradient-to-r from-[#fffaf0] via-[#fff6dd] to-[#f5e7b8] shadow-[0_12px_24px_rgba(183,141,40,0.14)]",
       avatarClass: "border-[#e5cb79] ring-[#f3e5ae]/70 bg-white",
       resultClass: "text-[#1f2937]",
+      catchImageWrapClass: "border-[#dccb97] bg-[#fff8e9]",
     };
   }
 
@@ -103,6 +104,7 @@ function getPlacementBadge(index: number) {
         "border-[#dde4ea] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]",
       avatarClass: "border-[#cfd7df] ring-[#edf1f4] bg-[#f9fafb]",
       resultClass: "text-[#111827]",
+      catchImageWrapClass: "border-[#dbe2e8] bg-[#f8fafb]",
     };
   }
 
@@ -114,6 +116,7 @@ function getPlacementBadge(index: number) {
       "border-[#e6ddd5] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]",
     avatarClass: "border-[#d8b08d] ring-[#f3e8df] bg-[#fbfaf8]",
     resultClass: "text-[#111827]",
+    catchImageWrapClass: "border-[#e6ddd5] bg-[#fcfaf7]",
   };
 }
 
@@ -177,6 +180,7 @@ function LeaderboardRow({
   bigFiveBreakdown,
   isExpanded,
   onToggleExpanded,
+  onImageClick,
 }: {
   entry: LeaderboardEntry;
   index: number;
@@ -185,6 +189,7 @@ function LeaderboardRow({
   bigFiveBreakdown?: BigFiveBreakdown;
   isExpanded: boolean;
   onToggleExpanded?: () => void;
+  onImageClick: (imageUrl: string) => void;
 }) {
   const styles = getPlacementBadge(index);
   const secondaryText =
@@ -192,7 +197,8 @@ function LeaderboardRow({
       ? `${entry.detail} · ${getPlacementCopy(index)}`
       : getPlacementCopy(index);
 
-  const isBigFiveRow = filter === "bigfive" && bigFiveBreakdown && onToggleExpanded;
+  const isBigFiveRow =
+    filter === "bigfive" && bigFiveBreakdown && onToggleExpanded;
 
   return (
     <div
@@ -304,6 +310,26 @@ function LeaderboardRow({
         </div>
       )}
 
+      {entry.catchImageUrl ? (
+        <button
+          type="button"
+          onClick={() => onImageClick(entry.catchImageUrl as string)}
+          className={[
+            "mt-3 block w-full overflow-hidden rounded-[18px] border text-left transition hover:brightness-[1.02]",
+            styles.catchImageWrapClass,
+          ].join(" ")}
+          aria-label={`Öppna fångstbild för ${entry.name}`}
+        >
+          <img
+            src={entry.catchImageUrl}
+            alt={`Fångstbild för ${entry.name}`}
+            className="h-44 w-full object-cover sm:h-52"
+            loading="lazy"
+            decoding="async"
+          />
+        </button>
+      ) : null}
+
       {isBigFiveRow && isExpanded ? (
         <BigFiveBreakdownPanel breakdown={bigFiveBreakdown} />
       ) : null}
@@ -323,7 +349,10 @@ function LeaderboardSectionComponent({
   bigFiveBreakdowns,
 }: LeaderboardSectionProps) {
   const topThree = useMemo(() => leaderboard.slice(0, 3), [leaderboard]);
-  const [expandedBigFiveName, setExpandedBigFiveName] = useState<string | null>(null);
+  const [expandedBigFiveName, setExpandedBigFiveName] = useState<string | null>(
+    null
+  );
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const memberImageMap = useMemo(() => {
     return members.reduce<Record<string, string | null>>((acc, member) => {
@@ -437,11 +466,26 @@ function LeaderboardSectionComponent({
                     ? () => handleToggleExpanded(entry.name)
                     : undefined
                 }
+                onImageClick={setSelectedImage}
               />
             ))}
           </div>
         )}
       </div>
+
+      {selectedImage ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <img
+            src={selectedImage}
+            alt="Förstorad fångstbild"
+            className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
+            decoding="async"
+          />
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -54,10 +54,16 @@ export default function GalleriPage() {
   const [selectedYear, setSelectedYear] = useState(currentSwedenYear);
 
   const filteredCatches = useMemo(() => {
+    if (selectedYear === "all") {
+      return approvedCatches;
+    }
+
     return approvedCatches.filter((item) =>
       item.catch_date?.startsWith(selectedYear)
     );
   }, [approvedCatches, selectedYear]);
+
+  const selectedYearLabel = selectedYear === "all" ? "Alla år" : selectedYear;
 
   return (
     <main className="px-4 pb-10 pt-4">
@@ -69,39 +75,54 @@ export default function GalleriPage() {
                 Galleri
               </h1>
               <p className="mt-2 max-w-2xl text-sm text-[#67747d]">
-                Här hittar du alla godkända fångster för valt år. Välj år och bläddra genom bilderna i lugn och ro.
+                Här hittar du alla godkända fångster för valt år. Välj år och
+                bläddra genom bilderna i lugn och ro.
               </p>
             </div>
 
-            <div className="relative shrink-0">
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="rounded-full border border-[#d8d2c7] bg-[#f7f4ee] px-4 py-2 pr-10 text-sm font-semibold text-[#4b5563] outline-none transition hover:bg-[#f1ece3] focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
-                aria-label="Välj år för galleri"
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedYear("all")}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold outline-none transition ${
+                  selectedYear === "all"
+                    ? "border-[#8b7b68] bg-[#e9dfcf] text-[#4b3f33]"
+                    : "border-[#d8d2c7] bg-[#f7f4ee] text-[#4b5563] hover:bg-[#f1ece3]"
+                }`}
               >
-                {availableYears.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
+                Alla år
+              </button>
 
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#6b7280]">
-                ▼
-              </span>
+              <div className="relative">
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="rounded-full border border-[#d8d2c7] bg-[#f7f4ee] px-4 py-2 pr-10 text-sm font-semibold text-[#4b5563] outline-none transition hover:bg-[#f1ece3] focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+                  aria-label="Välj år för galleri"
+                >
+                  {availableYears.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+
+                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#6b7280]">
+                  ▼
+                </span>
+              </div>
             </div>
           </div>
 
           <div className="mt-4">
             <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#5c4d3f]">
-              {selectedYear}
+              {selectedYearLabel}
             </span>
           </div>
 
           {filteredCatches.length === 0 ? (
             <div className="mt-5 rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#faf8f4] px-4 py-8 text-sm text-[#6b7280]">
-              Inga godkända fångster finns i galleriet för {selectedYear}.
+              Inga godkända fångster finns i galleriet för {selectedYearLabel}.
             </div>
           ) : (
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

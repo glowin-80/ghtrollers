@@ -26,7 +26,13 @@ function getFishLabel(catchItem: Catch) {
   return catchItem.fish_type;
 }
 
-export function buildBigFiveBreakdowns(catches: Catch[]): Record<string, BigFiveBreakdown> {
+function getCatchYear(catchItem: Catch) {
+  return catchItem.catch_date?.slice(0, 4) || null;
+}
+
+export function buildBigFiveBreakdowns(
+  catches: Catch[]
+): Record<string, BigFiveBreakdown> {
   if (!catches.length) {
     return {};
   }
@@ -79,15 +85,35 @@ export function buildLeaderboard(
   }
 
   if (filter === "bigfive") {
-    const breakdowns = buildBigFiveBreakdowns(catches);
+    const groupedCatches: Record<string, Catch[]> = {};
 
-    return Object.values(breakdowns)
-      .map((entry) => ({
-        name: entry.name,
-        total: entry.total,
-        detail: null,
-        sourceCount: entry.items.length,
-      }))
+    catches.forEach((catchItem) => {
+      if (!groupedCatches[catchItem.caught_for]) {
+        groupedCatches[catchItem.caught_for] = [];
+      }
+
+      groupedCatches[catchItem.caught_for].push(catchItem);
+    });
+
+    return Object.entries(groupedCatches)
+      .map(([name, memberCatches]) => {
+        const topFiveCatches = [...memberCatches]
+          .sort((a, b) => getBigFiveScore(b) - getBigFiveScore(a))
+          .slice(0, 5);
+
+        const total = topFiveCatches.reduce(
+          (sum, catchItem) => sum + getBigFiveScore(catchItem),
+          0
+        );
+
+        return {
+          name,
+          total,
+          detail: null,
+          sourceCount: topFiveCatches.length,
+          catchImageUrl: topFiveCatches[0]?.image_url || null,
+        };
+      })
       .sort((a, b) => b.total - a.total);
   }
 
@@ -118,24 +144,99 @@ export function buildLeaderboard(
       total: catchItem.weight_g,
       detail: filter === "fina" ? catchItem.fine_fish_type || null : null,
       sourceCount: 1,
+      catchImageUrl: catchItem.image_url || null,
     }));
 }
 
-function getBigFiveLeader(catches: Catch[]) {
-  const breakdowns = buildBigFiveBreakdowns(catches);
-  const candidates = Object.values(breakdowns)
-    .map((entry) => {
+function buildBigFiveBreakdownForCatches(
+  name: string,
+  catches: Catch[]
+): BigFiveBreakdown {
+  const topFiveCatches = [...catches]
+    .sort((a, b) => getBigFiveScore(b) - getBigFiveScore(a))
+    .slice(0, 5);
+
+  const items = topFiveCatches.map((catchItem) => ({
+    catchId: catchItem.id,
+    fishLabel: getFishLabel(catchItem),
+    originalWeight: catchItem.weight_g,
+    adjustedWeight: getBigFiveScore(catchItem),
+    catchDate: catchItem.catch_date || null,
+    usesMultiplier: catchItem.fish_type === "Abborre",
+  }));
+
+  const total = items.reduce((sum, item) => sum + item.adjustedWeight, 0);
+
+  return {
+    name,
+    total,
+    items,
+  };
+}
+
+export function buildAllTimeBigFiveLeader(
+  catches: Catch[]
+):
+  | {
+      winnerName: string;
+      bestYear: string;
+      total: number;
+      sourceCount: number;
+      catchDate: string | null;
+      catchImageUrl: string | null;
+      breakdown: BigFiveBreakdown;
+    }
+  | null {
+  if (!catches.length) {
+    return null;
+  }
+
+  const groupedByMemberYear: Record<string, Catch[]> = {};
+
+  catches.forEach((catchItem) => {
+    const year = getCatchYear(catchItem);
+
+    if (!year) {
+      return;
+    }
+
+    const key = `${catchItem.caught_for}__${year}`;
+
+    if (!groupedByMemberYear[key]) {
+      groupedByMemberYear[key] = [];
+    }
+
+    groupedByMemberYear[key].push(catchItem);
+  });
+
+  const candidates = Object.entries(groupedByMemberYear)
+    .map(([key, memberYearCatches]) => {
+      const [winnerName, bestYear] = key.split("__");
+      const breakdown = buildBigFiveBreakdownForCatches(
+        winnerName,
+        memberYearCatches
+      );
+
       const latestTopFiveDate =
-        [...entry.items]
+        [...breakdown.items]
           .map((item) => item.catchDate)
           .filter(Boolean)
-          .sort((a, b) => new Date(b as string).getTime() - new Date(a as string).getTime())[0] || null;
+          .sort(
+            (a, b) =>
+              new Date(b as string).getTime() - new Date(a as string).getTime()
+          )[0] || null;
+
+      const topCatch = [...memberYearCatches]
+        .sort((a, b) => getBigFiveScore(b) - getBigFiveScore(a))[0];
 
       return {
-        name: entry.name,
-        total: entry.total,
-        sourceCount: entry.items.length,
+        winnerName,
+        bestYear,
+        total: breakdown.total,
+        sourceCount: breakdown.items.length,
         catchDate: latestTopFiveDate,
+        catchImageUrl: topCatch?.image_url || null,
+        breakdown,
       };
     })
     .sort((a, b) => b.total - a.total);
@@ -144,7 +245,7 @@ function getBigFiveLeader(catches: Catch[]) {
 }
 
 export function buildAllTimeHighlights(catches: Catch[]): AllTimeHighlight[] {
-  const bigFiveLeader = getBigFiveLeader(catches);
+  const bigFiveLeader = buildAllTimeBigFiveLeader(catches);
   const largestPerch = [...catches]
     .filter((catchItem) => catchItem.fish_type === "Abborre")
     .sort((a, b) => b.weight_g - a.weight_g)[0];
@@ -161,10 +262,12 @@ export function buildAllTimeHighlights(catches: Catch[]): AllTimeHighlight[] {
     highlights.push({
       filter: "bigfive",
       title: "Big Five",
-      winnerName: bigFiveLeader.name,
+      winnerName: bigFiveLeader.winnerName,
       total: bigFiveLeader.total,
       sourceCount: bigFiveLeader.sourceCount,
       catchDate: bigFiveLeader.catchDate,
+      catchImageUrl: bigFiveLeader.catchImageUrl,
+      bestYear: bigFiveLeader.bestYear,
     });
   }
 
@@ -176,6 +279,7 @@ export function buildAllTimeHighlights(catches: Catch[]): AllTimeHighlight[] {
       total: largestPerch.weight_g,
       catchDate: largestPerch.catch_date,
       locationName: largestPerch.location_name || null,
+      catchImageUrl: largestPerch.image_url || null,
     });
   }
 
@@ -187,6 +291,7 @@ export function buildAllTimeHighlights(catches: Catch[]): AllTimeHighlight[] {
       total: largestPike.weight_g,
       catchDate: largestPike.catch_date,
       locationName: largestPike.location_name || null,
+      catchImageUrl: largestPike.image_url || null,
     });
   }
 
@@ -199,6 +304,7 @@ export function buildAllTimeHighlights(catches: Catch[]): AllTimeHighlight[] {
       detail: largestFineFish.fine_fish_type || null,
       catchDate: largestFineFish.catch_date,
       locationName: largestFineFish.location_name || null,
+      catchImageUrl: largestFineFish.image_url || null,
     });
   }
 
