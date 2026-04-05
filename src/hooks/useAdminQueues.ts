@@ -12,8 +12,10 @@ import {
 } from "@/lib/admin-tools";
 import {
   approvePendingFishingSpot,
+  approvePendingFishingSpotEdit,
   deletePendingFishingSpot,
   fetchPendingFishingSpots,
+  rejectPendingFishingSpotEdit,
   type PendingFishingSpot,
 } from "@/lib/fishing-spots";
 
@@ -171,7 +173,7 @@ export function useAdminQueues(adminMemberId: string | null) {
   }, []);
 
   const approveFishingSpot = useCallback(
-    async (spotId: string) => {
+    async (spotId: string, reviewType: PendingFishingSpot["review_type"]) => {
       if (!adminMemberId) {
         setError("Admin-id saknas för att kunna godkänna fiskeplatsen.");
         return;
@@ -180,7 +182,11 @@ export function useAdminQueues(adminMemberId: string | null) {
       try {
         setWorkingKey(`spot-approve-${spotId}`);
         setError(null);
-        await approvePendingFishingSpot(spotId, adminMemberId);
+        if (reviewType === "edit") {
+          await approvePendingFishingSpotEdit(spotId, adminMemberId);
+        } else {
+          await approvePendingFishingSpot(spotId, adminMemberId);
+        }
         setPendingFishingSpots((prev) => prev.filter((item) => item.id !== spotId));
       } catch (err) {
         console.error(err);
@@ -192,7 +198,7 @@ export function useAdminQueues(adminMemberId: string | null) {
     [adminMemberId]
   );
 
-  const rejectFishingSpot = useCallback(async (spotId: string) => {
+  const rejectFishingSpot = useCallback(async (spotId: string, reviewType: PendingFishingSpot["review_type"]) => {
     const confirmed = window.confirm(
       "Är du säker på att du vill ta bort denna fiskeplats?"
     );
@@ -204,11 +210,15 @@ export function useAdminQueues(adminMemberId: string | null) {
     try {
       setWorkingKey(`spot-reject-${spotId}`);
       setError(null);
-      await deletePendingFishingSpot(spotId);
+      if (reviewType === "edit") {
+        await rejectPendingFishingSpotEdit(spotId);
+      } else {
+        await deletePendingFishingSpot(spotId);
+      }
       setPendingFishingSpots((prev) => prev.filter((item) => item.id !== spotId));
     } catch (err) {
       console.error(err);
-      setError("Kunde inte ta bort fiskeplatsen.");
+      setError(reviewType === "edit" ? "Kunde inte avslå ändringen." : "Kunde inte ta bort fiskeplatsen.");
     } finally {
       setWorkingKey(null);
     }

@@ -21,3 +21,5 @@ export type FishingSpot = {
 };
 
 export type FishingSpotMapFilter = "all" | "catches" | "spots";
+
+export type FishingSpotReviewType = "new" | "edit";

@@ -8,6 +8,7 @@ import { useAuthMember } from "@/hooks/useAuthMember";
 import {
   createPendingFishingSpot,
   fetchOwnFishingSpots,
+  submitFishingSpotEdit,
 } from "@/lib/fishing-spots";
 import { getGeolocationErrorState } from "@/lib/home-upload";
 import type { FishingSpot } from "@/types/fishing-spots";
@@ -16,6 +17,54 @@ type FeedbackMessage = {
   variant: "success" | "error";
   text: string;
 };
+
+type EditDraftState = {
+  title: string;
+  notes: string;
+  latitude: number | null;
+  longitude: number | null;
+  gpsLoading: boolean;
+  gpsError: string | null;
+  mapOpen: boolean;
+  submitLoading: boolean;
+  formMessage: FeedbackMessage | null;
+};
+
+const DEFAULT_EDIT_DRAFT: EditDraftState = {
+  title: "",
+  notes: "",
+  latitude: null,
+  longitude: null,
+  gpsLoading: false,
+  gpsError: null,
+  mapOpen: false,
+  submitLoading: false,
+  formMessage: null,
+};
+
+function getInitialEditValues(spot: FishingSpot): Pick<EditDraftState, "title" | "notes" | "latitude" | "longitude"> {
+  if (
+    spot.has_pending_edit &&
+    spot.pending_latitude !== null &&
+    spot.pending_latitude !== undefined &&
+    spot.pending_longitude !== null &&
+    spot.pending_longitude !== undefined
+  ) {
+    return {
+      title: spot.pending_title ?? "",
+      notes: spot.pending_notes ?? "",
+      latitude: spot.pending_latitude,
+      longitude: spot.pending_longitude,
+    };
+  }
+
+  return {
+    title: spot.title ?? "",
+    notes: spot.notes ?? "",
+    latitude: spot.latitude,
+    longitude: spot.longitude,
+  };
+}
 
 export default function MarkeraFiskeplatsPage() {
   const { isLoggedIn, hasActiveMembership, member } = useAuthMember();
@@ -32,6 +81,8 @@ export default function MarkeraFiskeplatsPage() {
   const [spotsLoading, setSpotsLoading] = useState(false);
   const [spotsError, setSpotsError] = useState<string | null>(null);
   const [spots, setSpots] = useState<FishingSpot[]>([]);
+  const [editSpotId, setEditSpotId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState<EditDraftState>(DEFAULT_EDIT_DRAFT);
 
   const loadOwnSpots = useCallback(async () => {
     if (!member?.id || !isLoggedIn) {
@@ -153,6 +204,183 @@ export default function MarkeraFiskeplatsPage() {
     [hasActiveMembership, isLoggedIn, latitude, longitude, member, notes, title]
   );
 
+  const handleStartEdit = useCallback((spot: FishingSpot) => {
+    const initial = getInitialEditValues(spot);
+
+    setEditSpotId(spot.id);
+    setEditDraft({
+      ...DEFAULT_EDIT_DRAFT,
+      ...initial,
+    });
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditSpotId(null);
+    setEditDraft(DEFAULT_EDIT_DRAFT);
+  }, []);
+
+  const handleEditGetGps = useCallback(() => {
+    if (!hasActiveMembership) {
+      return;
+    }
+
+    setEditDraft((prev) => ({ ...prev, gpsError: null }));
+
+    if (!navigator.geolocation) {
+      setEditDraft((prev) => ({
+        ...prev,
+        gpsError: "GPS stöds inte i den här enheten/webbläsaren.",
+      }));
+      return;
+    }
+
+    setEditDraft((prev) => ({ ...prev, gpsLoading: true }));
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setEditDraft((prev) => ({
+          ...prev,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          gpsError: null,
+          gpsLoading: false,
+        }));
+      },
+      (error) => {
+        console.error(error);
+        setEditDraft((prev) => ({
+          ...prev,
+          gpsLoading: false,
+          gpsError: getGeolocationErrorState(error).message,
+        }));
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 30000,
+      }
+    );
+  }, [hasActiveMembership]);
+
+  const handleEditSubmit = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      if (!editSpotId) {
+        setEditDraft((prev) => ({
+          ...prev,
+          formMessage: {
+            variant: "error",
+            text: "Ingen fiskeplats vald för editering.",
+          },
+        }));
+        return;
+      }
+
+      if (!isLoggedIn || !hasActiveMembership || !member?.id) {
+        setEditDraft((prev) => ({
+          ...prev,
+          formMessage: {
+            variant: "error",
+            text: "Du behöver vara aktiv medlem för att editera en fiskeplats.",
+          },
+        }));
+        return;
+      }
+
+      if (editDraft.latitude === null || editDraft.longitude === null) {
+        setEditDraft((prev) => ({
+          ...prev,
+          formMessage: {
+            variant: "error",
+            text: "Välj en position via GPS eller kartan innan du sparar ändringen.",
+          },
+        }));
+        return;
+      }
+
+      const targetSpot = spots.find((spot) => spot.id === editSpotId);
+
+      if (!targetSpot) {
+        setEditDraft((prev) => ({
+          ...prev,
+          formMessage: {
+            variant: "error",
+            text: "Kunde inte hitta fiskeplatsen du försöker editera.",
+          },
+        }));
+        return;
+      }
+
+      try {
+        setEditDraft((prev) => ({ ...prev, submitLoading: true, formMessage: null }));
+
+        await submitFishingSpotEdit({
+          spotId: editSpotId,
+          latitude: editDraft.latitude,
+          longitude: editDraft.longitude,
+          title: editDraft.title.trim() ? editDraft.title.trim() : null,
+          notes: editDraft.notes.trim() ? editDraft.notes.trim() : null,
+        });
+
+        const nextSpots = spots.map((spot) => {
+          if (spot.id !== editSpotId) {
+            return spot;
+          }
+
+          const nextTitle = editDraft.title.trim() ? editDraft.title.trim() : null;
+          const nextNotes = editDraft.notes.trim() ? editDraft.notes.trim() : null;
+
+          if (spot.status === "pending") {
+            return {
+              ...spot,
+              title: nextTitle,
+              notes: nextNotes,
+              latitude: editDraft.latitude ?? spot.latitude,
+              longitude: editDraft.longitude ?? spot.longitude,
+              updated_at: new Date().toISOString(),
+            };
+          }
+
+          return {
+            ...spot,
+            pending_title: nextTitle,
+            pending_notes: nextNotes,
+            pending_latitude: editDraft.latitude,
+            pending_longitude: editDraft.longitude,
+            has_pending_edit: true,
+            updated_at: new Date().toISOString(),
+          };
+        });
+
+        setSpots(nextSpots);
+        setEditDraft((prev) => ({
+          ...prev,
+          submitLoading: false,
+          mapOpen: false,
+          formMessage: {
+            variant: "success",
+            text:
+              targetSpot.status === "pending"
+                ? "Den väntande fiskeplatsen uppdaterades. Den väntar fortfarande på admin-godkännande."
+                : "Ändringen sparades och väntar nu på admin-godkännande innan den syns på kartan.",
+          },
+        }));
+      } catch (error) {
+        console.error(error);
+        setEditDraft((prev) => ({
+          ...prev,
+          submitLoading: false,
+          formMessage: {
+            variant: "error",
+            text: "Kunde inte spara ändringen just nu.",
+          },
+        }));
+      }
+    },
+    [editDraft, editSpotId, hasActiveMembership, isLoggedIn, member?.id, spots]
+  );
+
   return (
     <main className="px-4 pb-10 pt-4">
       <div className="mx-auto max-w-5xl space-y-4">
@@ -203,7 +431,39 @@ export default function MarkeraFiskeplatsPage() {
         ) : null}
 
         {isLoggedIn ? (
-          <MyFishingSpotsSection loading={spotsLoading} error={spotsError} spots={spots} />
+          <MyFishingSpotsSection
+            loading={spotsLoading}
+            error={spotsError}
+            spots={spots}
+            isLoggedIn={isLoggedIn}
+            hasActiveMembership={hasActiveMembership}
+            editSpotId={editSpotId}
+            editDraft={editDraft}
+            onStartEdit={handleStartEdit}
+            onCancelEdit={handleCancelEdit}
+            onEditTitleChange={(value) =>
+              setEditDraft((prev) => ({ ...prev, title: value, formMessage: null }))
+            }
+            onEditNotesChange={(value) =>
+              setEditDraft((prev) => ({ ...prev, notes: value, formMessage: null }))
+            }
+            onEditGetGps={handleEditGetGps}
+            onEditOpenMap={() =>
+              setEditDraft((prev) => ({ ...prev, mapOpen: true, formMessage: null }))
+            }
+            onEditCloseMap={() => setEditDraft((prev) => ({ ...prev, mapOpen: false }))}
+            onEditMapSelect={(lat, lng) =>
+              setEditDraft((prev) => ({
+                ...prev,
+                latitude: lat,
+                longitude: lng,
+                gpsError: null,
+                mapOpen: false,
+                formMessage: null,
+              }))
+            }
+            onEditSubmit={handleEditSubmit}
+          />
         ) : null}
       </div>
     </main>

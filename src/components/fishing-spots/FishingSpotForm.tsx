@@ -26,6 +26,14 @@ type FishingSpotFormProps = {
   onCloseMap: () => void;
   onMapSelect: (lat: number, lng: number) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  mode?: "create" | "edit";
+  heading?: string;
+  description?: string;
+  lockedMessage?: string | null;
+  statusLabel?: string;
+  submitLabel?: string;
+  submitLoadingLabel?: string;
+  helperText?: string;
 };
 
 export default function FishingSpotForm({
@@ -47,34 +55,61 @@ export default function FishingSpotForm({
   onCloseMap,
   onMapSelect,
   onSubmit,
+  mode = "create",
+  heading,
+  description,
+  lockedMessage = null,
+  statusLabel,
+  submitLabel,
+  submitLoadingLabel,
+  helperText,
 }: FishingSpotFormProps) {
   const isLocked = !isLoggedIn || !hasActiveMembership;
+  const resolvedHeading =
+    heading ?? (mode === "edit" ? "✏️ Editera fiskeplats" : "📍 Markera fiskeplats");
+  const resolvedDescription =
+    description ??
+    (mode === "edit"
+      ? "Uppdatera plats, rubrik eller anteckningar. Om platsen redan är publicerad skickas ändringen till admin för godkännande innan den slår igenom på kartan."
+      : "Snabbmarkera en spot ute på sjön med GPS eller manuellt på karta. Titel och anteckningar är frivilliga så att du kan spara snabbt och fylla i mer senare.");
+  const resolvedStatusLabel =
+    statusLabel ??
+    (mode === "edit" ? "Ändring väntar på admin" : "Väntar på admin");
+  const resolvedSubmitLabel =
+    submitLabel ?? (mode === "edit" ? "Spara ändring" : "Spara fiskeplats");
+  const resolvedSubmitLoadingLabel =
+    submitLoadingLabel ??
+    (mode === "edit" ? "Sparar ändring..." : "Sparar fiskeplats...");
+  const resolvedHelperText =
+    helperText ??
+    (mode === "edit"
+      ? "Du kan justera koordinater, rubrik och anteckningar när du har mer tid."
+      : "Det räcker att spara endast position om du har bråttom.");
 
   return (
     <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#1f2937]">📍 Markera fiskeplats</h1>
-          <p className="mt-2 max-w-2xl text-sm text-[#6b7280]">
-            Snabbmarkera en spot ute på sjön med GPS eller manuellt på karta. Titel och
-            anteckningar är frivilliga så att du kan spara snabbt och fylla i mer senare.
-          </p>
+          <h1 className="text-3xl font-bold text-[#1f2937]">{resolvedHeading}</h1>
+          <p className="mt-2 max-w-2xl text-sm text-[#6b7280]">{resolvedDescription}</p>
         </div>
 
         <div className="rounded-2xl border border-[#d8d2c7] bg-[#faf8f4] px-4 py-3 text-sm text-[#4b5563]">
-          Status vid inskick: <span className="font-semibold text-[#1f2937]">Väntar på admin</span>
+          Status efter skickad ändring:{" "}
+          <span className="font-semibold text-[#1f2937]">{resolvedStatusLabel}</span>
         </div>
       </div>
 
       {!isLoggedIn ? (
         <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Du behöver logga in för att markera en fiskeplats.
+          {lockedMessage || "Du behöver logga in för att markera eller editera en fiskeplats."}
         </div>
       ) : null}
 
       {isLoggedIn && !hasActiveMembership ? (
         <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Ditt medlemskap är inte aktivt ännu. Fiskeplatser kan markeras först när medlemskapet är godkänt.
+          {lockedMessage ||
+            "Ditt medlemskap är inte aktivt ännu. Fiskeplatser kan markeras eller editeras först när medlemskapet är godkänt."}
         </div>
       ) : null}
 
@@ -187,12 +222,10 @@ export default function FishingSpotForm({
             disabled={isLocked || submitLoading || latitude === null || longitude === null}
             className="rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitLoading ? "Sparar fiskeplats..." : "Spara fiskeplats"}
+            {submitLoading ? resolvedSubmitLoadingLabel : resolvedSubmitLabel}
           </button>
 
-          <div className="text-sm text-[#6b7280]">
-            Det räcker att spara endast position om du har bråttom.
-          </div>
+          <div className="text-sm text-[#6b7280]">{resolvedHelperText}</div>
         </div>
       </form>
     </section>

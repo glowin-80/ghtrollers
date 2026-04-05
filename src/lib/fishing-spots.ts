@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import type { FishingSpot } from "@/types/fishing-spots";
+import type { FishingSpot, FishingSpotReviewType } from "@/types/fishing-spots";
 
 const FISHING_SPOT_SELECT =
   "id, created_at, updated_at, created_by_member_id, created_by_name, latitude, longitude, title, notes, status, pending_latitude, pending_longitude, pending_title, pending_notes, has_pending_edit, approved_at, approved_by_member_id";
@@ -63,20 +63,47 @@ export async function createPendingFishingSpot(input: {
   return data;
 }
 
-export type PendingFishingSpot = FishingSpot;
+export async function submitFishingSpotEdit(input: {
+  spotId: string;
+  latitude: number;
+  longitude: number;
+  title: string | null;
+  notes: string | null;
+}) {
+  const { data, error } = await supabase.rpc("submit_fishing_spot_edit", {
+    p_spot_id: input.spotId,
+    p_pending_latitude: input.latitude,
+    p_pending_longitude: input.longitude,
+    p_pending_title: input.title,
+    p_pending_notes: input.notes,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export type PendingFishingSpot = FishingSpot & {
+  review_type: FishingSpotReviewType;
+};
 
 export async function fetchPendingFishingSpots(): Promise<PendingFishingSpot[]> {
   const { data, error } = await supabase
     .from("fishing_spots")
     .select(FISHING_SPOT_SELECT)
-    .eq("status", "pending")
+    .or("status.eq.pending,has_pending_edit.eq.true")
     .order("created_at", { ascending: true });
 
   if (error) {
     throw error;
   }
 
-  return data || [];
+  return (data || []).map((spot) => ({
+    ...spot,
+    review_type: spot.status === "pending" ? "new" : "edit",
+  }));
 }
 
 export async function approvePendingFishingSpot(spotId: string, approverMemberId: string) {
@@ -94,13 +121,38 @@ export async function approvePendingFishingSpot(spotId: string, approverMemberId
   }
 }
 
-export async function deletePendingFishingSpot(spotId: string) {
-  const { error } = await supabase
-    .from("fishing_spots")
-    .delete()
-    .eq("id", spotId);
+export async function approvePendingFishingSpotEdit(
+  spotId: string,
+  approverMemberId: string
+) {
+  const { data, error } = await supabase.rpc("approve_fishing_spot_edit", {
+    p_spot_id: spotId,
+    p_admin_member_id: approverMemberId,
+  });
 
   if (error) {
     throw error;
   }
+
+  return data;
+}
+
+export async function deletePendingFishingSpot(spotId: string) {
+  const { error } = await supabase.from("fishing_spots").delete().eq("id", spotId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function rejectPendingFishingSpotEdit(spotId: string) {
+  const { data, error } = await supabase.rpc("reject_fishing_spot_edit", {
+    p_spot_id: spotId,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }
