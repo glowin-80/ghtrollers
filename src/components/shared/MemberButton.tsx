@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 type MemberButtonProps = {
   profileImage?: string | null;
@@ -12,8 +12,28 @@ function MemberButtonComponent({
   profileImage,
   compact = false,
 }: MemberButtonProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  function handleClick() {
+    if (pathname === "/min-sida") {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+      return;
+    }
+
+    router.push("/min-sida");
+  }
+
   return (
-    <Link href="/min-sida">
+    <button
+      type="button"
+      onClick={handleClick}
+      className="block rounded-full bg-transparent"
+      aria-label="Min sida"
+    >
       <div
         className={[
           "flex cursor-pointer items-center overflow-hidden rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] shadow-md transition hover:scale-[1.03]",
@@ -49,7 +69,7 @@ function MemberButtonComponent({
           MIN SIDA
         </span>
       </div>
-    </Link>
+    </button>
   );
 }
 

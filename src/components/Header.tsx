@@ -7,17 +7,21 @@ import { useAuthMember } from "@/hooks/useAuthMember";
 
 type NavItem = {
   id: string;
-  src: string;
+  src?: string;
+  label?: string;
   section?: string;
   href?: string;
   alt: string;
   type: "section" | "route" | "action";
 };
 
-const sectionItems: NavItem[] = [
+const MOBILE_MENU_BUTTON_WIDTH = 164;
+
+const desktopGraphicItems: NavItem[] = [
   {
     id: "leaderboard",
     src: "/nav/leaderboard.png",
+    label: "Leaderboard",
     section: "leaderboard-section",
     alt: "Leaderboard",
     type: "section",
@@ -25,6 +29,7 @@ const sectionItems: NavItem[] = [
   {
     id: "upload",
     src: "/nav/laddaUpp.png",
+    label: "Ladda upp fångst",
     section: "upload-section",
     alt: "Ladda upp fångst",
     type: "section",
@@ -32,6 +37,7 @@ const sectionItems: NavItem[] = [
   {
     id: "gallery",
     src: "/nav/galleri.png",
+    label: "Galleri",
     href: "/galleri",
     alt: "Galleri",
     type: "route",
@@ -39,11 +45,94 @@ const sectionItems: NavItem[] = [
   {
     id: "map",
     src: "/nav/karta.png",
+    label: "Karta",
     section: "map-section",
     alt: "Karta",
     type: "section",
   },
 ];
+
+const mobileMenuItems: NavItem[] = [
+  {
+    id: "home",
+    label: "Startsida",
+    href: "/",
+    alt: "Startsida",
+    type: "route",
+  },
+  {
+    id: "leaderboard",
+    src: "/nav/leaderboard.png",
+    label: "Leaderboard",
+    section: "leaderboard-section",
+    alt: "Leaderboard",
+    type: "section",
+  },
+  {
+    id: "upload",
+    src: "/nav/laddaUpp.png",
+    label: "Ladda upp fångst",
+    section: "upload-section",
+    alt: "Ladda upp fångst",
+    type: "section",
+  },
+  {
+    id: "approved",
+    label: "Nya godkända fångster",
+    section: "approved-section",
+    alt: "Nya godkända fångster",
+    type: "section",
+  },
+  {
+    id: "gallery",
+    src: "/nav/galleri.png",
+    label: "Galleri",
+    href: "/galleri",
+    alt: "Galleri",
+    type: "route",
+  },
+  {
+    id: "map",
+    src: "/nav/karta.png",
+    label: "Karta",
+    section: "map-section",
+    alt: "Karta",
+    type: "section",
+  },
+  {
+    id: "all-time-high",
+    label: "All-time-high",
+    href: "/all-time-high",
+    alt: "All-time-high",
+    type: "route",
+  },
+];
+
+function getNavOffset() {
+  const nav = document.getElementById("site-nav");
+  return nav ? nav.offsetHeight + 20 : 20;
+}
+
+function scrollToSection(sectionId: string, attempt = 0) {
+  const element = document.getElementById(sectionId);
+
+  if (!element) {
+    if (attempt < 14) {
+      window.setTimeout(() => {
+        scrollToSection(sectionId, attempt + 1);
+      }, 80);
+    }
+    return;
+  }
+
+  const targetPosition =
+    element.getBoundingClientRect().top + window.scrollY - getNavOffset();
+
+  window.scrollTo({
+    top: Math.max(targetPosition, 0),
+    behavior: "smooth",
+  });
+}
 
 export default function Header() {
   const pathname = usePathname();
@@ -57,6 +146,11 @@ export default function Header() {
   useEffect(() => {
     if (pathname === "/galleri") {
       setActive("gallery");
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
+    if (pathname === "/all-time-high") {
       setIsMobileMenuOpen(false);
       return;
     }
@@ -93,70 +187,153 @@ export default function Header() {
     };
   }, []);
 
-  const navItems = useMemo<NavItem[]>(() => {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (pathname !== "/") return;
+
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    const sectionId = hash.replace(/^#/, "");
+    const timer = window.setTimeout(() => {
+      scrollToSection(sectionId);
+    }, 60);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [pathname]);
+
+  const desktopNavItems = useMemo<NavItem[]>(() => {
     return [
-      ...sectionItems,
+      ...desktopGraphicItems,
       {
         id: "account",
         src: "/nav/loggaIn.png",
+        label: isLoggedIn ? "Min sida" : "Logga in",
         alt: isLoggedIn ? "Min sida" : "Logga in",
         type: "action",
       },
     ];
   }, [isLoggedIn]);
 
-  const activeMobileItem =
-    sectionItems.find((item) => item.id === active) ?? sectionItems[0];
+  function navigateToHref(href: string) {
+    const [rawPath, rawHash] = href.split("#");
+    const targetPath = rawPath || "/";
+    const targetHash = rawHash ?? "";
 
-  const mobileDropdownItems = sectionItems.filter(
-    (item) => item.id !== activeMobileItem.id
-  );
+    if (pathname === targetPath && targetHash) {
+      window.history.replaceState(null, "", `${targetPath}#${targetHash}`);
+      scrollToSection(targetHash);
+      return;
+    }
 
-  function performNavigation(item: NavItem) {
-    if (item.type === "section" && item.section) {
-      setActive(item.id);
-      setIsMobileMenuOpen(false);
-
-      const nav = document.getElementById("site-nav");
-
-      if (pathname !== "/") {
-        router.push(`/#${item.section}`);
-        return;
-      }
-
-      const el = document.getElementById(item.section);
-      if (!el) return;
-
-      const navHeight = nav ? nav.offsetHeight : 0;
-      const elementTop = el.getBoundingClientRect().top + window.scrollY;
-      const targetPosition = elementTop - navHeight - 20;
-
+    if (pathname === targetPath && !targetHash) {
       window.scrollTo({
-        top: targetPosition,
+        top: 0,
         behavior: "smooth",
       });
       return;
     }
 
-    if (item.type === "route" && item.href) {
-      setActive(item.id);
+    router.push(targetHash ? `${targetPath}#${targetHash}` : targetPath);
+  }
+
+  function performNavigation(item: NavItem) {
+    if (item.type === "section" && item.section) {
       setIsMobileMenuOpen(false);
-      router.push(item.href);
+
+      if (item.id === "leaderboard") setActive("leaderboard");
+      if (item.id === "upload") setActive("upload");
+      if (item.id === "map") setActive("map");
+
+      navigateToHref(`/#${item.section}`);
+      return;
+    }
+
+    if (item.type === "route" && item.href) {
+      setIsMobileMenuOpen(false);
+
+      if (item.id === "gallery") {
+        setActive("gallery");
+      }
+
+      navigateToHref(item.href);
       return;
     }
 
     if (item.type === "action") {
       setIsMobileMenuOpen(false);
-      router.push(isLoggedIn ? "/min-sida" : "/login");
-    }
-  }
 
-  function handleClick(item: NavItem) {
-    performNavigation(item);
+      if (isLoggedIn) {
+        if (pathname === "/min-sida") {
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+          return;
+        }
+
+        router.push("/min-sida");
+        return;
+      }
+
+      router.push("/login");
+    }
   }
 
   function toggleMobileMenu() {
     setIsMobileMenuOpen((prev) => !prev);
+  }
+
+  function renderMobileMenuButton(item: NavItem) {
+    if (item.src) {
+      return (
+        <div
+          key={item.id}
+          className="flex justify-start"
+          style={{ width: `${MOBILE_MENU_BUTTON_WIDTH}px` }}
+        >
+          <button
+            type="button"
+            onClick={() => performNavigation(item)}
+            className="block w-full rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
+          >
+            <img
+              src={item.src}
+              alt={item.alt}
+              draggable={false}
+              className="block h-[40px] w-full object-contain object-left"
+            />
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        key={item.id}
+        className="flex justify-start"
+        style={{ width: `${MOBILE_MENU_BUTTON_WIDTH}px` }}
+      >
+        <button
+          type="button"
+          onClick={() => performNavigation(item)}
+          className="flex min-h-[40px] w-full items-center justify-between rounded-full border border-[#cfc4ae] bg-[#f8f4ea] px-4 py-[7px] text-left text-[#3f352b] shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-200 hover:scale-[1.01]"
+        >
+          <span className="pr-2 text-[0.92rem] font-semibold leading-[1.05rem]">
+            {item.label}
+          </span>
+
+          <span
+            aria-hidden="true"
+            className="ml-2 shrink-0 text-[0.95rem] font-semibold text-[#8b7355]"
+          >
+            →
+          </span>
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -185,19 +362,16 @@ export default function Header() {
                   aria-expanded={isMobileMenuOpen}
                   aria-controls="mobile-nav-dropdown"
                   onClick={toggleMobileMenu}
-                  className="relative block w-full rounded-full bg-transparent transition-transform duration-200 active:scale-[0.99]"
+                  className="relative flex h-[47px] w-full items-center justify-between overflow-hidden rounded-full border border-[#bfa76a] bg-gradient-to-b from-[#2e3f2b] to-[#1f2b1d] px-5 shadow-md transition-transform duration-200 active:scale-[0.99]"
                 >
-                  <img
-                    src={activeMobileItem.src}
-                    alt={activeMobileItem.alt}
-                    draggable={false}
-                    className="block h-[44px] w-full object-contain object-left"
-                  />
+                  <span className="text-[15px] font-semibold uppercase tracking-wide text-[#e5d3a3]">
+                    Meny
+                  </span>
 
                   <span
                     aria-hidden="true"
                     className={[
-                      "pointer-events-none absolute right-[30px] top-[85%] z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-[11px] font-bold leading-none text-[#f3e4bc] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
+                      "pointer-events-none flex h-5 w-5 items-center justify-center rounded-full bg-black/55 text-[11px] font-bold leading-none text-[#e5d3a3] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
                       isMobileMenuOpen ? "rotate-180" : "rotate-0",
                     ].join(" ")}
                   >
@@ -213,7 +387,11 @@ export default function Header() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => handleClick(navItems[navItems.length - 1])}
+                  onClick={() =>
+                    performNavigation(
+                      desktopNavItems[desktopNavItems.length - 1]
+                    )
+                  }
                   className="shrink-0 rounded-full bg-transparent transition-transform duration-300 hover:scale-105"
                 >
                   <img
@@ -231,34 +409,18 @@ export default function Header() {
               className={[
                 "overflow-hidden transition-all duration-300 ease-out",
                 isMobileMenuOpen
-                  ? "mt-2 max-h-[260px] opacity-100"
+                  ? "mt-2 max-h-[520px] opacity-100"
                   : "mt-0 max-h-0 opacity-0",
               ].join(" ")}
             >
-              <div className="space-y-2 pb-1">
-                {mobileDropdownItems.map((item) => {
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleClick(item)}
-                      className="block w-[90%] rounded-full bg-transparent opacity-95 transition-all duration-200 hover:scale-[1.01]"
-                    >
-                      <img
-                        src={item.src}
-                        alt={item.alt}
-                        draggable={false}
-                        className="block h-[40px] w-full object-contain object-left"
-                      />
-                    </button>
-                  );
-                })}
+              <div className="flex flex-col items-start gap-2 pb-1">
+                {mobileMenuItems.map((item) => renderMobileMenuButton(item))}
               </div>
             </div>
           </div>
 
           <div className="hidden flex-wrap items-center justify-center gap-3 sm:flex sm:gap-4 md:gap-5">
-            {navItems.map((item) => {
+            {desktopNavItems.map((item) => {
               const isSectionActive =
                 item.type === "section" &&
                 active === item.id &&
@@ -278,7 +440,7 @@ export default function Header() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => handleClick(item)}
+                    onClick={() => performNavigation(item)}
                     className="rounded-full bg-transparent opacity-95 transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]"
                   >
                     <img
@@ -295,7 +457,7 @@ export default function Header() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => handleClick(item)}
+                  onClick={() => performNavigation(item)}
                   className={[
                     "rounded-full bg-transparent transition-all duration-300",
                     "hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]",
