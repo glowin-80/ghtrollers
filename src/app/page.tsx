@@ -39,6 +39,7 @@ export default function Home() {
     formMessage,
     confirmMissingLocationOpen,
     mapOpen,
+    locationChooserOpen,
     previewUrl,
     fileInputKey,
     loading,
@@ -49,6 +50,9 @@ export default function Home() {
     handleImageChange,
     handleCaughtForChange,
     handleFishTypeChange,
+    handleOpenLocationChooser,
+    handleCloseLocationChooser,
+    handleSaveManualLocation,
     handleGetGps,
     handleOpenMap,
     handleCloseMap,
@@ -166,6 +170,7 @@ export default function Home() {
             formMessage={formMessage}
             confirmMissingLocationOpen={confirmMissingLocationOpen}
             mapOpen={mapOpen}
+            locationChooserOpen={locationChooserOpen}
             previewUrl={previewUrl}
             fileInputKey={fileInputKey}
             loading={loading}
@@ -176,6 +181,9 @@ export default function Home() {
             onWeightChange={handleWeightChange}
             onCatchDateChange={handleCatchDateChange}
             onLocationNameChange={handleLocationNameChange}
+            onOpenLocationChooser={handleOpenLocationChooser}
+            onCloseLocationChooser={handleCloseLocationChooser}
+            onSaveManualLocation={handleSaveManualLocation}
             onGetGps={handleGetGps}
             onOpenMap={handleOpenMap}
             onCloseMap={handleCloseMap}
