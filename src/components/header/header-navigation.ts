@@ -10,10 +10,10 @@ export function scrollToSection(sectionId: string, attempt = 0) {
   const element = document.getElementById(sectionId);
 
   if (!element) {
-    if (attempt < 14) {
+    if (attempt < 40) {
       window.setTimeout(() => {
         scrollToSection(sectionId, attempt + 1);
-      }, 80);
+      }, 120);
     }
     return;
   }
