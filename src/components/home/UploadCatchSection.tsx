@@ -1,19 +1,23 @@
 "use client";
 
-
 import MembersOnlyOverlay from "@/components/shared/MembersOnlyOverlay";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import UploadCatchForm from "@/components/home/upload/UploadCatchForm";
 import MapPickerModal from "@/components/home/upload/MapPickerModal";
+import LocationMethodModal from "@/components/home/upload/LocationMethodModal";
 import type { UploadCatchSectionProps } from "@/components/home/upload/types";
 
 export default function UploadCatchSection({
   isLoggedIn,
   hasActiveMembership,
   mapOpen,
+  locationChooserOpen,
   confirmMissingLocationOpen,
   onCloseMap,
   onMapSelect,
+  onOpenLocationChooser,
+  onCloseLocationChooser,
+  onSaveManualLocation,
   onConfirmMissingLocation,
   onCancelMissingLocation,
   ...formProps
@@ -40,7 +44,20 @@ export default function UploadCatchSection({
       <div className={shouldLock ? "pointer-events-none select-none blur-[5px]" : ""}>
         <h2 className="mb-4 text-2xl font-bold text-[#1f2937]">📸 Ladda upp fångst</h2>
 
-        <UploadCatchForm {...formProps} />
+        <UploadCatchForm
+          {...formProps}
+          onOpenLocationChooser={onOpenLocationChooser}
+        />
+
+        <LocationMethodModal
+          open={locationChooserOpen}
+          initialLocationName={formProps.locationName}
+          gpsLoading={formProps.gpsLoading}
+          onClose={onCloseLocationChooser}
+          onSelectManual={onSaveManualLocation}
+          onSelectGps={formProps.onGetGps}
+          onSelectMap={formProps.onOpenMap}
+        />
 
         <MapPickerModal
           open={mapOpen}

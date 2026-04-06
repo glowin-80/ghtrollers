@@ -1,41 +1,42 @@
 "use client";
 
-import { formatCatchDate } from "@/lib/home-upload";
-
 type CatchDateFieldProps = {
   catchDate: string;
   onCatchDateChange: (value: string) => void;
 };
 
+function formatDisplayDate(value: string) {
+  if (!value) {
+    return "Datum för fångst";
+  }
+
+  const [year, month, day] = value.split("-");
+  if (!year || !month || !day) {
+    return value;
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
 export default function CatchDateField({
   catchDate,
   onCatchDateChange,
 }: CatchDateFieldProps) {
-  const formattedCatchDate = formatCatchDate(catchDate);
-
   return (
-    <div className="space-y-2">
-      <label
-        htmlFor="catch-date"
-        className="block text-sm font-semibold text-[#4b5563]"
-      >
-        Datum för fångst
-      </label>
-
+    <label className="relative block w-full cursor-pointer">
       <input
-        id="catch-date"
         type="date"
         value={catchDate}
         onChange={(e) => onCatchDateChange(e.target.value)}
-        className="date-input w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+        className="absolute inset-0 h-full w-full opacity-0"
         required
       />
 
-      <div className="min-h-[20px] text-sm text-[#6b7280]">
-        {formattedCatchDate
-          ? `Valt datum: ${formattedCatchDate}`
-          : "Tryck för att välja datum"}
+      <div className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition">
+        <span className={catchDate ? "text-[#1f2937]" : "text-[#9ca3af]"}>
+          {formatDisplayDate(catchDate)}
+        </span>
       </div>
-    </div>
+    </label>
   );
 }
