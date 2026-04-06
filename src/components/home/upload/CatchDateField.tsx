@@ -5,25 +5,38 @@ type CatchDateFieldProps = {
   onCatchDateChange: (value: string) => void;
 };
 
+function formatDisplayDate(value: string) {
+  if (!value) {
+    return "Datum för fångst";
+  }
+
+  const [year, month, day] = value.split("-");
+  if (!year || !month || !day) {
+    return value;
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
 export default function CatchDateField({
   catchDate,
   onCatchDateChange,
 }: CatchDateFieldProps) {
   return (
-    <div className="relative">
+    <label className="relative block w-full cursor-pointer">
       <input
         type="date"
         value={catchDate}
         onChange={(e) => onCatchDateChange(e.target.value)}
-        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+        className="absolute inset-0 h-full w-full opacity-0"
         required
       />
 
-      {!catchDate ? (
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4 text-[#9ca3af]">
-          Datum för fångst
-        </div>
-      ) : null}
-    </div>
+      <div className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition">
+        <span className={catchDate ? "text-[#1f2937]" : "text-[#9ca3af]"}>
+          {formatDisplayDate(catchDate)}
+        </span>
+      </div>
+    </label>
   );
 }
