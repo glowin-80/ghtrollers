@@ -80,6 +80,8 @@ export default function UploadCatchForm({
     ? "text-[#374151]"
     : "text-[#9ca3af]";
 
+  const selectedFileName = previewUrl ? "Bild vald" : "Ingen bild vald";
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {formMessage ? (
@@ -180,12 +182,21 @@ export default function UploadCatchForm({
         </div>
       </div>
 
+      <label
+        htmlFor={`catch-image-upload-${fileInputKey}`}
+        className="flex w-full cursor-pointer items-center justify-between rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] transition hover:border-[#c8c1b4]"
+      >
+        <span className="font-medium">Välj fångstbild</span>
+        <span className="text-sm text-[#9ca3af]">{selectedFileName}</span>
+      </label>
+
       <input
         key={fileInputKey}
+        id={`catch-image-upload-${fileInputKey}`}
         type="file"
         accept="image/*"
         onChange={(e) => onImageChange(e.target.files?.[0] || null)}
-        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937]"
+        className="hidden"
         required
       />
 
