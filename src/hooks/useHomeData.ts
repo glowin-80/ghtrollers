@@ -13,9 +13,7 @@ export function useHomeData() {
 
   const loadInitialData = useCallback(async () => {
     try {
-      const data = await fetchHomePageData({
-        includeFishingSpots: hasActiveMembership,
-      });
+      const data = await fetchHomePageData({ includeFishingSpots: hasActiveMembership });
       setMembers(data.members);
       setApprovedCatches(data.approvedCatches);
       setApprovedFishingSpots(data.approvedFishingSpots);
@@ -25,7 +23,11 @@ export function useHomeData() {
   }, [hasActiveMembership]);
 
   useEffect(() => {
-    void loadInitialData();
+    const timeoutId = window.setTimeout(() => {
+      void loadInitialData();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [loadInitialData]);
 
   return {

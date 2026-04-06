@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -79,19 +80,19 @@ export default function SignupForm() {
         <p className="mt-4 text-lg leading-8 text-[#4b5563]">{success}</p>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <a
+          <Link
             href="/login"
             className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
           >
             Till login
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/"
             className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
           >
             Till startsidan
-          </a>
+          </Link>
         </div>
       </section>
     );
@@ -178,12 +179,12 @@ export default function SignupForm() {
         ) : null}
 
         <div className="flex flex-wrap gap-3">
-          <a
+          <Link
             href="/login"
             className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
           >
             Till login
-          </a>
+          </Link>
 
           <button
             type="submit"
