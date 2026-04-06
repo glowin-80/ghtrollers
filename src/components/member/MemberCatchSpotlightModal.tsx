@@ -49,9 +49,17 @@ export default function MemberCatchSpotlightModal({
   }, [catchItem, onClose, selectedImage]);
 
   useEffect(() => {
-    if (!catchItem) {
-      setSelectedImage(null);
+    if (catchItem) {
+      return;
     }
+
+    const timeoutId = window.setTimeout(() => {
+      setSelectedImage(null);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [catchItem]);
 
   if (!catchItem) {

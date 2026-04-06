@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type MembersOnlyOverlayProps = {
   title: string;
   description: string;
@@ -18,20 +20,9 @@ export default function MembersOnlyOverlay({
         <p className="mt-3 text-sm leading-6 text-[#5b6470]">{description}</p>
 
         <div className="mt-5 flex items-center justify-center gap-3">
-          <a
-            href="/"
-            className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
-          >
-            Till startsidan
-          </a>
-
+          <Link href="/" className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]">Till startsidan</Link>
           {!hideLoginButton ? (
-            <a
-              href={loginHref}
-              className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
-            >
-              Logga in
-            </a>
+            <Link href={loginHref} className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]">Logga in</Link>
           ) : null}
         </div>
       </div>

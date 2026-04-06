@@ -65,8 +65,10 @@ export default function MyCatchesSection({
 
     const targetYear = targetCatch.catch_date?.slice(0, 4) || "all";
 
-    setSelectedYear(targetYear);
-    setHighlightedCatchId(targetCatchId);
+    const stateTimer = window.setTimeout(() => {
+      setSelectedYear(targetYear);
+      setHighlightedCatchId(targetCatchId);
+    }, 0);
 
     const sectionTimer = window.setTimeout(() => {
       sectionRef.current?.scrollIntoView({
@@ -89,6 +91,7 @@ export default function MyCatchesSection({
     }, 280);
 
     return () => {
+      window.clearTimeout(stateTimer);
       window.clearTimeout(sectionTimer);
       window.clearTimeout(catchTimer);
     };

@@ -162,8 +162,14 @@ export default function LeafletCatchesMap({
     [fishingSpots]
   );
 
-  const visibleCatches = filter === "spots" ? [] : catchesWithCoords;
-  const visibleSpots = filter === "catches" ? [] : spotsWithCoords;
+  const visibleCatches = useMemo(
+    () => (filter === "spots" ? [] : catchesWithCoords),
+    [catchesWithCoords, filter]
+  );
+  const visibleSpots = useMemo(
+    () => (filter === "catches" ? [] : spotsWithCoords),
+    [filter, spotsWithCoords]
+  );
 
   const center = useMemo<[number, number]>(() => {
     if (visibleSpots.length > 0) {
