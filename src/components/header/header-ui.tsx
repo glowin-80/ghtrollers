@@ -68,3 +68,59 @@ export function MobileTopButton({
     </button>
   );
 }
+
+export function ThemedNavButton({
+  label,
+  onClick,
+  themeOuter,
+  themeIconCircle,
+  themeArrow,
+  isActive = false,
+  compact = false,
+}: {
+  label: string;
+  onClick: () => void;
+  themeOuter: string;
+  themeIconCircle: string;
+  themeArrow: string;
+  isActive?: boolean;
+  compact?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={[
+        "group relative flex items-center overflow-visible rounded-full border text-left shadow-[0_7px_16px_rgba(0,0,0,0.13)] transition-all duration-200 active:scale-[0.99]",
+        compact
+          ? "min-h-[42px] pr-[12px] pl-[54px] py-[4px]"
+          : "min-h-[48px] pr-[14px] pl-[58px] py-[6px]",
+        isActive ? "scale-[1.02]" : "hover:scale-[1.02]",
+        themeOuter,
+      ].join(" ")}
+    >
+      <div className="pointer-events-none absolute inset-[1px] rounded-full border border-white/10" />
+      <SmallMenuBubble className={themeIconCircle} />
+      <div className="min-w-0 flex-1 pr-[4px]">
+        <div
+          className={[
+            "truncate font-semibold leading-[1.05] tracking-[0.01em]",
+            compact ? "text-[13px]" : "text-[14px]",
+          ].join(" ")}
+        >
+          {label}
+        </div>
+      </div>
+      <div
+        className={[
+          "flex shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-[1px]",
+          compact ? "h-6 w-6" : "h-7 w-7",
+          themeArrow,
+        ].join(" ")}
+        aria-hidden="true"
+      >
+        <span className={compact ? "text-[17px] leading-none" : "text-[18px] leading-none"}>›</span>
+      </div>
+    </button>
+  );
+}

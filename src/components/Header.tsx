@@ -3,20 +3,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthMember } from "@/hooks/useAuthMember";
-import { desktopGraphicItems, getMobileCardTheme, mobileMenuItems, type NavItem } from "@/components/header/header-config";
-import { getPathActiveItem, performNavigation, scrollToSection } from "@/components/header/header-navigation";
-import { MobileTopButton, SmallMenuBubble } from "@/components/header/header-ui";
-
-function getDesktopNavImage(itemId: string) {
-  const srcMap: Record<string, string> = {
-    leaderboard: "/nav/leaderboard.png",
-    upload: "/nav/laddaUpp.png",
-    gallery: "/nav/galleri.png",
-    map: "/nav/karta.png",
-  };
-
-  return srcMap[itemId] || "";
-}
+import {
+  desktopGraphicItems,
+  getMobileCardTheme,
+  mobileMenuItems,
+  type NavItem,
+} from "@/components/header/header-config";
+import {
+  getPathActiveItem,
+  performNavigation,
+  scrollToSection,
+} from "@/components/header/header-navigation";
+import {
+  MobileTopButton,
+  SmallMenuBubble,
+  ThemedNavButton,
+} from "@/components/header/header-ui";
 
 export default function Header() {
   const pathname = usePathname();
@@ -28,7 +30,12 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (pathname !== "/" && pathname !== "/all-time-high" && pathname !== "/galleri" && pathname !== "/markera-fiskeplats") {
+    if (
+      pathname !== "/" &&
+      pathname !== "/all-time-high" &&
+      pathname !== "/galleri" &&
+      pathname !== "/markera-fiskeplats"
+    ) {
       return;
     }
 
@@ -78,53 +85,90 @@ export default function Header() {
 
   const filteredDesktopItems = useMemo(() => {
     if (isLoggedIn) return desktopGraphicItems;
-    return desktopGraphicItems.filter((item) => item.id !== "map" && item.id !== "markera-fiskeplats");
+    return desktopGraphicItems.filter(
+      (item) => item.id !== "map" && item.id !== "markera-fiskeplats"
+    );
   }, [isLoggedIn]);
 
   const filteredMobileItems = useMemo(() => {
     if (isLoggedIn) return mobileMenuItems;
-    return mobileMenuItems.filter((item) => item.id !== "map" && item.id !== "markera-fiskeplats");
+    return mobileMenuItems.filter(
+      (item) => item.id !== "map" && item.id !== "markera-fiskeplats"
+    );
   }, [isLoggedIn]);
 
-  const desktopNavItems = useMemo<NavItem[]>(() => [
-    ...filteredDesktopItems,
-    {
-      id: "account",
-      label: isLoggedIn ? "Min sida" : "Logga in",
-      alt: isLoggedIn ? "Min sida" : "Logga in",
-      type: "action",
-    },
-  ], [filteredDesktopItems, isLoggedIn]);
+  const desktopNavItems = useMemo<NavItem[]>(
+    () => [
+      ...filteredDesktopItems,
+      {
+        id: "account",
+        label: isLoggedIn ? "Min sida" : "Logga in",
+        alt: isLoggedIn ? "Min sida" : "Logga in",
+        type: "action",
+      },
+    ],
+    [filteredDesktopItems, isLoggedIn]
+  );
 
-  const currentActive = useMemo(() => getPathActiveItem(pathname) ?? activeSection, [activeSection, pathname]);
+  const currentActive = useMemo(
+    () => getPathActiveItem(pathname) ?? activeSection,
+    [activeSection, pathname]
+  );
 
   function handleNavigation(item: NavItem) {
-    performNavigation({ item, isLoggedIn, pathname, router, setIsMobileMenuOpen, setActiveSection });
+    performNavigation({
+      item,
+      isLoggedIn,
+      pathname,
+      router,
+      setIsMobileMenuOpen,
+      setActiveSection,
+    });
   }
 
   function renderMobileMenuButton(item: NavItem) {
     const theme = getMobileCardTheme(item.id);
-    const isCurrentRoute = item.type === "route" && ((item.href === "/" && pathname === "/") || item.href === pathname);
-    const isCurrentSection = pathname === "/" && item.type === "section" && currentActive === item.id;
+    const isCurrentRoute =
+      item.type === "route" &&
+      ((item.href === "/" && pathname === "/") || item.href === pathname);
+    const isCurrentSection =
+      pathname === "/" && item.type === "section" && currentActive === item.id;
     const isActive = isCurrentRoute || isCurrentSection;
 
     return (
-      <button
+      <ThemedNavButton
         key={item.id}
-        type="button"
+        label={item.label ?? item.alt}
         onClick={() => handleNavigation(item)}
-        className={[
-          "group relative mx-auto flex w-full max-w-[calc(100%-36px)] items-center overflow-visible rounded-full border pr-[12px] pl-[54px] py-[4px] text-left shadow-[0_7px_16px_rgba(0,0,0,0.13)] transition-all duration-200",
-          "min-h-[42px] active:scale-[0.99]",
-          isActive ? "scale-[1.01]" : "hover:scale-[1.01]",
-          theme.outer,
-        ].join(" ")}
-      >
-        <div className="pointer-events-none absolute inset-[1px] rounded-full border border-white/10" />
-        <SmallMenuBubble className={theme.iconCircle} />
-        <div className="min-w-0 flex-1 pr-[2px]"><div className="truncate text-[13px] font-semibold leading-[1.05] tracking-[0.01em]">{item.label}</div></div>
-        <div className={["flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:translate-x-[1px]", theme.arrow].join(" ")} aria-hidden="true"><span className="text-[17px] leading-none">›</span></div>
-      </button>
+        themeOuter={theme.outer}
+        themeIconCircle={theme.iconCircle}
+        themeArrow={theme.arrow}
+        isActive={isActive}
+        compact
+      />
+    );
+  }
+
+  function renderDesktopMenuButton(item: NavItem) {
+    const theme = getMobileCardTheme(item.id);
+    const isSectionActive =
+      item.type === "section" && currentActive === item.id && pathname === "/";
+    const isRouteActive =
+      item.type === "route" &&
+      ((item.href === "/" && pathname === "/") || item.href === pathname);
+    const isActive = isSectionActive || isRouteActive;
+
+    return (
+      <div key={item.id} className="min-w-[220px] max-w-[260px] flex-1">
+        <ThemedNavButton
+          label={item.label ?? item.alt}
+          onClick={() => handleNavigation(item)}
+          themeOuter={theme.outer}
+          themeIconCircle={theme.iconCircle}
+          themeArrow={theme.arrow}
+          isActive={isActive}
+        />
+      </div>
     );
   }
 
@@ -132,66 +176,116 @@ export default function Header() {
     <>
       <header className="w-full">
         <div className="relative h-[140px] w-full overflow-hidden sm:h-[320px] md:h-[380px]">
-          <img src="/header.png" alt="Gäddhäng Trollers" className="h-full w-full object-cover object-[center_35%]" draggable={false} />
+          <img
+            src="/header.png"
+            alt="Gäddhäng Trollers"
+            className="h-full w-full object-cover object-[center_35%]"
+            draggable={false}
+          />
         </div>
       </header>
 
-      <div id="site-nav" className="sticky top-0 z-50 border-b border-black/10 bg-[#e5dccd]/95 backdrop-blur-md">
+      <div
+        id="site-nav"
+        className="sticky top-0 z-50 border-b border-black/10 bg-[#e5dccd]/95 backdrop-blur-md"
+      >
         <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
           <div ref={mobileMenuRef} className="relative sm:hidden">
             <div className="grid grid-cols-2 gap-[10px]">
-              <MobileTopButton label="Meny" onClick={() => setIsMobileMenuOpen((prev) => !prev)} showArrow isExpanded={isMobileMenuOpen} />
+              <MobileTopButton
+                label="Meny"
+                onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+                showArrow
+                isExpanded={isMobileMenuOpen}
+              />
               <MobileTopButton
                 label={isLoggedIn ? "Min sida" : "Logga in"}
-                onClick={() => handleNavigation({ id: "account", label: isLoggedIn ? "Min sida" : "Logga in", alt: isLoggedIn ? "Min sida" : "Logga in", type: "action" })}
+                onClick={() =>
+                  handleNavigation({
+                    id: "account",
+                    label: isLoggedIn ? "Min sida" : "Logga in",
+                    alt: isLoggedIn ? "Min sida" : "Logga in",
+                    type: "action",
+                  })
+                }
                 imageUrl={isLoggedIn ? profileImageUrl : null}
               />
             </div>
-            <div id="mobile-nav-dropdown" className={["overflow-hidden transition-all duration-300 ease-out", isMobileMenuOpen ? "mt-3 max-h-[520px] opacity-100" : "mt-0 max-h-0 opacity-0"].join(" ")}>
+
+            <div
+              id="mobile-nav-dropdown"
+              className={[
+                "overflow-hidden transition-all duration-300 ease-out",
+                isMobileMenuOpen
+                  ? "mt-3 max-h-[520px] opacity-100"
+                  : "mt-0 max-h-0 opacity-0",
+              ].join(" ")}
+            >
               <div className="rounded-[22px] border border-[#cbb489] bg-[linear-gradient(180deg,rgba(252,246,235,0.96)_0%,rgba(235,224,202,0.93)_100%)] p-[7px] shadow-[0_16px_34px_rgba(0,0,0,0.16)]">
-                <div className="flex flex-col gap-[7px]">{filteredMobileItems.map((item) => renderMobileMenuButton(item))}</div>
+                <div className="flex flex-col gap-[7px]">
+                  {filteredMobileItems.map((item) => renderMobileMenuButton(item))}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="hidden flex-wrap items-center justify-center gap-3 sm:flex sm:gap-4 md:gap-5">
-            {desktopNavItems.map((item) => {
-              const isSectionActive = item.type === "section" && currentActive === item.id && pathname === "/";
-              const isRouteActive = item.type === "route" && item.href === pathname;
-              const isActive = isSectionActive || isRouteActive;
+          <div className="hidden sm:block">
+            <div className="rounded-[26px] border border-[#cbb489] bg-[linear-gradient(180deg,rgba(252,246,235,0.96)_0%,rgba(235,224,202,0.93)_100%)] p-[10px] shadow-[0_16px_34px_rgba(0,0,0,0.14)]">
+              <div className="flex flex-wrap items-stretch justify-center gap-[10px]">
+                {desktopNavItems.map((item) => {
+                  if (item.id === "account") {
+                    return (
+                      <div key={item.id} className="min-w-[220px] max-w-[260px] flex-1">
+                        <button
+                          type="button"
+                          onClick={() => handleNavigation(item)}
+                          className="relative flex min-h-[52px] w-full items-center overflow-visible rounded-full border border-[#bfa76a] bg-[linear-gradient(180deg,#2b4c20_0%,#183417_100%)] pr-[14px] pl-[64px] text-left shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.99]"
+                        >
+                          <div className="pointer-events-none absolute inset-[1px] rounded-full border border-white/10" />
+                          <div className="absolute left-0 top-1/2 -translate-y-1/2">
+                            {isLoggedIn ? (
+                              <div className="absolute left-0 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#d2b77a] bg-[#29441f] shadow-[0_2px_7px_rgba(0,0,0,0.16),inset_0_1px_0_rgba(255,255,255,0.22)]">
+                                {profileImageUrl ? (
+                                  <img
+                                    src={profileImageUrl}
+                                    alt="Min sida"
+                                    draggable={false}
+                                    className="h-[46px] w-[46px] rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="flex h-[46px] w-[46px] items-center justify-center rounded-full bg-[linear-gradient(180deg,#6c8655_0%,#466233_100%)] text-[#f3ddb0]">
+                                    <span className="text-[24px] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.20)]">
+                                      ★
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <SmallMenuBubble className="bg-[linear-gradient(180deg,#6c8655_0%,#466233_100%)] text-[#f3ddb0]" />
+                            )}
+                          </div>
 
-              if (item.id === "account") {
-                return isLoggedIn ? (
-                  <button key={item.id} type="button" onClick={() => handleNavigation(item)} className="rounded-full bg-transparent transition-all duration-300 hover:scale-105">
-                    <img src="/nav/minSida.png" alt="Min sida" draggable={false} className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]" />
-                  </button>
-                ) : (
-                  <button key={item.id} type="button" onClick={() => handleNavigation(item)} className="rounded-full bg-transparent opacity-95 transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]">
-                    <img src="/nav/loggaIn.png" alt="Logga in" draggable={false} className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]" />
-                  </button>
-                );
-              }
+                          <div className="min-w-0 flex-1 pr-[4px]">
+                            <div className="truncate text-[14px] font-semibold uppercase tracking-[0.04em] text-[#ead8ab]">
+                              {isLoggedIn ? "Min sida" : "Logga in"}
+                            </div>
+                          </div>
 
-              if (item.id === "markera-fiskeplats") {
-                return (
-                  <button key={item.id} type="button" onClick={() => handleNavigation(item)} className={[
-                    "inline-flex h-[34px] items-center rounded-full border border-[#c3a766] bg-[linear-gradient(180deg,#5f6f8f_0%,#42526f_100%)] px-4 text-[12px] font-semibold uppercase tracking-[0.04em] text-[#f3e5c1] transition-all duration-300 sm:h-[40px] md:h-[48px] md:px-5 md:text-[13px]",
-                    "hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]",
-                    isActive ? "scale-105 drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]" : "opacity-95",
-                  ].join(" ")}>Markera fiskeplats</button>
-                );
-              }
+                          <div
+                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#ead8ab]"
+                            aria-hidden="true"
+                          >
+                            <span className="text-[18px] leading-none">›</span>
+                          </div>
+                        </button>
+                      </div>
+                    );
+                  }
 
-              return (
-                <button key={item.id} type="button" onClick={() => handleNavigation(item)} className={[
-                  "rounded-full bg-transparent transition-all duration-300",
-                  "hover:scale-105 hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]",
-                  isActive ? "scale-105 drop-shadow-[0_8px_18px_rgba(0,0,0,0.20)]" : "opacity-95",
-                ].join(" ")}>
-                  <img src={getDesktopNavImage(item.id)} alt={item.alt} draggable={false} className="block h-[34px] w-auto object-contain sm:h-[40px] md:h-[48px]" />
-                </button>
-              );
-            })}
+                  return renderDesktopMenuButton(item);
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
