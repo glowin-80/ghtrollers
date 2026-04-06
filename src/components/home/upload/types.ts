@@ -42,6 +42,7 @@ export type UploadCatchSectionProps = {
   formMessage: UploadFeedbackMessage | null;
   confirmMissingLocationOpen: boolean;
   mapOpen: boolean;
+  locationChooserOpen: boolean;
   previewUrl: string | null;
   fileInputKey: number;
   loading: boolean;
@@ -52,6 +53,9 @@ export type UploadCatchSectionProps = {
   onWeightChange: (value: string) => void;
   onCatchDateChange: (value: string) => void;
   onLocationNameChange: (value: string) => void;
+  onOpenLocationChooser: () => void;
+  onCloseLocationChooser: () => void;
+  onSaveManualLocation: (value: string) => void;
   onGetGps: () => void;
   onOpenMap: () => void;
   onCloseMap: () => void;

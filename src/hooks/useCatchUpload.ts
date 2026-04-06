@@ -53,8 +53,10 @@ export function useCatchUpload({
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<GpsErrorState | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
+  const [locationChooserOpen, setLocationChooserOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formMessage, setFormMessage] = useState<UploadFeedbackMessage | null>(null);
+  const [formMessage, setFormMessage] =
+    useState<UploadFeedbackMessage | null>(null);
   const [confirmMissingLocationOpen, setConfirmMissingLocationOpen] =
     useState(false);
 
@@ -62,6 +64,7 @@ export function useCatchUpload({
     setLatitude(null);
     setLongitude(null);
     setGpsError(null);
+    setLocationChooserOpen(false);
     setMapOpen(false);
     setConfirmMissingLocationOpen(false);
   }, []);
@@ -81,12 +84,32 @@ export function useCatchUpload({
     }
   }, [formMessage, router]);
 
+  const handleOpenLocationChooser = useCallback(() => {
+    setLocationChooserOpen(true);
+  }, []);
+
+  const handleCloseLocationChooser = useCallback(() => {
+    setLocationChooserOpen(false);
+  }, []);
+
+  const handleSaveManualLocation = useCallback(
+    (value: string) => {
+      handleLocationNameChange(value);
+      setLatitude(null);
+      setLongitude(null);
+      setGpsError(null);
+      setLocationChooserOpen(false);
+    },
+    [handleLocationNameChange]
+  );
+
   const handleGetGps = useCallback(() => {
     if (!hasActiveMembership) {
       return;
     }
 
     setGpsError(null);
+    setLocationChooserOpen(false);
 
     if (!navigator.geolocation) {
       setGpsError({
@@ -103,9 +126,7 @@ export function useCatchUpload({
         setLatitude(position.coords.latitude);
         setLongitude(position.coords.longitude);
 
-        if (!locationName.trim()) {
-          handleLocationNameChange("GPS-hämtad plats");
-        }
+        handleLocationNameChange("GPS-hämtad plats");
 
         setGpsError(null);
         setGpsLoading(false);
@@ -121,10 +142,11 @@ export function useCatchUpload({
         maximumAge: 30000,
       }
     );
-  }, [hasActiveMembership, locationName, handleLocationNameChange]);
+  }, [hasActiveMembership, handleLocationNameChange]);
 
   const handleOpenMap = useCallback(() => {
     setGpsError(null);
+    setLocationChooserOpen(false);
     setMapOpen(true);
   }, []);
 
@@ -142,13 +164,14 @@ export function useCatchUpload({
       setLongitude(lng);
       setGpsError(null);
 
-      if (!locationName.trim()) {
-        handleLocationNameChange(`Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
-      }
+      handleLocationNameChange(
+        `Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`
+      );
 
+      setLocationChooserOpen(false);
       setMapOpen(false);
     },
-    [hasActiveMembership, locationName, handleLocationNameChange]
+    [hasActiveMembership, handleLocationNameChange]
   );
 
   const submitCatch = useCallback(
@@ -261,6 +284,7 @@ export function useCatchUpload({
     formMessage,
     confirmMissingLocationOpen,
     mapOpen,
+    locationChooserOpen,
     previewUrl,
     fileInputKey,
     loading,
@@ -271,6 +295,9 @@ export function useCatchUpload({
     handleImageChange,
     handleCaughtForChange,
     handleFishTypeChange,
+    handleOpenLocationChooser,
+    handleCloseLocationChooser,
+    handleSaveManualLocation,
     handleGetGps,
     handleOpenMap,
     handleCloseMap,

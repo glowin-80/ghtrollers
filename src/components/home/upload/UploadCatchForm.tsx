@@ -34,6 +34,7 @@ type UploadCatchFormProps = {
   onWeightChange: (value: string) => void;
   onCatchDateChange: (value: string) => void;
   onLocationNameChange: (value: string) => void;
+  onOpenLocationChooser: () => void;
   onGetGps: () => void;
   onOpenMap: () => void;
   onImageChange: (file: File | null) => void;
@@ -64,13 +65,21 @@ export default function UploadCatchForm({
   onFineFishTypeChange,
   onWeightChange,
   onCatchDateChange,
-  onLocationNameChange,
+  onOpenLocationChooser,
   onGetGps,
   onOpenMap,
   onImageChange,
   onDismissFormMessage,
   onFormMessageAction,
 }: UploadCatchFormProps) {
+  const hasLocationSelection =
+    locationName.trim().length > 0 || latitude !== null || longitude !== null;
+
+  const locationSummary = locationName.trim() || "Saknas";
+  const locationSummaryTextClass = hasLocationSelection
+    ? "text-[#374151]"
+    : "text-[#9ca3af]";
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {formMessage ? (
@@ -144,32 +153,13 @@ export default function UploadCatchForm({
         onCatchDateChange={onCatchDateChange}
       />
 
-      <input
-        type="text"
-        value={locationName}
-        onChange={(e) => onLocationNameChange(e.target.value)}
-        placeholder="Plats (valfritt)"
-        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
-      />
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <button
-          type="button"
-          onClick={onGetGps}
-          disabled={gpsLoading}
-          className="rounded-2xl bg-[#1f46d8] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#264fe6] disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          {gpsLoading ? "Hämtar GPS..." : "📍 Hämta GPS-position"}
-        </button>
-
-        <button
-          type="button"
-          onClick={onOpenMap}
-          className="rounded-2xl bg-[#1f46d8] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#264fe6]"
-        >
-          🗺️ Importera plats från karta
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={onOpenLocationChooser}
+        className="w-full rounded-2xl bg-[#1f46d8] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#264fe6]"
+      >
+        📍 Ange plats för fångst
+      </button>
 
       <GpsPermissionHelp
         gpsError={gpsError}
@@ -178,9 +168,16 @@ export default function UploadCatchForm({
         onOpenMap={onOpenMap}
       />
 
-      <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-3 text-sm text-[#4b5563]">
-        <div>Latitud: {latitude ?? "Saknas"}</div>
-        <div>Longitud: {longitude ?? "Saknas"}</div>
+      <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-3 text-sm">
+        <div className={`font-medium ${locationSummaryTextClass}`}>
+          Plats: {locationSummary}
+        </div>
+        <div className={locationSummaryTextClass}>
+          Latitud: {latitude ?? "Saknas"}
+        </div>
+        <div className={locationSummaryTextClass}>
+          Longitud: {longitude ?? "Saknas"}
+        </div>
       </div>
 
       <input
