@@ -13,6 +13,7 @@ import LeaderboardSection from "@/components/home/LeaderboardSection";
 import UploadCatchSection from "@/components/home/UploadCatchSection";
 import RecentApprovedSection from "@/components/home/RecentApprovedSection";
 import MapPreviewSection from "@/components/home/MapPreviewSection";
+import HashSectionScroller from "@/components/shared/HashSectionScroller";
 
 export default function Home() {
   const {
@@ -133,105 +134,117 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="px-4 pb-10 pt-4">
-      <div className="mx-auto max-w-xl">
-        <div id="leaderboard-section" className="scroll-mt-[360px]">
-          <LeaderboardSection
-            leaderboard={leaderboard}
-            members={members}
-            filter={filter}
-            onFilterChange={handleFilterChange}
-            selectedYear={selectedLeaderboardYear}
-            availableYears={availableLeaderboardYears}
-            onYearChange={handleLeaderboardYearChange}
-            allTimeHighlights={allTimeHighlights}
-            bigFiveBreakdowns={bigFiveBreakdowns}
-          />
-        </div>
+    <>
+      <HashSectionScroller
+        watchValues={[
+          members.length,
+          approvedCatches.length,
+          approvedFishingSpots.length,
+          isLoggedIn,
+          hasActiveMembership,
+        ]}
+      />
 
-        <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-black/15 to-transparent" />
-
-        <div id="upload-section" className="scroll-mt-[360px]">
-          <UploadCatchSection
-            isLoggedIn={isLoggedIn}
-            hasActiveMembership={hasActiveMembership}
-            members={members}
-            caughtFor={caughtFor}
-            registeredBy={registeredBy}
-            fishType={fishType}
-            fineFishType={fineFishType}
-            weight={weight}
-            catchDate={catchDate}
-            locationName={locationName}
-            latitude={latitude}
-            longitude={longitude}
-            gpsLoading={gpsLoading}
-            gpsError={gpsError}
-            formMessage={formMessage}
-            confirmMissingLocationOpen={confirmMissingLocationOpen}
-            mapOpen={mapOpen}
-            locationChooserOpen={locationChooserOpen}
-            previewUrl={previewUrl}
-            fileInputKey={fileInputKey}
-            loading={loading}
-            onSubmit={handleSubmit}
-            onCaughtForChange={handleCaughtForChange}
-            onFishTypeChange={handleFishTypeChange}
-            onFineFishTypeChange={handleFineFishTypeChange}
-            onWeightChange={handleWeightChange}
-            onCatchDateChange={handleCatchDateChange}
-            onLocationNameChange={handleLocationNameChange}
-            onOpenLocationChooser={handleOpenLocationChooser}
-            onCloseLocationChooser={handleCloseLocationChooser}
-            onSaveManualLocation={handleSaveManualLocation}
-            onGetGps={handleGetGps}
-            onOpenMap={handleOpenMap}
-            onCloseMap={handleCloseMap}
-            onMapSelect={handleMapSelect}
-            onImageChange={handleImageChange}
-            onDismissFormMessage={dismissFormMessage}
-            onFormMessageAction={handleFormMessageAction}
-            onConfirmMissingLocation={handleConfirmMissingLocation}
-            onCancelMissingLocation={handleCancelMissingLocation}
-          />
-        </div>
-
-        <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-black/15 to-transparent" />
-
-        <div id="approved-section" className="scroll-mt-[360px]">
-          <RecentApprovedSection
-            catches={recentApprovedCatches}
-            allApprovedCatches={approvedCatches}
-            isLoggedIn={isLoggedIn}
-            onImageClick={handleImageClick}
-          />
-        </div>
-
-        <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-black/15 to-transparent" />
-
-        <div id="map-section" className="scroll-mt-[360px]">
-          <MapPreviewSection
-            isLoggedIn={isLoggedIn}
-            hasActiveMembership={hasActiveMembership}
-            catches={approvedCatches}
-            fishingSpots={approvedFishingSpots}
-          />
-        </div>
-
-        {selectedImage ? (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-            onClick={handleCloseSelectedImage}
-          >
-            <img
-              src={selectedImage}
-              alt="Förstorad fångstbild"
-              className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
-              decoding="async"
+      <main className="px-4 pb-10 pt-4">
+        <div className="mx-auto max-w-xl">
+          <div id="leaderboard-section" className="scroll-mt-[360px]">
+            <LeaderboardSection
+              leaderboard={leaderboard}
+              members={members}
+              filter={filter}
+              onFilterChange={handleFilterChange}
+              selectedYear={selectedLeaderboardYear}
+              availableYears={availableLeaderboardYears}
+              onYearChange={handleLeaderboardYearChange}
+              allTimeHighlights={allTimeHighlights}
+              bigFiveBreakdowns={bigFiveBreakdowns}
             />
           </div>
-        ) : null}
-      </div>
-    </main>
+
+          <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-black/15 to-transparent" />
+
+          <div id="upload-section" className="scroll-mt-[360px]">
+            <UploadCatchSection
+              isLoggedIn={isLoggedIn}
+              hasActiveMembership={hasActiveMembership}
+              members={members}
+              caughtFor={caughtFor}
+              registeredBy={registeredBy}
+              fishType={fishType}
+              fineFishType={fineFishType}
+              weight={weight}
+              catchDate={catchDate}
+              locationName={locationName}
+              latitude={latitude}
+              longitude={longitude}
+              gpsLoading={gpsLoading}
+              gpsError={gpsError}
+              formMessage={formMessage}
+              confirmMissingLocationOpen={confirmMissingLocationOpen}
+              mapOpen={mapOpen}
+              locationChooserOpen={locationChooserOpen}
+              previewUrl={previewUrl}
+              fileInputKey={fileInputKey}
+              loading={loading}
+              onSubmit={handleSubmit}
+              onCaughtForChange={handleCaughtForChange}
+              onFishTypeChange={handleFishTypeChange}
+              onFineFishTypeChange={handleFineFishTypeChange}
+              onWeightChange={handleWeightChange}
+              onCatchDateChange={handleCatchDateChange}
+              onLocationNameChange={handleLocationNameChange}
+              onOpenLocationChooser={handleOpenLocationChooser}
+              onCloseLocationChooser={handleCloseLocationChooser}
+              onSaveManualLocation={handleSaveManualLocation}
+              onGetGps={handleGetGps}
+              onOpenMap={handleOpenMap}
+              onCloseMap={handleCloseMap}
+              onMapSelect={handleMapSelect}
+              onImageChange={handleImageChange}
+              onDismissFormMessage={dismissFormMessage}
+              onFormMessageAction={handleFormMessageAction}
+              onConfirmMissingLocation={handleConfirmMissingLocation}
+              onCancelMissingLocation={handleCancelMissingLocation}
+            />
+          </div>
+
+          <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-black/15 to-transparent" />
+
+          <div id="approved-section" className="scroll-mt-[360px]">
+            <RecentApprovedSection
+              catches={recentApprovedCatches}
+              allApprovedCatches={approvedCatches}
+              isLoggedIn={isLoggedIn}
+              onImageClick={handleImageClick}
+            />
+          </div>
+
+          <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-black/15 to-transparent" />
+
+          <div id="map-section" className="scroll-mt-[360px]">
+            <MapPreviewSection
+              isLoggedIn={isLoggedIn}
+              hasActiveMembership={hasActiveMembership}
+              catches={approvedCatches}
+              fishingSpots={approvedFishingSpots}
+            />
+          </div>
+
+          {selectedImage ? (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+              onClick={handleCloseSelectedImage}
+            >
+              <img
+                src={selectedImage}
+                alt="Förstorad fångstbild"
+                className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
+                decoding="async"
+              />
+            </div>
+          ) : null}
+        </div>
+      </main>
+    </>
   );
 }

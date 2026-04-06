@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import HashSectionScroller from "@/components/shared/HashSectionScroller";
+import { scrollToSection } from "@/components/header/header-navigation";
 import { useHomeData } from "@/hooks/useHomeData";
 import {
   buildAllTimeBigFiveLeader,
@@ -311,84 +313,93 @@ export default function AllTimeHighPage() {
   }, [allTimeHighlights]);
 
   return (
-    <main className="px-4 pb-10 pt-4">
-      <div className="mx-auto max-w-5xl">
-        <section className="rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] p-5 shadow-[0_12px_30px_rgba(18,35,28,0.08)] sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <div className="text-[0.95rem] font-medium tracking-wide text-[#74685a]">
-                🏅 Historiska rekord
+    <>
+      <HashSectionScroller watchValues={[allTimeHighlights.length]} />
+
+      <main className="px-4 pb-10 pt-4">
+        <div className="mx-auto max-w-5xl">
+          <section className="rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] p-5 shadow-[0_12px_30px_rgba(18,35,28,0.08)] sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <div className="text-[0.95rem] font-medium tracking-wide text-[#74685a]">
+                  🏅 Historiska rekord
+                </div>
+                <h1 className="mt-2 text-[2rem] font-bold leading-none text-[#1f2937] sm:text-[2.3rem]">
+                  All-time-high
+                </h1>
               </div>
-              <h1 className="mt-2 text-[2rem] font-bold leading-none text-[#1f2937] sm:text-[2.3rem]">
-                All-time-high
-              </h1>
+
+              <Link
+                href="/#leaderboard-section"
+                className="inline-flex h-[46px] shrink-0 items-center justify-center rounded-full border border-[#d8d2c7] bg-white px-4 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
+              >
+                Till leaderboard
+              </Link>
             </div>
 
-            <Link
-              href="/#leaderboard-section"
-              className="inline-flex h-[46px] shrink-0 items-center justify-center rounded-full border border-[#d8d2c7] bg-white px-4 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
+            <div className="mt-4 flex flex-wrap gap-2 overflow-x-auto pb-1">
+              {sections.map((item) => (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => {
+                    const sectionId = getSectionId(item.value);
+                    window.history.replaceState(null, "", `#${sectionId}`);
+                    scrollToSection(sectionId);
+                  }}
+                  className="shrink-0 rounded-full border border-[#d8d2c7] bg-[#f7f4ee] px-3.5 py-2 text-sm font-semibold text-[#4b5563] transition hover:bg-[#f1ece3]"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <div className="mt-6 space-y-6">
+            {sections.map((section) => {
+              const highlight = highlightMap[section.value];
+
+              if (!highlight) {
+                return <EmptyAllTimeCard key={section.value} filter={section.value} />;
+              }
+
+              return (
+                <AllTimeCard
+                  key={section.value}
+                  item={highlight}
+                  profileImage={memberImageMap[highlight.winnerName] || null}
+                  bigFiveBreakdown={
+                    section.value === "bigfive"
+                      ? allTimeBigFiveLeader?.breakdown
+                      : undefined
+                  }
+                  isExpanded={section.value === "bigfive" ? expandedBigFive : false}
+                  onToggleExpanded={
+                    section.value === "bigfive"
+                      ? () => setExpandedBigFive((current) => !current)
+                      : undefined
+                  }
+                  onImageClick={setSelectedImage}
+                />
+              );
+            })}
+          </div>
+
+          {selectedImage ? (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+              onClick={() => setSelectedImage(null)}
             >
-              Till leaderboard
-            </Link>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2 overflow-x-auto pb-1">
-            {sections.map((item) => (
-              <a
-                key={item.value}
-                href={`#${getSectionId(item.value)}`}
-                className="shrink-0 rounded-full border border-[#d8d2c7] bg-[#f7f4ee] px-3.5 py-2 text-sm font-semibold text-[#4b5563] transition hover:bg-[#f1ece3]"
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
-        </section>
-
-        <div className="mt-6 space-y-6">
-          {sections.map((section) => {
-            const highlight = highlightMap[section.value];
-
-            if (!highlight) {
-              return <EmptyAllTimeCard key={section.value} filter={section.value} />;
-            }
-
-            return (
-              <AllTimeCard
-                key={section.value}
-                item={highlight}
-                profileImage={memberImageMap[highlight.winnerName] || null}
-                bigFiveBreakdown={
-                  section.value === "bigfive"
-                    ? allTimeBigFiveLeader?.breakdown
-                    : undefined
-                }
-                isExpanded={section.value === "bigfive" ? expandedBigFive : false}
-                onToggleExpanded={
-                  section.value === "bigfive"
-                    ? () => setExpandedBigFive((current) => !current)
-                    : undefined
-                }
-                onImageClick={setSelectedImage}
+              <img
+                src={selectedImage}
+                alt="Förstorad fångstbild"
+                className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
+                decoding="async"
               />
-            );
-          })}
+            </div>
+          ) : null}
         </div>
-
-        {selectedImage ? (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-            onClick={() => setSelectedImage(null)}
-          >
-            <img
-              src={selectedImage}
-              alt="Förstorad fångstbild"
-              className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
-              decoding="async"
-            />
-          </div>
-        ) : null}
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
