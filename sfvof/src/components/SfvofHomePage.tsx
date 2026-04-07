@@ -22,56 +22,56 @@ function formatCoordinate(value: number) {
 
 function MeasurementCard({ measurement }: { measurement: SfvofMeasurement }) {
   return (
-    <article className="rounded-[24px] border border-[#d8d2c7] bg-white/80 p-4 shadow-[0_8px_22px_rgba(18,35,28,0.06)]">
+    <article className="rounded-[24px] border border-[#d7dfdc] bg-white p-4 shadow-[0_8px_22px_rgba(18,35,28,0.06)]">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#7a6540]">
+          <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#5c6f69]">
             {measurement.length_interval_label}
           </div>
-          <h3 className="mt-1 text-[1.2rem] font-bold text-[#1f2937]">
+          <h3 className="mt-1 text-[1.2rem] font-bold text-[#1f2f2a]">
             {measurement.fish_length_cm} cm
           </h3>
         </div>
 
-        <div className="rounded-full border border-[#d8d2c7] bg-[#f6f2ea] px-3 py-1 text-[0.78rem] font-semibold text-[#5c4d3f]">
+        <div className="rounded-full border border-[#d7dfdc] bg-[#f3f7f6] px-3 py-1 text-[0.78rem] font-semibold text-[#46615a]">
           {measurement.is_approved ? "Sparad" : "Ej godkänd"}
         </div>
       </div>
 
-      <dl className="mt-4 grid grid-cols-1 gap-3 text-sm text-[#4b5563] sm:grid-cols-2">
-        <div className="rounded-[18px] bg-[#faf7f1] px-3 py-2.5">
-          <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#8b7460]">
+      <dl className="mt-4 grid grid-cols-1 gap-3 text-sm text-[#4c5f59] sm:grid-cols-2">
+        <div className="rounded-[18px] bg-[#f6faf8] px-3 py-2.5">
+          <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
             Mätt
           </dt>
-          <dd className="mt-1 font-medium text-[#1f2937]">
+          <dd className="mt-1 font-medium text-[#1f2f2a]">
             {formatMeasuredAt(measurement.measured_at)}
           </dd>
         </div>
 
-        <div className="rounded-[18px] bg-[#faf7f1] px-3 py-2.5">
-          <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#8b7460]">
+        <div className="rounded-[18px] bg-[#f6faf8] px-3 py-2.5">
+          <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
             Registrerad av
           </dt>
-          <dd className="mt-1 font-medium text-[#1f2937]">
+          <dd className="mt-1 font-medium text-[#1f2f2a]">
             {measurement.registered_by_name}
           </dd>
         </div>
 
-        <div className="rounded-[18px] bg-[#faf7f1] px-3 py-2.5 sm:col-span-2">
-          <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#8b7460]">
+        <div className="rounded-[18px] bg-[#f6faf8] px-3 py-2.5 sm:col-span-2">
+          <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
             GPS
           </dt>
-          <dd className="mt-1 font-medium text-[#1f2937]">
+          <dd className="mt-1 font-medium text-[#1f2f2a]">
             {formatCoordinate(measurement.gps_lat)}, {formatCoordinate(measurement.gps_lng)}
           </dd>
         </div>
 
         {measurement.comment ? (
-          <div className="rounded-[18px] bg-[#faf7f1] px-3 py-2.5 sm:col-span-2">
-            <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#8b7460]">
+          <div className="rounded-[18px] bg-[#f6faf8] px-3 py-2.5 sm:col-span-2">
+            <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
               Kommentar
             </dt>
-            <dd className="mt-1 font-medium text-[#1f2937]">{measurement.comment}</dd>
+            <dd className="mt-1 font-medium text-[#1f2f2a]">{measurement.comment}</dd>
           </div>
         ) : null}
       </dl>
@@ -122,75 +122,75 @@ export default function SfvofHomePage() {
   }, []);
 
   return (
-    <main className="px-4 pb-10 pt-4">
+    <main className="px-4 pb-10 pt-6 sm:px-6">
       <div className="mx-auto max-w-4xl">
-        <section className="rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] p-5 shadow-[0_12px_30px_rgba(18,35,28,0.08)] sm:p-6">
-          <div className="text-[0.92rem] font-medium tracking-wide text-[#74685a]">
-            Storsjöns FVOF
+        <section className="rounded-[30px] border border-[#d7dfdc] bg-white p-5 shadow-[0_12px_30px_rgba(18,35,28,0.06)] sm:p-6">
+          <div className="text-[0.82rem] font-semibold uppercase tracking-[0.14em] text-[#5c6f69]">
+            Översikt
           </div>
-          <h1 className="mt-2 text-[2rem] font-bold leading-none text-[#1f2937] sm:text-[2.3rem]">
-            SFVOF – basvy
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6b7280]">
-            Detta är en första helt isolerad sida för SFVOF. Den läser bara data från
-            schema <span className="font-semibold text-[#374151]">sfvof</span> och
-            visar inget från Gäddhäng Trollers.
+          <h2 className="mt-2 text-[1.8rem] font-bold leading-none text-[#1f2f2a] sm:text-[2.05rem]">
+            Första isolerade SFVOF-sidan
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#58706a]">
+            Den här sidan är nu frikopplad visuellt från Gäddhäng Trollers. Ingen
+            Gäddhäng-header eller meny visas här, och sidan läser bara data från
+            schema <span className="font-semibold text-[#2f4a43]">sfvof</span>.
           </p>
         </section>
 
         <div className="mt-6 space-y-6">
           {state.status === "loading" ? (
-            <section className="rounded-[26px] border border-[#d8d2c7] bg-white/80 p-5 text-sm text-[#4b5563] shadow-[0_10px_24px_rgba(18,35,28,0.06)]">
+            <section className="rounded-[26px] border border-[#d7dfdc] bg-white p-5 text-sm text-[#4c5f59] shadow-[0_10px_24px_rgba(18,35,28,0.05)]">
               Läser SFVOF-data...
             </section>
           ) : null}
 
           {state.status === "error" ? (
-            <section className="rounded-[26px] border border-[#d8d2c7] bg-white/80 p-5 shadow-[0_10px_24px_rgba(18,35,28,0.06)]">
-              <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#7a6540]">
+            <section className="rounded-[26px] border border-[#d7dfdc] bg-white p-5 shadow-[0_10px_24px_rgba(18,35,28,0.05)]">
+              <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#5c6f69]">
                 Fel
               </div>
-              <p className="mt-2 text-sm leading-6 text-[#4b5563]">{state.message}</p>
+              <p className="mt-2 text-sm leading-6 text-[#4c5f59]">{state.message}</p>
             </section>
           ) : null}
 
           {state.status === "ready" ? (
             <>
-              <section className="rounded-[26px] border border-[#d8d2c7] bg-white/80 p-5 shadow-[0_10px_24px_rgba(18,35,28,0.06)]">
+              <section className="rounded-[26px] border border-[#d7dfdc] bg-white p-5 shadow-[0_10px_24px_rgba(18,35,28,0.05)]">
                 <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-[20px] bg-[#faf7f1] px-4 py-4">
-                    <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#8b7460]">
+                  <div className="rounded-[20px] bg-[#f6faf8] px-4 py-4">
+                    <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
                       Inloggad
                     </div>
-                    <div className="mt-2 text-[1rem] font-semibold text-[#1f2937]">
+                    <div className="mt-2 text-[1rem] font-semibold text-[#1f2f2a]">
                       {state.isLoggedIn ? "Ja" : "Nej"}
                     </div>
                   </div>
 
-                  <div className="rounded-[20px] bg-[#faf7f1] px-4 py-4">
-                    <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#8b7460]">
+                  <div className="rounded-[20px] bg-[#f6faf8] px-4 py-4">
+                    <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
                       SFVOF-medlem
                     </div>
-                    <div className="mt-2 text-[1rem] font-semibold text-[#1f2937]">
+                    <div className="mt-2 text-[1rem] font-semibold text-[#1f2f2a]">
                       {state.member?.is_active ? "Aktiv" : "Ingen access"}
                     </div>
                   </div>
 
-                  <div className="rounded-[20px] bg-[#faf7f1] px-4 py-4">
-                    <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#8b7460]">
+                  <div className="rounded-[20px] bg-[#f6faf8] px-4 py-4">
+                    <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
                       Roll
                     </div>
-                    <div className="mt-2 text-[1rem] font-semibold text-[#1f2937]">
+                    <div className="mt-2 text-[1rem] font-semibold text-[#1f2f2a]">
                       {state.member?.is_admin ? "Admin" : state.member ? "Medlem" : "Ingen"}
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-[20px] bg-[#faf7f1] px-4 py-4">
-                  <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#8b7460]">
+                <div className="mt-5 rounded-[20px] bg-[#f6faf8] px-4 py-4">
+                  <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
                     Konto
                   </div>
-                  <div className="mt-2 text-sm leading-6 text-[#1f2937]">
+                  <div className="mt-2 text-sm leading-6 text-[#1f2f2a]">
                     {state.member ? (
                       <>
                         <div className="font-semibold">{state.member.name}</div>
@@ -205,20 +205,20 @@ export default function SfvofHomePage() {
                 </div>
               </section>
 
-              <section className="rounded-[26px] border border-[#d8d2c7] bg-white/80 p-5 shadow-[0_10px_24px_rgba(18,35,28,0.06)]">
+              <section className="rounded-[26px] border border-[#d7dfdc] bg-white p-5 shadow-[0_10px_24px_rgba(18,35,28,0.05)]">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#7a6540]">
+                    <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#5c6f69]">
                       Mina registreringar
                     </div>
-                    <h2 className="mt-1 text-[1.35rem] font-bold text-[#1f2937]">
+                    <h2 className="mt-1 text-[1.35rem] font-bold text-[#1f2f2a]">
                       {state.measurements.length} st
                     </h2>
                   </div>
                 </div>
 
                 {state.measurements.length === 0 ? (
-                  <p className="mt-4 text-sm leading-6 text-[#6b7280]">
+                  <p className="mt-4 text-sm leading-6 text-[#58706a]">
                     Inga SFVOF-registreringar hittades för det här kontot ännu.
                   </p>
                 ) : (
