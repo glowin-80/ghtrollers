@@ -1,238 +1,311 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getSfvofAccessState } from "@sfvof/lib/get-access-state";
-import type { SfvofAccessState, SfvofMeasurement } from "@sfvof/types";
+import Link from "next/link";
+import { useState } from "react";
 
-type LoadState =
-  | { status: "loading" }
-  | { status: "error"; message: string }
-  | ({ status: "ready" } & SfvofAccessState);
+type PublicSection = {
+  id: string;
+  title: string;
+  description: string;
+  imageSrc: string;
+  imageAlt: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  links?: Array<{ label: string; href: string }>;
+};
 
-function formatMeasuredAt(value: string) {
-  return new Intl.DateTimeFormat("sv-SE", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
+const publicSections: PublicSection[] = [
+  {
+    id: "fiskarter",
+    title: "Fiskarter",
+    description:
+      "Översikt över vanliga arter i området och hur vanligt förekommande de är i vattnen runt Storsjöns FVOF Sandviken.",
+    imageSrc: "/sfvof/public-section-1.png",
+    imageAlt: "Översikt över fiskarter och förekomstnivåer.",
+  },
+  {
+    id: "fiskekort",
+    title: "Fiskekort och kontakt",
+    description:
+      "Tillfällig informationssektion med kontaktpersoner och praktisk översikt för köp av fiskekort.",
+    imageSrc: "/sfvof/public-section-2.png",
+    imageAlt: "Informationssida för Storsjöns FVOF Sandviken med karta och kontaktpersoner.",
+  },
+  {
+    id: "filer",
+    title: "Filer för nedladdning",
+    description:
+      "Tillfälligt dokumentgalleri för protokoll, verksamhetsberättelser och översiktskartor.",
+    imageSrc: "/sfvof/public-section-3.png",
+    imageAlt: "Sektion med filer för nedladdning.",
+  },
+  {
+    id: "omraden",
+    title: "Fiskeområden i närheten",
+    description:
+      "Snabblänkar till omkringliggande fiskeområden via iFiske.",
+    imageSrc: "/sfvof/public-section-4.png",
+    imageAlt: "Sektion med fiskeområden i närheten av Storsjöns FVOF Sandviken.",
+    links: [
+      {
+        label: "Ottnaren och Ältebosjön med tillrinnande vattendrag",
+        href: "https://www.ifiske.se/fiske-ottnaren-och-altebosjon-med-tillrinnande-vattendrag.htm",
+      },
+      {
+        label: "Öjaren m fl sjöar",
+        href: "https://www.ifiske.se/fiske-ojaren-m-fl-sjoar.htm",
+      },
+      {
+        label: "Medskogssjöns SFK",
+        href: "https://www.ifiske.se/fiske-medskogssjons-sfk.htm",
+      },
+      {
+        label: "Järbo FVOF",
+        href: "https://www.ifiske.se/fiske-jarbo-fvof.htm",
+      },
+      {
+        label: "Järbo SFK Djuptjärn och Svarttjärn",
+        href: "https://www.ifiske.se/fiske-jarbo-sfk-djuptjarn-och-svarttjarn.htm",
+      },
+    ],
+  },
+];
 
-function formatCoordinate(value: number) {
-  return value.toFixed(6);
-}
-
-function MeasurementCard({ measurement }: { measurement: SfvofMeasurement }) {
+function TopBubble({ label }: { label: string }) {
   return (
-    <article className="rounded-[24px] border border-[#d7dfdc] bg-white p-4 shadow-[0_8px_22px_rgba(18,35,28,0.06)]">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#5c6f69]">
-            {measurement.length_interval_label}
-          </div>
-          <h3 className="mt-1 text-[1.2rem] font-bold text-[#1f2f2a]">
-            {measurement.fish_length_cm} cm
-          </h3>
-        </div>
+    <div className="absolute left-0 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#d2b77a] bg-[linear-gradient(180deg,#6c8655_0%,#466233_100%)] text-[#f3ddb0] shadow-[0_2px_7px_rgba(0,0,0,0.16),inset_0_1px_0_rgba(255,255,255,0.24)]">
+      <span className="text-[16px] font-bold uppercase tracking-[0.08em] leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.20)]">
+        {label}
+      </span>
+    </div>
+  );
+}
 
-        <div className="rounded-full border border-[#d7dfdc] bg-[#f3f7f6] px-3 py-1 text-[0.78rem] font-semibold text-[#46615a]">
-          {measurement.is_approved ? "Sparad" : "Ej godkänd"}
+function TopButton({
+  label,
+  bubbleLabel,
+  onClick,
+  showArrow = false,
+  isExpanded = false,
+  href,
+}: {
+  label: string;
+  bubbleLabel: string;
+  onClick?: () => void;
+  showArrow?: boolean;
+  isExpanded?: boolean;
+  href?: string;
+}) {
+  const className =
+    "relative flex h-[52px] w-full items-center overflow-visible rounded-full border border-[#bfa76a] bg-[linear-gradient(180deg,#2b4c20_0%,#183417_100%)] pr-[12px] pl-[64px] shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]";
+
+  const inner = (
+    <>
+      <TopBubble label={bubbleLabel} />
+      <span className="truncate text-[15px] font-semibold uppercase tracking-[0.04em] text-[#ead8ab]">
+        {label}
+      </span>
+      {showArrow ? (
+        <span
+          aria-hidden="true"
+          className={[
+            "ml-auto flex h-8 w-8 items-center justify-center rounded-full bg-black/55 text-[14px] font-bold leading-none text-[#ead8ab] shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform duration-200",
+            isExpanded ? "rotate-180" : "rotate-0",
+          ].join(" ")}
+        >
+          ▼
+        </span>
+      ) : (
+        <span
+          aria-hidden="true"
+          className="ml-auto flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-[18px] leading-none text-[#ead8ab]"
+        >
+          ›
+        </span>
+      )}
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" onClick={onClick} className={className}>
+      {inner}
+    </button>
+  );
+}
+
+function PublicSectionCard({ section }: { section: PublicSection }) {
+  return (
+    <section
+      id={section.id}
+      className="overflow-hidden rounded-[28px] border border-[#d6ddd5] bg-white shadow-[0_12px_32px_rgba(19,38,30,0.08)]"
+    >
+      <div className="border-b border-[#e7ede7] px-5 py-5 sm:px-6">
+        <div className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#5d775f]">
+          Öppen sektion
         </div>
+        <h2 className="mt-2 text-[1.55rem] font-bold leading-tight text-[#1e3528] sm:text-[1.8rem]">
+          {section.title}
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#516257] sm:text-[0.98rem]">
+          {section.description}
+        </p>
       </div>
 
-      <dl className="mt-4 grid grid-cols-1 gap-3 text-sm text-[#4c5f59] sm:grid-cols-2">
-        <div className="rounded-[18px] bg-[#f6faf8] px-3 py-2.5">
-          <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
-            Mätt
-          </dt>
-          <dd className="mt-1 font-medium text-[#1f2f2a]">
-            {formatMeasuredAt(measurement.measured_at)}
-          </dd>
+      <div className="bg-[#f7faf7] p-4 sm:p-5">
+        <div className="overflow-hidden rounded-[22px] border border-[#dbe3db] bg-white shadow-[0_8px_22px_rgba(19,38,30,0.07)]">
+          <img
+            src={section.imageSrc}
+            alt={section.imageAlt}
+            className="w-full object-cover object-top"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
 
-        <div className="rounded-[18px] bg-[#f6faf8] px-3 py-2.5">
-          <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
-            Registrerad av
-          </dt>
-          <dd className="mt-1 font-medium text-[#1f2f2a]">
-            {measurement.registered_by_name}
-          </dd>
-        </div>
-
-        <div className="rounded-[18px] bg-[#f6faf8] px-3 py-2.5 sm:col-span-2">
-          <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
-            GPS
-          </dt>
-          <dd className="mt-1 font-medium text-[#1f2f2a]">
-            {formatCoordinate(measurement.gps_lat)}, {formatCoordinate(measurement.gps_lng)}
-          </dd>
-        </div>
-
-        {measurement.comment ? (
-          <div className="rounded-[18px] bg-[#f6faf8] px-3 py-2.5 sm:col-span-2">
-            <dt className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
-              Kommentar
-            </dt>
-            <dd className="mt-1 font-medium text-[#1f2f2a]">{measurement.comment}</dd>
+        {section.links?.length ? (
+          <div className="mt-5 rounded-[22px] border border-[#dbe3db] bg-white px-4 py-4 shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5">
+            <div className="text-[0.76rem] font-semibold uppercase tracking-[0.14em] text-[#5d775f]">
+              Länkar
+            </div>
+            <div className="mt-3 flex flex-col gap-2.5">
+              {section.links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-[16px] border border-[#dbe3db] bg-[#f7faf7] px-4 py-3 text-sm font-medium text-[#1e3528] transition hover:bg-[#eef5ee]"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
           </div>
         ) : null}
-      </dl>
-    </article>
+      </div>
+    </section>
   );
 }
 
 export default function SfvofHomePage() {
-  const [state, setState] = useState<LoadState>({ status: "loading" });
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function load() {
-      try {
-        const accessState = await getSfvofAccessState();
-
-        if (!isMounted) {
-          return;
-        }
-
-        setState({
-          status: "ready",
-          ...accessState,
-        });
-      } catch (error) {
-        if (!isMounted) {
-          return;
-        }
-
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Kunde inte läsa SFVOF-data just nu.";
-
-        setState({
-          status: "error",
-          message,
-        });
-      }
-    }
-
-    void load();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <main className="px-4 pb-10 pt-6 sm:px-6">
-      <div className="mx-auto max-w-4xl">
-        <section className="rounded-[30px] border border-[#d7dfdc] bg-white p-5 shadow-[0_12px_30px_rgba(18,35,28,0.06)] sm:p-6">
-          <div className="text-[0.82rem] font-semibold uppercase tracking-[0.14em] text-[#5c6f69]">
-            Översikt
-          </div>
-          <h2 className="mt-2 text-[1.8rem] font-bold leading-none text-[#1f2f2a] sm:text-[2.05rem]">
-            Första isolerade SFVOF-sidan
-          </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#58706a]">
-            Den här sidan är nu frikopplad visuellt från Gäddhäng Trollers. Ingen
-            Gäddhäng-header eller meny visas här, och sidan läser bara data från
-            schema <span className="font-semibold text-[#2f4a43]">sfvof</span>.
-          </p>
-        </section>
-
-        <div className="mt-6 space-y-6">
-          {state.status === "loading" ? (
-            <section className="rounded-[26px] border border-[#d7dfdc] bg-white p-5 text-sm text-[#4c5f59] shadow-[0_10px_24px_rgba(18,35,28,0.05)]">
-              Läser SFVOF-data...
-            </section>
-          ) : null}
-
-          {state.status === "error" ? (
-            <section className="rounded-[26px] border border-[#d7dfdc] bg-white p-5 shadow-[0_10px_24px_rgba(18,35,28,0.05)]">
-              <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#5c6f69]">
-                Fel
+    <main className="min-h-screen bg-transparent pb-12 text-[#1f2937]">
+      <header className="w-full">
+        <div className="relative h-[140px] w-full overflow-hidden sm:h-[300px] md:h-[360px]">
+          <img
+            src="/sfvof/header.jpg"
+            alt="Storsjöns FVOF Sandviken"
+            className="h-full w-full object-cover object-center"
+            draggable={false}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,17,13,0.08)_0%,rgba(6,17,13,0.30)_100%)]" />
+          <div className="absolute inset-x-0 bottom-0 px-4 pb-5 sm:px-6 sm:pb-8">
+            <div className="mx-auto max-w-6xl">
+              <div className="inline-flex max-w-[92%] flex-col rounded-[22px] border border-white/20 bg-[linear-gradient(180deg,rgba(18,37,28,0.72)_0%,rgba(11,25,18,0.82)_100%)] px-4 py-3 text-white shadow-[0_18px_34px_rgba(0,0,0,0.24)] backdrop-blur-sm sm:px-5 sm:py-4">
+                <div className="text-[0.76rem] font-semibold uppercase tracking-[0.18em] text-[#d7e7da]">
+                  Tillfällig startsida
+                </div>
+                <h1 className="mt-2 text-[1.55rem] font-bold leading-tight sm:text-[2rem]">
+                  Storsjöns FVOF Sandviken
+                </h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#e8f0ea] sm:text-[0.98rem]">
+                  Separat informations- och inloggningssida för SFVOF. Gäddhäng Trollers syns
+                  inte här och sidan byggs vidare helt isolerat.
+                </p>
               </div>
-              <p className="mt-2 text-sm leading-6 text-[#4c5f59]">{state.message}</p>
-            </section>
-          ) : null}
+            </div>
+          </div>
+        </div>
+      </header>
 
-          {state.status === "ready" ? (
-            <>
-              <section className="rounded-[26px] border border-[#d7dfdc] bg-white p-5 shadow-[0_10px_24px_rgba(18,35,28,0.05)]">
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-[20px] bg-[#f6faf8] px-4 py-4">
-                    <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
-                      Inloggad
-                    </div>
-                    <div className="mt-2 text-[1rem] font-semibold text-[#1f2f2a]">
-                      {state.isLoggedIn ? "Ja" : "Nej"}
-                    </div>
-                  </div>
+      <div className="sticky top-0 z-40 border-b border-black/10 bg-[#edf2ee]/95 backdrop-blur-md">
+        <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4">
+          <div className="relative sm:hidden">
+            <div className="grid grid-cols-2 gap-[10px]">
+              <TopButton
+                label="Meny"
+                bubbleLabel="M"
+                onClick={() => setIsMenuOpen((current) => !current)}
+                showArrow
+                isExpanded={isMenuOpen}
+              />
+              <TopButton label="Login" bubbleLabel="L" href="/login" />
+            </div>
 
-                  <div className="rounded-[20px] bg-[#f6faf8] px-4 py-4">
-                    <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
-                      SFVOF-medlem
-                    </div>
-                    <div className="mt-2 text-[1rem] font-semibold text-[#1f2f2a]">
-                      {state.member?.is_active ? "Aktiv" : "Ingen access"}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[20px] bg-[#f6faf8] px-4 py-4">
-                    <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
-                      Roll
-                    </div>
-                    <div className="mt-2 text-[1rem] font-semibold text-[#1f2f2a]">
-                      {state.member?.is_admin ? "Admin" : state.member ? "Medlem" : "Ingen"}
-                    </div>
-                  </div>
+            <div
+              className={[
+                "overflow-hidden transition-all duration-300 ease-out",
+                isMenuOpen ? "mt-3 max-h-[180px] opacity-100" : "mt-0 max-h-0 opacity-0",
+              ].join(" ")}
+            >
+              <div className="rounded-[22px] border border-[#cbb489] bg-[linear-gradient(180deg,rgba(252,246,235,0.96)_0%,rgba(235,224,202,0.93)_100%)] p-[10px] shadow-[0_16px_34px_rgba(0,0,0,0.16)]">
+                <div className="rounded-[18px] border border-dashed border-[#d2bc8a] bg-[#fff9ef] px-4 py-4 text-sm text-[#6c5b3d]">
+                  Menyn är tom just nu.
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <div className="mt-5 rounded-[20px] bg-[#f6faf8] px-4 py-4">
-                  <div className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#748983]">
-                    Konto
-                  </div>
-                  <div className="mt-2 text-sm leading-6 text-[#1f2f2a]">
-                    {state.member ? (
-                      <>
-                        <div className="font-semibold">{state.member.name}</div>
-                        <div>{state.member.email}</div>
-                      </>
-                    ) : state.isLoggedIn ? (
-                      "Du är inloggad men är ännu inte upplagd som aktiv SFVOF-medlem."
-                    ) : (
-                      "Du är inte inloggad."
-                    )}
-                  </div>
+          <div className="hidden sm:block">
+            <div className="rounded-[26px] border border-[#cbb489] bg-[linear-gradient(180deg,rgba(252,246,235,0.96)_0%,rgba(235,224,202,0.93)_100%)] p-[10px] shadow-[0_16px_34px_rgba(0,0,0,0.14)]">
+              <div className="flex flex-wrap items-stretch justify-center gap-[10px]">
+                <div className="min-w-[220px] max-w-[260px] flex-1">
+                  <TopButton
+                    label="Meny"
+                    bubbleLabel="M"
+                    onClick={() => setIsMenuOpen((current) => !current)}
+                    showArrow
+                    isExpanded={isMenuOpen}
+                  />
                 </div>
-              </section>
-
-              <section className="rounded-[26px] border border-[#d7dfdc] bg-white p-5 shadow-[0_10px_24px_rgba(18,35,28,0.05)]">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#5c6f69]">
-                      Mina registreringar
-                    </div>
-                    <h2 className="mt-1 text-[1.35rem] font-bold text-[#1f2f2a]">
-                      {state.measurements.length} st
-                    </h2>
-                  </div>
+                <div className="min-w-[220px] max-w-[260px] flex-1">
+                  <TopButton label="Login" bubbleLabel="L" href="/login" />
                 </div>
+              </div>
 
-                {state.measurements.length === 0 ? (
-                  <p className="mt-4 text-sm leading-6 text-[#58706a]">
-                    Inga SFVOF-registreringar hittades för det här kontot ännu.
-                  </p>
-                ) : (
-                  <div className="mt-4 space-y-4">
-                    {state.measurements.map((measurement) => (
-                      <MeasurementCard key={measurement.id} measurement={measurement} />
-                    ))}
-                  </div>
-                )}
-              </section>
-            </>
-          ) : null}
+              {isMenuOpen ? (
+                <div className="mt-3 rounded-[18px] border border-dashed border-[#d2bc8a] bg-[#fff9ef] px-4 py-4 text-sm text-[#6c5b3d]">
+                  Menyn är tom just nu.
+                </div>
+              ) : null}
+            </div>
+          </div>
         </div>
       </div>
+
+      <section className="px-4 pt-6 sm:px-5">
+        <div className="mx-auto max-w-6xl rounded-[28px] border border-[#d6ddd5] bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(247,250,247,0.98)_100%)] px-5 py-5 shadow-[0_12px_32px_rgba(19,38,30,0.08)] sm:px-6 sm:py-6">
+          <div className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#5d775f]">
+            Publikt just nu
+          </div>
+          <h2 className="mt-2 text-[1.45rem] font-bold leading-tight text-[#1e3528] sm:text-[1.75rem]">
+            Öppna sektioner innan inloggning
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#516257] sm:text-[0.98rem]">
+            Nedan ligger de publika blocken som ska vara tillgängliga innan inloggning. De är
+            just nu uppbyggda av de referensbilder du skickade in, så att vi snabbt kan forma
+            SFVOF-sidan utan att blanda in Gäddhäng.
+          </p>
+        </div>
+      </section>
+
+      <section className="px-4 pt-6 sm:px-5">
+        <div className="mx-auto max-w-6xl space-y-6">
+          {publicSections.map((section) => (
+            <PublicSectionCard key={section.id} section={section} />
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
