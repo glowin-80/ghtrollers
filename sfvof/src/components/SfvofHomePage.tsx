@@ -7,10 +7,8 @@ type PublicSection = {
   id: string;
   title: string;
   description: string;
-  imageSrc: string;
-  imageAlt: string;
-  ctaLabel?: string;
-  ctaHref?: string;
+  imageSrc?: string;
+  imageAlt?: string;
   links?: Array<{ label: string; href: string }>;
 };
 
@@ -44,8 +42,7 @@ const publicSections: PublicSection[] = [
     title: "Fiskeområden i närheten",
     description:
       "Snabblänkar till omkringliggande fiskeområden via iFiske.",
-    imageSrc: "/sfvof/public-section-4.png",
-    imageAlt: "Sektion med fiskeområden i närheten av Storsjöns FVOF Sandviken.",
+
     links: [
       {
         label: "Ottnaren och Ältebosjön med tillrinnande vattendrag",
@@ -160,18 +157,20 @@ function PublicSectionCard({ section }: { section: PublicSection }) {
       </div>
 
       <div className="bg-[#f7faf7] p-4 sm:p-5">
-        <div className="overflow-hidden rounded-[22px] border border-[#dbe3db] bg-white shadow-[0_8px_22px_rgba(19,38,30,0.07)]">
-          <img
-            src={section.imageSrc}
-            alt={section.imageAlt}
-            className="w-full object-cover object-top"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
+        {section.imageSrc ? (
+          <div className="overflow-hidden rounded-[22px] border border-[#dbe3db] bg-white shadow-[0_8px_22px_rgba(19,38,30,0.07)]">
+            <img
+              src={section.imageSrc}
+              alt={section.imageAlt ?? section.title}
+              className="w-full object-cover object-top"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        ) : null}
 
         {section.links?.length ? (
-          <div className="mt-5 rounded-[22px] border border-[#dbe3db] bg-white px-4 py-4 shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5">
+          <div className={`${section.imageSrc ? 'mt-5 ' : ''}rounded-[22px] border border-[#dbe3db] bg-white px-4 py-4 shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5`}>
             <div className="text-[0.76rem] font-semibold uppercase tracking-[0.14em] text-[#5d775f]">
               Länkar
             </div>
@@ -201,28 +200,19 @@ export default function SfvofHomePage() {
   return (
     <main className="min-h-screen bg-transparent pb-12 text-[#1f2937]">
       <header className="w-full">
-        <div className="relative h-[140px] w-full overflow-hidden sm:h-[300px] md:h-[360px]">
+        <div className="relative h-[220px] w-full overflow-hidden bg-[#dfe7e1] sm:h-[320px] md:h-[380px]">
           <img
             src="/sfvof/header.jpg"
             alt="Storsjöns FVOF Sandviken"
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full object-contain object-center"
             draggable={false}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,17,13,0.08)_0%,rgba(6,17,13,0.30)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,17,13,0.08)_0%,rgba(6,17,13,0.22)_100%)]" />
           <div className="absolute inset-x-0 bottom-0 px-4 pb-5 sm:px-6 sm:pb-8">
             <div className="mx-auto max-w-6xl">
-              <div className="inline-flex max-w-[92%] flex-col rounded-[22px] border border-white/20 bg-[linear-gradient(180deg,rgba(18,37,28,0.72)_0%,rgba(11,25,18,0.82)_100%)] px-4 py-3 text-white shadow-[0_18px_34px_rgba(0,0,0,0.24)] backdrop-blur-sm sm:px-5 sm:py-4">
-                <div className="text-[0.76rem] font-semibold uppercase tracking-[0.18em] text-[#d7e7da]">
-                  Tillfällig startsida
-                </div>
-                <h1 className="mt-2 text-[1.55rem] font-bold leading-tight sm:text-[2rem]">
-                  Storsjöns FVOF Sandviken
-                </h1>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#e8f0ea] sm:text-[0.98rem]">
-                  Separat informations- och inloggningssida för SFVOF. Gäddhäng Trollers syns
-                  inte här och sidan byggs vidare helt isolerat.
-                </p>
-              </div>
+              <h1 className="text-[1.9rem] font-bold leading-tight text-white drop-shadow-[0_3px_10px_rgba(0,0,0,0.55)] sm:text-[2.5rem]">
+                Storsjöns FVOF Sandviken
+              </h1>
             </div>
           </div>
         </div>
@@ -239,7 +229,7 @@ export default function SfvofHomePage() {
                 showArrow
                 isExpanded={isMenuOpen}
               />
-              <TopButton label="Login" bubbleLabel="L" href="/login" />
+              <TopButton label="Login" bubbleLabel="L" href="/sfvof/login" />
             </div>
 
             <div
@@ -269,7 +259,7 @@ export default function SfvofHomePage() {
                   />
                 </div>
                 <div className="min-w-[220px] max-w-[260px] flex-1">
-                  <TopButton label="Login" bubbleLabel="L" href="/login" />
+                  <TopButton label="Login" bubbleLabel="L" href="/sfvof/login" />
                 </div>
               </div>
 
@@ -282,22 +272,6 @@ export default function SfvofHomePage() {
           </div>
         </div>
       </div>
-
-      <section className="px-4 pt-6 sm:px-5">
-        <div className="mx-auto max-w-6xl rounded-[28px] border border-[#d6ddd5] bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(247,250,247,0.98)_100%)] px-5 py-5 shadow-[0_12px_32px_rgba(19,38,30,0.08)] sm:px-6 sm:py-6">
-          <div className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#5d775f]">
-            Publikt just nu
-          </div>
-          <h2 className="mt-2 text-[1.45rem] font-bold leading-tight text-[#1e3528] sm:text-[1.75rem]">
-            Öppna sektioner innan inloggning
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#516257] sm:text-[0.98rem]">
-            Nedan ligger de publika blocken som ska vara tillgängliga innan inloggning. De är
-            just nu uppbyggda av de referensbilder du skickade in, så att vi snabbt kan forma
-            SFVOF-sidan utan att blanda in Gäddhäng.
-          </p>
-        </div>
-      </section>
 
       <section className="px-4 pt-6 sm:px-5">
         <div className="mx-auto max-w-6xl space-y-6">
