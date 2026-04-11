@@ -41,8 +41,12 @@ export default function UploadCatchSection({
         />
       ) : null}
 
-      <div className={shouldLock ? "pointer-events-none select-none blur-[5px]" : ""}>
-        <h2 className="mb-4 text-2xl font-bold text-[#1f2937]">📸 Ladda upp fångst</h2>
+      <div
+        className={shouldLock ? "pointer-events-none select-none blur-[5px]" : ""}
+      >
+        <h2 className="mb-4 text-2xl font-bold text-[#1f2937]">
+          📸 Ladda upp fångst
+        </h2>
 
         <UploadCatchForm
           {...formProps}

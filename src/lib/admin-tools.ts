@@ -27,6 +27,7 @@ export type PendingCatch = {
   live_scope: boolean | null;
   caught_abroad: boolean | null;
   is_location_private: boolean | null;
+  owner_member_role?: string | null;
   status: string;
   created_at: string | null;
   original_image_size_bytes: number | null;
@@ -47,16 +48,32 @@ export async function fetchPendingMembers() {
 }
 
 export async function fetchPendingCatches() {
-  const { data, error } = await supabase
-    .from("catches")
-    .select(
-      "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, fishing_method, live_scope, caught_abroad, is_location_private, status, created_at, original_image_size_bytes, compressed_image_size_bytes"
-    )
-    .eq("status", "pending")
-    .order("created_at", { ascending: true });
+  const [{ data, error }, { data: members, error: membersError }] = await Promise.all([
+    supabase
+      .from("catches")
+      .select(
+        "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, fishing_method, live_scope, caught_abroad, is_location_private, status, created_at, original_image_size_bytes, compressed_image_size_bytes"
+      )
+      .eq("status", "pending")
+      .order("created_at", { ascending: true }),
+    supabase.from("members").select("name, member_role"),
+  ]);
 
   if (error) throw error;
-  return (data ?? []) as PendingCatch[];
+  if (membersError) throw membersError;
+
+  const memberRoleByName = (members ?? []).reduce<Record<string, string | null>>((acc, member) => {
+    const key = member.name?.trim();
+    if (key) {
+      acc[key] = member.member_role ?? null;
+    }
+    return acc;
+  }, {});
+
+  return ((data ?? []) as PendingCatch[]).map((item) => ({
+    ...item,
+    owner_member_role: memberRoleByName[item.caught_for?.trim() ?? ""] ?? null,
+  }));
 }
 
 export async function approvePendingMember(

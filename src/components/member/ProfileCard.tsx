@@ -63,7 +63,7 @@ export default function ProfileCard({
               </h1>
             </div>
 
-            <div className="shrink-0 rounded-full border border-[#d8d2c7] bg-white px-3 py-1 text-sm font-semibold text-[#5c4d3f] shadow-[0_4px_10px_rgba(0,0,0,0.04)]">
+            <div className="shrink-0 text-right text-[1rem] font-medium text-[#74685a] sm:text-[1.05rem]">
               {profileRoleLabel}
             </div>
           </div>

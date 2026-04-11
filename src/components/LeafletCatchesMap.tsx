@@ -11,7 +11,6 @@ type LeafletCatchesMapProps = {
   catches: Catch[];
   fishingSpots?: FishingSpot[];
   filter?: FishingSpotMapFilter;
-  includePrivate?: boolean;
 };
 
 const defaultCenter: [number, number] = [59.3293, 18.0686];
@@ -142,17 +141,15 @@ export default function LeafletCatchesMap({
   catches,
   fishingSpots = [],
   filter = "all",
-  includePrivate = false,
 }: LeafletCatchesMapProps) {
   const catchesWithCoords = useMemo(
     () =>
       catches.filter(
         (item) =>
           typeof item.latitude === "number" &&
-          typeof item.longitude === "number" &&
-          (includePrivate || !item.is_location_private)
+          typeof item.longitude === "number"
       ),
-    [catches, includePrivate]
+    [catches]
   );
 
   const spotsWithCoords = useMemo(
@@ -160,10 +157,9 @@ export default function LeafletCatchesMap({
       fishingSpots.filter(
         (item) =>
           typeof item.latitude === "number" &&
-          typeof item.longitude === "number" &&
-          (includePrivate || !item.is_private)
+          typeof item.longitude === "number"
       ),
-    [fishingSpots, includePrivate]
+    [fishingSpots]
   );
 
   const visibleCatches = useMemo(

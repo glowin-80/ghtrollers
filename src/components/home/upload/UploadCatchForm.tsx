@@ -58,7 +58,7 @@ export default function UploadCatchForm({ members, caughtFor, registeredBy, fish
       {formMessage ? <InlineMessage variant={formMessage.variant} message={formMessage.message} actionLabel={formMessage.actionLabel} onAction={formMessage.actionLabel ? onFormMessageAction : undefined} onDismiss={onDismissFormMessage} /> : null}
       {isGuestAngler ? (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Du är ej aktiv medlem i tävlingen "Gäddhäng Trollers", denna fångst kommer inte registreras under leaderboard och all-time-high
+          Du är ej aktiv medlem i tävlingen "Gäddhäng Trollers", denna fångst kommer inte registreras under leaderboard och all-time-high. Den kommer fortfarande registreras under Mina sidor.
         </div>
       ) : null}
       <select value={caughtFor} onChange={(e) => onCaughtForChange(e.target.value)} className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]" required><option value="">Välj vem som fångade fisken</option>{members.map((member) => <option key={member.id} value={member.name}>{member.name}</option>)}</select>

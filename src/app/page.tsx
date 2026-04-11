@@ -23,7 +23,6 @@ export default function Home() {
     isLoggedIn,
     hasActiveMembership,
     member,
-    isSuperAdmin,
   } = useHomeData();
 
   const {
@@ -125,7 +124,7 @@ export default function Home() {
 
   const recentApprovedCatches = useMemo(() => {
     return approvedCatches.slice(0, 8);
-  }, [approvedCatches, members]);
+  }, [approvedCatches]);
 
   const handleFilterChange = useCallback((value: LeaderboardFilter) => {
     setFilter(value);
@@ -247,7 +246,6 @@ export default function Home() {
               hasActiveMembership={hasActiveMembership}
               catches={approvedCatches}
               fishingSpots={approvedFishingSpots}
-              isSuperAdmin={isSuperAdmin}
             />
           </div>
 

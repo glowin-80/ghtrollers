@@ -64,6 +64,7 @@ export function useCatchUpload({
   const [loading, setLoading] = useState(false);
   const [formMessage, setFormMessage] = useState<UploadFeedbackMessage | null>(null);
   const [confirmMissingLocationOpen, setConfirmMissingLocationOpen] = useState(false);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
 
   const resetLocationState = useCallback(() => {
     setLatitude(null);
@@ -80,6 +81,7 @@ export function useCatchUpload({
   }, [resetForm, resetLocationState]);
 
   const dismissFormMessage = useCallback(() => setFormMessage(null), []);
+  const dismissSuccessDialog = useCallback(() => setSuccessDialogOpen(false), []);
 
   const handleFormMessageAction = useCallback(() => {
     if (formMessage?.actionType === "login") router.push("/login");
@@ -206,11 +208,10 @@ export function useCatchUpload({
         });
         resetEntireForm();
         setFormMessage({
-          variant: isGuestAngler ? "info" : "success",
-          message: isGuestAngler
-            ? 'Du är ej aktiv medlem i tävlingen "Gäddhäng Trollers", denna fångst kommer inte registreras under leaderboard och all-time-high'
-            : "Fångsten skickades in och väntar på godkännande.",
+          variant: "success",
+          message: "Fångsten är rapporterad.",
         });
+        setSuccessDialogOpen(true);
       } catch (error) {
         console.error(error);
         setFormMessage({
@@ -242,7 +243,6 @@ export function useCatchUpload({
       latitude,
       longitude,
       resetEntireForm,
-      isGuestAngler,
     ]
   );
 
@@ -264,6 +264,7 @@ export function useCatchUpload({
     gpsError,
     formMessage,
     confirmMissingLocationOpen,
+    successDialogOpen,
     mapOpen,
     locationChooserOpen,
     previewUrl,
@@ -303,5 +304,6 @@ export function useCatchUpload({
       () => setConfirmMissingLocationOpen(false),
       []
     ),
+    onDismissSuccessDialog: dismissSuccessDialog,
   };
 }
