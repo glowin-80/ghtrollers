@@ -261,7 +261,7 @@ function MemberStatusCard({
   return (
     <div className="rounded-[22px] border border-[#cfe0ce] bg-[#f5fbf5] px-4 py-4 text-sm text-[#20402a] shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5">
       Inloggad som <strong>{accessState.member.name}</strong>
-      {accessState.member.is_admin ? " (admin)" : ""}. SFVOF hittade din medlemsrad och du kan nu använda den inloggade delen när vi bygger vidare den.
+      {accessState.member.is_admin ? " (admin)" : ""}. SFVOF hittade din medlemsrad. Du kan nu gå vidare till <Link href="/sfvof/min-sida" className="underline underline-offset-4">Min sida</Link>.
     </div>
   );
 }
@@ -271,7 +271,7 @@ export default function SfvofHomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [accessState, setAccessState] = useState<SfvofAccessState>(initialAccessState);
   const [isLoadingAccessState, setIsLoadingAccessState] = useState(true);
-  const loginLabel = accessState.isLoggedIn ? "Logga ut" : "Login";
+  const loginLabel = accessState.isLoggedIn ? "Min sida" : "Login";
 
   useEffect(() => {
     let mounted = true;
@@ -316,9 +316,7 @@ export default function SfvofHomePage() {
 
   async function handleAuthAction() {
     if (accessState.isLoggedIn) {
-      await sfvofSupabase.auth.signOut();
-      setAccessState(initialAccessState);
-      router.refresh();
+      router.push("/sfvof/min-sida");
       return;
     }
 

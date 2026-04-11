@@ -55,7 +55,7 @@ export default function SfvofLoginForm() {
       return;
     }
 
-    router.push("/sfvof");
+    router.push("/sfvof/min-sida");
     router.refresh();
   }
 
