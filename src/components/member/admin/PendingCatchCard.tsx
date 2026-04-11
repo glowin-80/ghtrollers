@@ -8,7 +8,7 @@ type PendingCatchCardProps = {
   workingKey: string | null;
   isSuperAdmin: boolean;
   onApprove: (catchId: string) => void;
-  onRemove: (catchId: string) => void;
+  onReject: (catchId: string) => void;
 };
 
 function formatBytes(bytes: number | null) {
@@ -36,7 +36,7 @@ export default function PendingCatchCard({
   workingKey,
   isSuperAdmin,
   onApprove,
-  onRemove,
+  onReject,
 }: PendingCatchCardProps) {
   const fishLabel =
     item.fish_type === "Fina fisken" && item.fine_fish_type
@@ -145,7 +145,7 @@ export default function PendingCatchCard({
 
           <button
             type="button"
-            onClick={() => onRemove(item.id)}
+            onClick={() => onReject(item.id)}
             disabled={workingKey === item.id}
             className="rounded-full border border-[#f1b5b5] px-6 py-3 text-lg font-semibold text-[#cc3b3b] transition hover:bg-[#fff5f5] disabled:cursor-not-allowed disabled:opacity-60"
           >
