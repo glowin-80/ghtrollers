@@ -32,6 +32,10 @@ export default function Home() {
     fineFishType,
     weight,
     catchDate,
+    fishingMethod,
+    liveScope,
+    caughtAbroad,
+    isLocationPrivate,
     locationName,
     latitude,
     longitude,
@@ -39,6 +43,8 @@ export default function Home() {
     gpsError,
     formMessage,
     confirmMissingLocationOpen,
+    successDialogOpen,
+    validationDialogMessage,
     mapOpen,
     locationChooserOpen,
     previewUrl,
@@ -47,6 +53,10 @@ export default function Home() {
     handleFineFishTypeChange,
     handleWeightChange,
     handleCatchDateChange,
+    handleFishingMethodChange,
+    handleLiveScopeChange,
+    handleCaughtAbroadChange,
+    handleIsLocationPrivateChange,
     handleLocationNameChange,
     handleImageChange,
     handleCaughtForChange,
@@ -63,10 +73,13 @@ export default function Home() {
     handleFormMessageAction,
     handleConfirmMissingLocation,
     handleCancelMissingLocation,
+    onDismissSuccessDialog,
+    onDismissValidationDialog,
   } = useCatchUpload({
     isLoggedIn,
     hasActiveMembership,
     registeredByDefault: member?.name ?? "",
+    isGuestAngler: member?.member_role === "guest_angler",
   });
 
   const currentSwedenYear = useMemo(() => {
@@ -102,16 +115,16 @@ export default function Home() {
   }, [approvedCatches, selectedLeaderboardYear]);
 
   const leaderboard = useMemo(() => {
-    return buildLeaderboard(leaderboardCatches, filter);
-  }, [leaderboardCatches, filter]);
+    return buildLeaderboard(leaderboardCatches, filter, members);
+  }, [leaderboardCatches, filter, members]);
 
   const bigFiveBreakdowns = useMemo(() => {
-    return buildBigFiveBreakdowns(leaderboardCatches);
-  }, [leaderboardCatches]);
+    return buildBigFiveBreakdowns(leaderboardCatches, members);
+  }, [leaderboardCatches, members]);
 
   const allTimeHighlights = useMemo(() => {
-    return buildAllTimeHighlights(approvedCatches);
-  }, [approvedCatches]);
+    return buildAllTimeHighlights(approvedCatches, members);
+  }, [approvedCatches, members]);
 
   const recentApprovedCatches = useMemo(() => {
     return approvedCatches.slice(0, 8);
@@ -174,6 +187,11 @@ export default function Home() {
               fineFishType={fineFishType}
               weight={weight}
               catchDate={catchDate}
+              fishingMethod={fishingMethod}
+              liveScope={liveScope}
+              caughtAbroad={caughtAbroad}
+              isLocationPrivate={isLocationPrivate}
+              isGuestAngler={member?.member_role === "guest_angler"}
               locationName={locationName}
               latitude={latitude}
               longitude={longitude}
@@ -181,6 +199,8 @@ export default function Home() {
               gpsError={gpsError}
               formMessage={formMessage}
               confirmMissingLocationOpen={confirmMissingLocationOpen}
+              successDialogOpen={successDialogOpen}
+              validationDialogMessage={validationDialogMessage}
               mapOpen={mapOpen}
               locationChooserOpen={locationChooserOpen}
               previewUrl={previewUrl}
@@ -192,6 +212,10 @@ export default function Home() {
               onFineFishTypeChange={handleFineFishTypeChange}
               onWeightChange={handleWeightChange}
               onCatchDateChange={handleCatchDateChange}
+              onFishingMethodChange={handleFishingMethodChange}
+              onLiveScopeChange={handleLiveScopeChange}
+              onCaughtAbroadChange={handleCaughtAbroadChange}
+              onIsLocationPrivateChange={handleIsLocationPrivateChange}
               onLocationNameChange={handleLocationNameChange}
               onOpenLocationChooser={handleOpenLocationChooser}
               onCloseLocationChooser={handleCloseLocationChooser}
@@ -205,6 +229,8 @@ export default function Home() {
               onFormMessageAction={handleFormMessageAction}
               onConfirmMissingLocation={handleConfirmMissingLocation}
               onCancelMissingLocation={handleCancelMissingLocation}
+              onDismissSuccessDialog={onDismissSuccessDialog}
+              onDismissValidationDialog={onDismissValidationDialog}
             />
           </div>
 
@@ -215,6 +241,7 @@ export default function Home() {
               catches={recentApprovedCatches}
               allApprovedCatches={approvedCatches}
               isLoggedIn={isLoggedIn}
+              members={members}
               onImageClick={handleImageClick}
             />
           </div>

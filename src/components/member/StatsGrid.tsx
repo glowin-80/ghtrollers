@@ -17,6 +17,7 @@ import type {
 
 type Props = {
   catches: MemberCatch[];
+  memberRole?: string | null;
   onSelectCatch?: (catchId: string) => void;
 };
 
@@ -220,7 +221,7 @@ function BigFiveBreakdownPanel({
   );
 }
 
-export default function StatsGrid({ catches, onSelectCatch }: Props) {
+export default function StatsGrid({ catches, memberRole, onSelectCatch }: Props) {
   const currentSwedenYear = useMemo(() => {
     const formatter = new Intl.DateTimeFormat("sv-SE", {
       timeZone: "Europe/Stockholm",
@@ -255,8 +256,8 @@ export default function StatsGrid({ catches, onSelectCatch }: Props) {
   }, [catches, selectedYear]);
 
   const stats: MemberStats = useMemo(
-    () => calculateMemberStats(filteredCatches),
-    [filteredCatches]
+    () => calculateMemberStats(filteredCatches, memberRole),
+    [filteredCatches, memberRole]
   );
 
   const bestPikeCatch = useMemo(
@@ -276,8 +277,8 @@ export default function StatsGrid({ catches, onSelectCatch }: Props) {
     [filteredCatches]
   );
   const bestBigFiveBreakdown = useMemo(
-    () => buildMemberBestBigFiveBreakdown(filteredCatches),
-    [filteredCatches]
+    () => buildMemberBestBigFiveBreakdown(filteredCatches, memberRole),
+    [filteredCatches, memberRole]
   );
 
   const filterBadgeLabel = getFilterBadgeLabel(selectedYear);

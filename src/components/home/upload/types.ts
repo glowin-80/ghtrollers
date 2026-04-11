@@ -34,6 +34,11 @@ export type UploadCatchSectionProps = {
   fineFishType: string;
   weight: string;
   catchDate: string;
+  fishingMethod: string;
+  liveScope: boolean;
+  caughtAbroad: boolean;
+  isLocationPrivate: boolean;
+  isGuestAngler?: boolean;
   locationName: string;
   latitude: number | null;
   longitude: number | null;
@@ -41,6 +46,8 @@ export type UploadCatchSectionProps = {
   gpsError: GpsErrorState | null;
   formMessage: UploadFeedbackMessage | null;
   confirmMissingLocationOpen: boolean;
+  successDialogOpen: boolean;
+  validationDialogMessage: string | null;
   mapOpen: boolean;
   locationChooserOpen: boolean;
   previewUrl: string | null;
@@ -52,6 +59,10 @@ export type UploadCatchSectionProps = {
   onFineFishTypeChange: (value: string) => void;
   onWeightChange: (value: string) => void;
   onCatchDateChange: (value: string) => void;
+  onFishingMethodChange: (value: string) => void;
+  onLiveScopeChange: (value: boolean) => void;
+  onCaughtAbroadChange: (value: boolean) => void;
+  onIsLocationPrivateChange: (value: boolean) => void;
   onLocationNameChange: (value: string) => void;
   onOpenLocationChooser: () => void;
   onCloseLocationChooser: () => void;
@@ -65,4 +76,6 @@ export type UploadCatchSectionProps = {
   onFormMessageAction: () => void;
   onConfirmMissingLocation: () => void;
   onCancelMissingLocation: () => void;
+  onDismissSuccessDialog: () => void;
+  onDismissValidationDialog: () => void;
 };

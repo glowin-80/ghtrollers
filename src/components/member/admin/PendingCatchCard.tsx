@@ -1,95 +1,156 @@
 "use client";
 
-import {
-  formatBytes,
-  getCompressionReduction,
-  getPendingCatchFishLabel,
-  type PendingCatch,
-} from "@/lib/admin-tools";
+import { isGuestAnglerRole } from "@/lib/ght-rules";
+import type { PendingCatch } from "@/lib/admin-tools";
 
 type PendingCatchCardProps = {
   item: PendingCatch;
   workingKey: string | null;
+  isSuperAdmin: boolean;
   onApprove: (catchId: string) => void;
   onReject: (catchId: string) => void;
 };
 
+function formatBytes(bytes: number | null) {
+  if (!bytes || bytes <= 0) return "Saknas";
+  if (bytes < 1024) return `${bytes} B`;
+
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(0)} KB`;
+
+  return `${(kb / 1024).toFixed(2)} MB`;
+}
+
+function getCompressionReduction(
+  originalBytes: number | null,
+  compressedBytes: number | null
+) {
+  if (!originalBytes || !compressedBytes || originalBytes <= 0) return null;
+
+  const reduction = ((originalBytes - compressedBytes) / originalBytes) * 100;
+  return reduction < 0 ? 0 : Math.round(reduction);
+}
+
 export default function PendingCatchCard({
   item,
   workingKey,
+  isSuperAdmin,
   onApprove,
   onReject,
 }: PendingCatchCardProps) {
-  const fishLabel = getPendingCatchFishLabel(item);
-  const reduction = getCompressionReduction(
-    item.original_image_size_bytes,
-    item.compressed_image_size_bytes
-  );
+  const fishLabel =
+    item.fish_type === "Fina fisken" && item.fine_fish_type
+      ? `Fina fisken • ${item.fine_fish_type}`
+      : item.fish_type;
+
+  const isGuestCatch = isGuestAnglerRole(item.owner_member_role);
+  const competitionReason = isGuestCatch
+    ? "Gästfiskare"
+    : item.live_scope
+      ? "Live-scope"
+      : item.caught_abroad
+        ? "Utomlands"
+        : null;
+
+  const isCompetitionEligible = !competitionReason;
+
+  const reduction =
+    item.original_image_size_bytes && item.compressed_image_size_bytes
+      ? getCompressionReduction(
+          item.original_image_size_bytes,
+          item.compressed_image_size_bytes
+        )
+      : null;
 
   return (
     <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] p-4">
-      <div className="flex flex-col gap-4 lg:flex-row">
-        {item.image_url ? (
-          <img
-            src={item.image_url}
-            alt="Fångstbild"
-            className="h-32 w-full rounded-2xl object-cover lg:w-40"
-          />
-        ) : null}
+      {item.image_url ? (
+        <img
+          src={item.image_url}
+          alt={fishLabel}
+          className="mb-4 h-48 w-full rounded-2xl object-cover"
+        />
+      ) : null}
 
-        <div className="flex-1">
-          <div className="text-lg font-bold text-[#1f2937]">{item.caught_for}</div>
-
-          <div className="mt-1 text-sm text-[#6b7280]">
+      <div className="space-y-3">
+        <div>
+          <h3 className="text-2xl font-bold text-[#102033]">{item.caught_for}</h3>
+          <p className="text-lg text-[#5b6575]">
             Registrerad av {item.registered_by}
-          </div>
+          </p>
+        </div>
 
-          <div className="mt-3 grid gap-2 text-sm text-[#374151] md:grid-cols-2">
-            <div>
-              <span className="font-semibold">Art:</span> {fishLabel}
-            </div>
-            <div>
-              <span className="font-semibold">Vikt:</span> {item.weight_g} g
-            </div>
-            <div>
-              <span className="font-semibold">Datum:</span> {item.catch_date}
-            </div>
-            <div>
-              <span className="font-semibold">Plats:</span> {item.location_name || "Ej angiven"}
-            </div>
-          </div>
+        <div className="flex flex-wrap gap-2">
+          {item.fishing_method ? (
+            <span className="rounded-full bg-[#eaf6e5] px-3 py-1 text-sm font-medium text-[#3e6b35]">
+              {item.fishing_method}
+            </span>
+          ) : null}
 
-          <div className="mt-4 rounded-2xl border border-[#e5ded2] bg-[#faf8f4] px-4 py-3 text-sm text-[#4b5563]">
-            <div>
-              <span className="font-semibold">Före:</span> {formatBytes(item.original_image_size_bytes)}
-            </div>
-            <div>
-              <span className="font-semibold">Efter:</span> {formatBytes(item.compressed_image_size_bytes)}
-            </div>
-            <div>
-              <span className="font-semibold">Minskning:</span> {reduction !== null ? `${reduction}% mindre` : "Saknas"}
-            </div>
-          </div>
+          {item.is_location_private ? (
+            <span className="rounded-full bg-[#f1f3f5] px-3 py-1 text-sm font-medium text-[#5b6575]">
+              Privat plats
+            </span>
+          ) : null}
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => onApprove(item.id)}
-              disabled={workingKey === `catch-approve-${item.id}`}
-              className="rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3e5d3b] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {workingKey === `catch-approve-${item.id}` ? "Jobbar..." : "Godkänn fångst"}
-            </button>
+          <span
+            className={`rounded-full px-3 py-1 text-sm font-medium ${
+              isCompetitionEligible
+                ? "bg-[#eaf6e5] text-[#3e6b35]"
+                : "bg-[#fdf0d5] text-[#8a5a00]"
+            }`}
+          >
+            {isCompetitionEligible
+              ? "Tävlingsgrundande"
+              : `Ej tävlingsgrundande · ${competitionReason}`}
+          </span>
+        </div>
 
-            <button
-              type="button"
-              onClick={() => onReject(item.id)}
-              disabled={workingKey === `catch-reject-${item.id}`}
-              className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {workingKey === `catch-reject-${item.id}` ? "Jobbar..." : "Ta bort"}
-            </button>
-          </div>
+        <div className="space-y-2 text-lg text-[#102033]">
+          <p>
+            <span className="font-semibold">Art:</span> {fishLabel}
+          </p>
+          <p>
+            <span className="font-semibold">Vikt:</span> {item.weight_g} g
+          </p>
+          <p>
+            <span className="font-semibold">Datum:</span> {item.catch_date}
+          </p>
+          <p>
+            <span className="font-semibold">Plats:</span>{" "}
+            {item.is_location_private && !isSuperAdmin
+              ? "Privat plats"
+              : item.location_name || "Saknas"}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-[#e4ddd2] bg-[#faf7f2] p-3 text-base text-[#5b6575]">
+          <p>Före: {formatBytes(item.original_image_size_bytes)}</p>
+          <p>Efter: {formatBytes(item.compressed_image_size_bytes)}</p>
+          <p>
+            Minskning:{" "}
+            {reduction !== null ? `${reduction}% mindre` : "Saknas"}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => onApprove(item.id)}
+            disabled={workingKey === item.id}
+            className="rounded-full bg-[#235b2f] px-6 py-3 text-lg font-semibold text-white transition hover:bg-[#1d4a26] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Godkänn fångst
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onReject(item.id)}
+            disabled={workingKey === item.id}
+            className="rounded-full border border-[#f1b5b5] px-6 py-3 text-lg font-semibold text-[#cc3b3b] transition hover:bg-[#fff5f5] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Ta bort
+          </button>
         </div>
       </div>
     </div>

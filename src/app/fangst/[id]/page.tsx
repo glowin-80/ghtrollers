@@ -9,7 +9,13 @@ import {
   formatCatchWeightForDisplay,
 } from "@/lib/catch-sharing";
 import {
+  buildMemberLookupByName,
+  isCompetitionEligibleCatch,
+  isGuestAnglerRole,
+} from "@/lib/ght-rules";
+import {
   fetchAllApprovedCatches,
+  fetchPublicActiveMembers,
   fetchPublicApprovedCatchById,
 } from "@/lib/public-catch";
 
@@ -26,12 +32,15 @@ const getCatchPageData = cache(async (catchId: string) => {
     return null;
   }
 
-  const approvedCatches = await fetchAllApprovedCatches();
-  const shareDetails = buildCatchShareDetails(catchItem, approvedCatches);
+  const [approvedCatches, members] = await Promise.all([fetchAllApprovedCatches(), fetchPublicActiveMembers()]);
+  const shareDetails = buildCatchShareDetails(catchItem, approvedCatches, members);
 
   return {
     catchItem,
-    shareDetails,
+    shareDetails: {
+      ...shareDetails,
+      members,
+    },
   };
 });
 
@@ -91,6 +100,13 @@ export default async function CatchPage({ params }: CatchPageProps) {
   }
 
   const { catchItem, shareDetails } = data;
+  const memberLookup = buildMemberLookupByName(shareDetails.members);
+  const owner = memberLookup[catchItem.caught_for?.trim() || ""];
+  const catchBadgeLabel = isGuestAnglerRole(owner?.member_role)
+    ? "Privat fångst"
+    : isCompetitionEligibleCatch(catchItem, memberLookup)
+      ? "Tävlings fångst"
+      : "Privat fångst";
   const yearlyRankLabel = shareDetails.yearlyRank
     ? `Plats ${shareDetails.yearlyRank}${shareDetails.yearlyRankYear ? ` · ${shareDetails.yearlyRankYear}` : ""}`
     : "Placering saknas";
@@ -114,7 +130,7 @@ export default async function CatchPage({ params }: CatchPageProps) {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold uppercase tracking-[0.16em] text-[#7a6540]">
-                  Offentlig fångst
+                  {catchBadgeLabel}
                 </div>
                 <h1 className="mt-2 text-[2rem] font-bold leading-[0.96] text-[#1f2937] sm:text-[2.2rem]">
                   {catchItem.caught_for}

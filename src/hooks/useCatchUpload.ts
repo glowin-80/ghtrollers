@@ -16,15 +16,16 @@ type UseCatchUploadOptions = {
   isLoggedIn: boolean;
   hasActiveMembership: boolean;
   registeredByDefault: string;
+  isGuestAngler?: boolean;
 };
 
 export function useCatchUpload({
   isLoggedIn,
   hasActiveMembership,
   registeredByDefault,
+  isGuestAngler = false,
 }: UseCatchUploadOptions) {
   const router = useRouter();
-
   const {
     caughtFor,
     registeredBy,
@@ -32,6 +33,10 @@ export function useCatchUpload({
     fineFishType,
     weight,
     catchDate,
+    fishingMethod,
+    liveScope,
+    caughtAbroad,
+    isLocationPrivate,
     locationName,
     imageFile,
     previewUrl,
@@ -42,11 +47,13 @@ export function useCatchUpload({
     handleFineFishTypeChange,
     handleWeightChange,
     handleCatchDateChange,
+    handleFishingMethodChange,
+    handleLiveScopeChange,
+    handleCaughtAbroadChange,
+    handleIsLocationPrivateChange,
     handleLocationNameChange,
     handleImageChange,
-  } = useCatchUploadForm({
-    registeredByDefault,
-  });
+  } = useCatchUploadForm({ registeredByDefault });
 
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
@@ -55,10 +62,10 @@ export function useCatchUpload({
   const [mapOpen, setMapOpen] = useState(false);
   const [locationChooserOpen, setLocationChooserOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formMessage, setFormMessage] =
-    useState<UploadFeedbackMessage | null>(null);
-  const [confirmMissingLocationOpen, setConfirmMissingLocationOpen] =
-    useState(false);
+  const [formMessage, setFormMessage] = useState<UploadFeedbackMessage | null>(null);
+  const [confirmMissingLocationOpen, setConfirmMissingLocationOpen] = useState(false);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [validationDialogMessage, setValidationDialogMessage] = useState<string | null>(null);
 
   const resetLocationState = useCallback(() => {
     setLatitude(null);
@@ -74,23 +81,25 @@ export function useCatchUpload({
     resetLocationState();
   }, [resetForm, resetLocationState]);
 
-  const dismissFormMessage = useCallback(() => {
-    setFormMessage(null);
-  }, []);
+  const dismissFormMessage = useCallback(() => setFormMessage(null), []);
+  const dismissSuccessDialog = useCallback(() => setSuccessDialogOpen(false), []);
+  const dismissValidationDialog = useCallback(
+    () => setValidationDialogMessage(null),
+    []
+  );
 
   const handleFormMessageAction = useCallback(() => {
-    if (formMessage?.actionType === "login") {
-      router.push("/login");
-    }
+    if (formMessage?.actionType === "login") router.push("/login");
   }, [formMessage, router]);
 
-  const handleOpenLocationChooser = useCallback(() => {
-    setLocationChooserOpen(true);
-  }, []);
-
-  const handleCloseLocationChooser = useCallback(() => {
-    setLocationChooserOpen(false);
-  }, []);
+  const handleOpenLocationChooser = useCallback(
+    () => setLocationChooserOpen(true),
+    []
+  );
+  const handleCloseLocationChooser = useCallback(
+    () => setLocationChooserOpen(false),
+    []
+  );
 
   const handleSaveManualLocation = useCallback(
     (value: string) => {
@@ -104,10 +113,7 @@ export function useCatchUpload({
   );
 
   const handleGetGps = useCallback(() => {
-    if (!hasActiveMembership) {
-      return;
-    }
-
+    if (!hasActiveMembership) return;
     setGpsError(null);
     setLocationChooserOpen(false);
 
@@ -120,14 +126,11 @@ export function useCatchUpload({
     }
 
     setGpsLoading(true);
-
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLatitude(position.coords.latitude);
         setLongitude(position.coords.longitude);
-
         handleLocationNameChange("GPS-hämtad plats");
-
         setGpsError(null);
         setGpsLoading(false);
       },
@@ -136,11 +139,7 @@ export function useCatchUpload({
         setGpsLoading(false);
         setGpsError(getGeolocationErrorState(error));
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 30000,
-      }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
     );
   }, [hasActiveMembership, handleLocationNameChange]);
 
@@ -150,24 +149,15 @@ export function useCatchUpload({
     setMapOpen(true);
   }, []);
 
-  const handleCloseMap = useCallback(() => {
-    setMapOpen(false);
-  }, []);
+  const handleCloseMap = useCallback(() => setMapOpen(false), []);
 
   const handleMapSelect = useCallback(
     (lat: number, lng: number) => {
-      if (!hasActiveMembership) {
-        return;
-      }
-
+      if (!hasActiveMembership) return;
       setLatitude(lat);
       setLongitude(lng);
       setGpsError(null);
-
-      handleLocationNameChange(
-        `Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`
-      );
-
+      handleLocationNameChange(`Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
       setLocationChooserOpen(false);
       setMapOpen(false);
     },
@@ -185,6 +175,7 @@ export function useCatchUpload({
         fineFishType,
         weight,
         catchDate,
+        fishingMethod,
         locationName,
         imageFile,
         allowMissingLocation,
@@ -196,12 +187,18 @@ export function useCatchUpload({
           return;
         }
 
+        if (validationResult.missingSections?.length) {
+          setValidationDialogMessage(validationResult.message.message);
+          return;
+        }
+
         setFormMessage(validationResult.message);
         return;
       }
 
       setLoading(true);
       setFormMessage(null);
+      setValidationDialogMessage(null);
       setConfirmMissingLocationOpen(false);
 
       try {
@@ -212,17 +209,17 @@ export function useCatchUpload({
           fineFishType: validationResult.normalizedFineFishType,
           weight,
           catchDate,
+          fishingMethod,
+          liveScope,
+          caughtAbroad,
+          isLocationPrivate,
           locationName,
           latitude,
           longitude,
           imageFile: imageFile as File,
         });
-
         resetEntireForm();
-        setFormMessage({
-          variant: "success",
-          message: "Fångsten skickades in och väntar på godkännande.",
-        });
+        setSuccessDialogOpen(true);
       } catch (error) {
         console.error(error);
         setFormMessage({
@@ -245,29 +242,17 @@ export function useCatchUpload({
       fineFishType,
       weight,
       catchDate,
+      fishingMethod,
       locationName,
       imageFile,
+      liveScope,
+      caughtAbroad,
+      isLocationPrivate,
       latitude,
       longitude,
       resetEntireForm,
     ]
   );
-
-  const handleSubmit = useCallback(
-    async (e: FormEvent) => {
-      e.preventDefault();
-      await submitCatch({ allowMissingLocation: false });
-    },
-    [submitCatch]
-  );
-
-  const handleConfirmMissingLocation = useCallback(async () => {
-    await submitCatch({ allowMissingLocation: true });
-  }, [submitCatch]);
-
-  const handleCancelMissingLocation = useCallback(() => {
-    setConfirmMissingLocationOpen(false);
-  }, []);
 
   return {
     caughtFor,
@@ -276,6 +261,10 @@ export function useCatchUpload({
     fineFishType,
     weight,
     catchDate,
+    fishingMethod,
+    liveScope,
+    caughtAbroad,
+    isLocationPrivate,
     locationName,
     latitude,
     longitude,
@@ -283,6 +272,8 @@ export function useCatchUpload({
     gpsError,
     formMessage,
     confirmMissingLocationOpen,
+    successDialogOpen,
+    validationDialogMessage,
     mapOpen,
     locationChooserOpen,
     previewUrl,
@@ -291,6 +282,10 @@ export function useCatchUpload({
     handleFineFishTypeChange,
     handleWeightChange,
     handleCatchDateChange,
+    handleFishingMethodChange,
+    handleLiveScopeChange,
+    handleCaughtAbroadChange,
+    handleIsLocationPrivateChange,
     handleLocationNameChange,
     handleImageChange,
     handleCaughtForChange,
@@ -302,10 +297,23 @@ export function useCatchUpload({
     handleOpenMap,
     handleCloseMap,
     handleMapSelect,
-    handleSubmit,
+    handleSubmit: useCallback(
+      async (e: FormEvent) => {
+        e.preventDefault();
+        await submitCatch({ allowMissingLocation: false });
+      },
+      [submitCatch]
+    ),
     dismissFormMessage,
     handleFormMessageAction,
-    handleConfirmMissingLocation,
-    handleCancelMissingLocation,
+    handleConfirmMissingLocation: useCallback(async () => {
+      await submitCatch({ allowMissingLocation: true });
+    }, [submitCatch]),
+    handleCancelMissingLocation: useCallback(
+      () => setConfirmMissingLocationOpen(false),
+      []
+    ),
+    onDismissSuccessDialog: dismissSuccessDialog,
+    onDismissValidationDialog: dismissValidationDialog,
   };
 }

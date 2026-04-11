@@ -7,12 +7,46 @@ import MapPickerModal from "@/components/home/upload/MapPickerModal";
 import LocationMethodModal from "@/components/home/upload/LocationMethodModal";
 import type { UploadCatchSectionProps } from "@/components/home/upload/types";
 
+type NoticeDialogProps = {
+  open: boolean;
+  title: string;
+  description: string;
+  onClose: () => void;
+};
+
+function NoticeDialog({ open, title, description, onClose }: NoticeDialogProps) {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-md rounded-[28px] border border-[#d8d2c7] bg-white p-5 shadow-2xl">
+        <h3 className="text-xl font-bold text-[#1f2937]">{title}</h3>
+        <p className="mt-3 whitespace-pre-line text-sm text-[#4b5563]">{description}</p>
+
+        <div className="mt-5 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-2xl bg-[#324b2f] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
+          >
+            Ok
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function UploadCatchSection({
   isLoggedIn,
   hasActiveMembership,
   mapOpen,
   locationChooserOpen,
   confirmMissingLocationOpen,
+  successDialogOpen,
+  validationDialogMessage,
   onCloseMap,
   onMapSelect,
   onOpenLocationChooser,
@@ -20,6 +54,8 @@ export default function UploadCatchSection({
   onSaveManualLocation,
   onConfirmMissingLocation,
   onCancelMissingLocation,
+  onDismissSuccessDialog,
+  onDismissValidationDialog,
   ...formProps
 }: UploadCatchSectionProps) {
   const shouldLock = !isLoggedIn || !hasActiveMembership;
@@ -41,8 +77,12 @@ export default function UploadCatchSection({
         />
       ) : null}
 
-      <div className={shouldLock ? "pointer-events-none select-none blur-[5px]" : ""}>
-        <h2 className="mb-4 text-2xl font-bold text-[#1f2937]">📸 Ladda upp fångst</h2>
+      <div
+        className={shouldLock ? "pointer-events-none select-none blur-[5px]" : ""}
+      >
+        <h2 className="mb-4 text-2xl font-bold text-[#1f2937]">
+          📸 Ladda upp fångst
+        </h2>
 
         <UploadCatchForm
           {...formProps}
@@ -74,6 +114,20 @@ export default function UploadCatchSection({
         cancelLabel="Gå tillbaka"
         onConfirm={onConfirmMissingLocation}
         onCancel={onCancelMissingLocation}
+      />
+
+      <NoticeDialog
+        open={Boolean(validationDialogMessage)}
+        title="Komplettera fångstrapporten"
+        description={validationDialogMessage ?? ""}
+        onClose={onDismissValidationDialog}
+      />
+
+      <NoticeDialog
+        open={successDialogOpen}
+        title="Fångsten är rapporterad"
+        description="Din fångst är registerad och väntar på godkännande"
+        onClose={onDismissSuccessDialog}
       />
     </section>
   );

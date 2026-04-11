@@ -155,7 +155,7 @@ export default function MemberCatchSpotlightModal({
                   Plats
                 </div>
                 <div className="mt-1 text-[0.88rem] font-semibold leading-snug text-[#374151]">
-                  {catchItem.location_name || "Saknas"}
+                  {catchItem.is_location_private && !catchItem.location_name ? "Privat plats" : catchItem.location_name || "Saknas"}
                 </div>
               </div>
 
@@ -165,6 +165,15 @@ export default function MemberCatchSpotlightModal({
                 </div>
                 <div className="mt-1 text-[0.88rem] font-semibold leading-snug text-[#374151]">
                   {catchItem.caught_for}
+                </div>
+              </div>
+
+              <div className="rounded-[16px] border border-[#e5ddd0] bg-white/82 px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+                <div className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[#8b7460]">
+                  Metod
+                </div>
+                <div className="mt-1 text-[0.88rem] font-semibold leading-snug text-[#374151]">
+                  {catchItem.fishing_method || "Ej vald"}
                 </div>
               </div>
 

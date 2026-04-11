@@ -12,7 +12,7 @@ export type AuthMemberState = {
 };
 
 const AUTH_MEMBER_SELECT =
-  "id, name, email, is_admin, is_active, profile_image_url";
+  "id, name, email, is_admin, is_super_admin, is_active, member_role, profile_image_url";
 
 export function createGuestAuthMemberState(): AuthMemberState {
   return {
@@ -29,7 +29,9 @@ export function mapMemberProfileToHomeMember(member: MemberProfile): Member {
     name: member.name,
     email: member.email ?? null,
     is_admin: member.is_admin ?? false,
+    is_super_admin: member.is_super_admin ?? false,
     is_active: member.is_active ?? false,
+    member_role: member.member_role ?? "competition_member",
     profile_image_url: member.profile_image_url ?? null,
     category: "senior",
   };
@@ -61,7 +63,9 @@ export function buildFallbackMemberProfile(params: {
     name: params.name?.trim() || params.email || "Medlem",
     email: params.email,
     is_admin: false,
+    is_super_admin: false,
     is_active: false,
+    member_role: "competition_member",
     profile_image_url: null,
   };
 }

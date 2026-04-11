@@ -23,6 +23,8 @@ import {
 type AuthMemberContextValue = AuthMemberState & {
   loading: boolean;
   hasActiveMembership: boolean;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
   refresh: () => Promise<void>;
 };
 
@@ -115,6 +117,8 @@ export function AuthMemberProvider({ children }: { children: ReactNode }) {
       ...state,
       loading,
       hasActiveMembership: state.membershipStatus === "active",
+      isAdmin: Boolean(state.member?.is_admin || state.member?.is_super_admin),
+      isSuperAdmin: Boolean(state.member?.is_super_admin),
       refresh,
     }),
     [state, loading, refresh]

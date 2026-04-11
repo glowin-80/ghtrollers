@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { getMemberRoleLabel } from "@/lib/ght-rules";
 
 export type PendingMember = {
   id: string;
@@ -7,7 +8,9 @@ export type PendingMember = {
   category: string | null;
   created_at: string | null;
   is_admin: boolean | null;
+  is_super_admin: boolean | null;
   is_active: boolean | null;
+  member_role: string | null;
 };
 
 export type PendingCatch = {
@@ -20,6 +23,11 @@ export type PendingCatch = {
   catch_date: string;
   location_name: string | null;
   image_url: string | null;
+  fishing_method: string | null;
+  live_scope: boolean | null;
+  caught_abroad: boolean | null;
+  is_location_private: boolean | null;
+  owner_member_role?: string | null;
   status: string;
   created_at: string | null;
   original_image_size_bytes: number | null;
@@ -29,61 +37,73 @@ export type PendingCatch = {
 export async function fetchPendingMembers() {
   const { data, error } = await supabase
     .from("members")
-    .select("id, name, email, category, created_at, is_admin, is_active")
+    .select(
+      "id, name, email, category, created_at, is_admin, is_super_admin, is_active, member_role"
+    )
     .eq("is_active", false)
     .order("created_at", { ascending: true });
 
-  if (error) {
-    throw error;
-  }
-
-  return data || [];
+  if (error) throw error;
+  return (data ?? []) as PendingMember[];
 }
 
 export async function fetchPendingCatches() {
-  const { data, error } = await supabase
-    .from("catches")
-    .select(
-      "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, status, created_at, original_image_size_bytes, compressed_image_size_bytes"
-    )
-    .eq("status", "pending")
-    .order("created_at", { ascending: true });
+  const [{ data, error }, { data: members, error: membersError }] = await Promise.all([
+    supabase
+      .from("catches")
+      .select(
+        "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, fishing_method, live_scope, caught_abroad, is_location_private, status, created_at, original_image_size_bytes, compressed_image_size_bytes"
+      )
+      .eq("status", "pending")
+      .order("created_at", { ascending: true }),
+    supabase.from("members").select("name, member_role"),
+  ]);
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
+  if (membersError) throw membersError;
 
-  return data || [];
+  const memberRoleByName = (members ?? []).reduce<Record<string, string | null>>((acc, member) => {
+    const key = member.name?.trim();
+    if (key) {
+      acc[key] = member.member_role ?? null;
+    }
+    return acc;
+  }, {});
+
+  return ((data ?? []) as PendingCatch[]).map((item) => ({
+    ...item,
+    owner_member_role: memberRoleByName[item.caught_for?.trim() ?? ""] ?? null,
+  }));
 }
 
-export async function approvePendingMember(memberId: string) {
+export async function approvePendingMember(
+  memberId: string,
+  memberRole: "competition_member" | "guest_angler"
+) {
   const { error } = await supabase
     .from("members")
-    .update({ is_active: true })
+    .update({ is_active: true, member_role: memberRole })
     .eq("id", memberId);
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 }
 
 export async function makePendingMemberAdmin(memberId: string) {
   const { error } = await supabase
     .from("members")
-    .update({ is_admin: true, is_active: true })
+    .update({
+      is_admin: true,
+      is_active: true,
+      member_role: "competition_member",
+    })
     .eq("id", memberId);
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 }
 
 export async function deletePendingMember(memberId: string) {
   const { error } = await supabase.from("members").delete().eq("id", memberId);
-
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 }
 
 export async function approvePendingCatch(catchId: string) {
@@ -92,62 +112,44 @@ export async function approvePendingCatch(catchId: string) {
     .update({ status: "approved" })
     .eq("id", catchId);
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 }
 
 export async function deletePendingCatch(catchId: string) {
   const { error } = await supabase.from("catches").delete().eq("id", catchId);
-
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 }
 
 export function formatBytes(bytes: number | null) {
-  if (!bytes || bytes <= 0) {
-    return "Saknas";
-  }
-
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
+  if (!bytes || bytes <= 0) return "Saknas";
+  if (bytes < 1024) return `${bytes} B`;
 
   const kb = bytes / 1024;
-  if (kb < 1024) {
-    return `${kb.toFixed(0)} KB`;
-  }
+  if (kb < 1024) return `${kb.toFixed(0)} KB`;
 
-  const mb = kb / 1024;
-  return `${mb.toFixed(2)} MB`;
+  return `${(kb / 1024).toFixed(2)} MB`;
 }
 
 export function getCompressionReduction(
   originalBytes: number | null,
   compressedBytes: number | null
 ) {
-  if (!originalBytes || !compressedBytes || originalBytes <= 0) {
-    return null;
-  }
+  if (!originalBytes || !compressedBytes || originalBytes <= 0) return null;
 
   const reduction = ((originalBytes - compressedBytes) / originalBytes) * 100;
-
-  if (reduction < 0) {
-    return 0;
-  }
-
-  return Math.round(reduction);
+  return reduction < 0 ? 0 : Math.round(reduction);
 }
 
 export function getPendingCatchFishLabel(item: PendingCatch) {
-  if (item.fish_type === "Fina fisken" && item.fine_fish_type) {
-    return `${item.fish_type} • ${item.fine_fish_type}`;
-  }
-
-  return item.fish_type;
+  return item.fish_type === "Fina fisken" && item.fine_fish_type
+    ? `${item.fish_type} • ${item.fine_fish_type}`
+    : item.fish_type;
 }
 
 export function getPendingMemberDisplayName(member: PendingMember) {
   return member.name?.trim() || member.email || "Namnlös medlem";
+}
+
+export function getPendingMemberRoleLabel(member: PendingMember) {
+  return getMemberRoleLabel(member.member_role);
 }

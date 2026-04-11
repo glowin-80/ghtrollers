@@ -10,6 +10,7 @@ export type CatchUploadValidationInput = {
   fineFishType: string;
   weight: string;
   catchDate: string;
+  fishingMethod: string;
   locationName: string;
   imageFile: File | null;
   allowMissingLocation: boolean;
@@ -24,6 +25,7 @@ export type CatchUploadValidationResult =
       ok: false;
       message: UploadFeedbackMessage;
       requiresMissingLocationConfirmation?: boolean;
+      missingSections?: string[];
     };
 
 export function validateCatchUpload(
@@ -52,41 +54,50 @@ export function validateCatchUpload(
     };
   }
 
-  if (
-    !input.caughtFor.trim() ||
-    !input.registeredBy.trim() ||
-    !input.fishType.trim() ||
-    !input.weight.trim() ||
-    !input.catchDate
-  ) {
-    return {
-      ok: false,
-      message: {
-        variant: "error",
-        message: "Fyll i alla obligatoriska fält.",
-      },
-    };
+  const missingSections: string[] = [];
+
+  if (!input.caughtFor.trim()) {
+    missingSections.push("Vem som fångade fisken");
+  }
+
+  if (!input.registeredBy.trim()) {
+    missingSections.push("Registrerad av");
+  }
+
+  if (!input.fishType.trim()) {
+    missingSections.push("Art");
+  }
+
+  if (!input.weight.trim()) {
+    missingSections.push("Vikt");
+  }
+
+  if (!input.catchDate) {
+    missingSections.push("Datum för fångst");
+  }
+
+  if (!input.fishingMethod.trim()) {
+    missingSections.push("Fiskemetod");
   }
 
   const normalizedFineFishType = normalizeFineFishTypeForSave(input.fineFishType);
 
   if (input.fishType === "Fina fisken" && !normalizedFineFishType) {
-    return {
-      ok: false,
-      message: {
-        variant: "error",
-        message: "Fyll i art på fina fisken.",
-      },
-    };
+    missingSections.push("Art på fina fisken");
   }
 
   if (!input.imageFile) {
+    missingSections.push("Fångstbild");
+  }
+
+  if (missingSections.length > 0) {
     return {
       ok: false,
       message: {
         variant: "error",
-        message: "Välj en bild.",
+        message: `Följande saknas för att registrera fångst:\n• ${missingSections.join("\n• ")}`,
       },
+      missingSections,
     };
   }
 

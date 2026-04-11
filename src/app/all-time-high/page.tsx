@@ -289,12 +289,12 @@ export default function AllTimeHighPage() {
   const [expandedBigFive, setExpandedBigFive] = useState(false);
 
   const allTimeHighlights = useMemo(() => {
-    return buildAllTimeHighlights(approvedCatches);
-  }, [approvedCatches]);
+    return buildAllTimeHighlights(approvedCatches, members);
+  }, [approvedCatches, members]);
 
   const allTimeBigFiveLeader = useMemo(() => {
-    return buildAllTimeBigFiveLeader(approvedCatches);
-  }, [approvedCatches]);
+    return buildAllTimeBigFiveLeader(approvedCatches, members);
+  }, [approvedCatches, members]);
 
   const memberImageMap = useMemo(() => {
     return members.reduce<Record<string, string | null>>((acc, member) => {

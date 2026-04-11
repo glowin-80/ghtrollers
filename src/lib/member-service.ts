@@ -3,7 +3,7 @@ import { getCurrentAuthMemberState } from "@/lib/auth-member";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
 
 const MEMBER_CATCHES_SELECT =
-  "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, status, created_at";
+  "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, latitude, longitude, fishing_method, live_scope, caught_abroad, is_location_private, status, created_at";
 
 export async function fetchCurrentMemberProfile(): Promise<MemberProfile | null> {
   const authState = await getCurrentAuthMemberState();

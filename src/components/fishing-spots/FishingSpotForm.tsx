@@ -12,6 +12,7 @@ type FishingSpotFormProps = {
   hasActiveMembership: boolean;
   title: string;
   notes: string;
+  isPrivate: boolean;
   latitude: number | null;
   longitude: number | null;
   gpsLoading: boolean;
@@ -21,6 +22,7 @@ type FishingSpotFormProps = {
   formMessage: FeedbackMessage | null;
   onTitleChange: (value: string) => void;
   onNotesChange: (value: string) => void;
+  onIsPrivateChange: (value: boolean) => void;
   onGetGps: () => void;
   onOpenMap: () => void;
   onCloseMap: () => void;
@@ -41,6 +43,7 @@ export default function FishingSpotForm({
   hasActiveMembership,
   title,
   notes,
+  isPrivate,
   latitude,
   longitude,
   gpsLoading,
@@ -50,6 +53,7 @@ export default function FishingSpotForm({
   formMessage,
   onTitleChange,
   onNotesChange,
+  onIsPrivateChange,
   onGetGps,
   onOpenMap,
   onCloseMap,
@@ -215,6 +219,20 @@ export default function FishingSpotForm({
             />
           </label>
         </div>
+
+        <label className="flex items-start gap-3 rounded-2xl border border-[#e5ddd0] bg-white px-4 py-3 text-sm text-[#374151]">
+          <input
+            type="checkbox"
+            checked={isPrivate}
+            onChange={(event) => onIsPrivateChange(event.target.checked)}
+            disabled={isLocked || submitLoading}
+            className="mt-1 h-4 w-4 rounded border-[#cfc6b8] text-[#324b2f] focus:ring-[#d9cfbf]"
+          />
+          <span>
+            <span className="block font-semibold text-[#1f2937]">Gör platsen privat</span>
+            <span className="mt-1 block text-xs leading-5 text-[#6b7280]">Denna kan bara du se.</span>
+          </span>
+        </label>
 
         <div className="flex flex-wrap items-center gap-3">
           <button

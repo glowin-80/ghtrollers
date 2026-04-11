@@ -46,7 +46,7 @@ export function findBestFineFishBySpeciesCatchMap(
   return bestBySpecies;
 }
 
-export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
+export function calculateMemberStats(catches: MemberCatch[], memberRole?: string | null): MemberStats {
   const approved = catches.filter((c) => c.status === "approved");
   const pending = catches.filter((c) => c.status === "pending");
 
@@ -57,7 +57,7 @@ export function calculateMemberStats(catches: MemberCatch[]): MemberStats {
   const biggestPike = pike.length > 0 ? Math.max(...pike.map((c) => c.weight_g)) : 0;
   const biggestPerch = perch.length > 0 ? Math.max(...perch.map((c) => c.weight_g)) : 0;
   const bestFine = fine.length > 0 ? [...fine].sort((a, b) => b.weight_g - a.weight_g)[0] : null;
-  const bestBigFiveBreakdown = buildMemberBestBigFiveBreakdown(catches);
+  const bestBigFiveBreakdown = buildMemberBestBigFiveBreakdown(catches, memberRole);
   const sum = (arr: MemberCatch[]) => arr.reduce((s, c) => s + c.weight_g, 0);
 
   const fineSpeciesMap: Record<string, { count: number; weight: number }> = {};
