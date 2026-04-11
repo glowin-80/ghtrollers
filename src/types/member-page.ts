@@ -3,7 +3,9 @@ export type MemberProfile = {
   name: string;
   email?: string | null;
   is_admin?: boolean | null;
+  is_super_admin?: boolean | null;
   is_active?: boolean | null;
+  member_role?: "competition_member" | "guest_angler" | string | null;
   profile_image_url?: string | null;
 };
 
@@ -36,6 +38,11 @@ export type MemberCatch = {
   catch_date: string;
   location_name?: string | null;
   image_url?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  fishing_method?: string | null;
+  caught_abroad?: boolean | null;
+  is_location_private?: boolean | null;
   status: "pending" | "approved" | "rejected" | string;
   created_at?: string | null;
 };

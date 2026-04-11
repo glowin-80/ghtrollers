@@ -202,12 +202,28 @@ export default function MyCatchesSection({
 
                     <div className="mt-2 text-sm leading-6 text-[#6b7280]">
                       {formatWeight(item.weight_g)} • {formatDate(item.catch_date)}
-                      {item.location_name ? ` • ${item.location_name}` : ""}
+                      {item.is_location_private && !item.location_name
+                        ? " • Privat plats"
+                        : item.location_name
+                          ? ` • ${item.location_name}`
+                          : ""}
                     </div>
 
                     <div className="mt-1 text-sm leading-6 text-[#6b7280]">
                       Fångad av: {item.caught_for} • Registrerad av:{" "}
                       {item.registered_by}
+                    </div>
+
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                      <span className="rounded-full bg-[#eef6ea] px-3 py-1 text-[#355b2c]">
+                        {item.fishing_method || "Ingen metod"}
+                      </span>
+                      {item.caught_abroad ? (
+                        <span className="rounded-full bg-[#fff7ea] px-3 py-1 text-[#7a5b1e]">Utomlands</span>
+                      ) : null}
+                      {item.is_location_private ? (
+                        <span className="rounded-full bg-[#f3f4f6] px-3 py-1 text-[#4b5563]">Privat plats</span>
+                      ) : null}
                     </div>
                   </div>
 

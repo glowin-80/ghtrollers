@@ -34,6 +34,9 @@ export type UploadCatchSectionProps = {
   fineFishType: string;
   weight: string;
   catchDate: string;
+  fishingMethod: string;
+  caughtAbroad: boolean;
+  isLocationPrivate: boolean;
   locationName: string;
   latitude: number | null;
   longitude: number | null;
@@ -52,6 +55,9 @@ export type UploadCatchSectionProps = {
   onFineFishTypeChange: (value: string) => void;
   onWeightChange: (value: string) => void;
   onCatchDateChange: (value: string) => void;
+  onFishingMethodChange: (value: string) => void;
+  onCaughtAbroadChange: (value: boolean) => void;
+  onIsLocationPrivateChange: (value: boolean) => void;
   onLocationNameChange: (value: string) => void;
   onOpenLocationChooser: () => void;
   onCloseLocationChooser: () => void;

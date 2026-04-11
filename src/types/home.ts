@@ -6,7 +6,9 @@ export type Member = {
   category: "junior" | "senior" | string;
   email?: string | null;
   is_admin?: boolean;
+  is_super_admin?: boolean;
   is_active?: boolean;
+  member_role?: "competition_member" | "guest_angler" | string;
   created_at?: string;
   profile_image_url?: string | null;
 };
@@ -23,6 +25,9 @@ export type Catch = {
   image_url?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  fishing_method?: string | null;
+  caught_abroad?: boolean | null;
+  is_location_private?: boolean | null;
   original_image_size_bytes?: number | null;
   compressed_image_size_bytes?: number | null;
   status: "pending" | "approved" | "rejected" | string;

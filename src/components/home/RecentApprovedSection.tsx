@@ -9,12 +9,13 @@ import {
   formatCatchWeightForDisplay,
   getCatchCategoryLabel,
 } from "@/lib/catch-sharing";
-import type { Catch } from "@/types/home";
+import type { Catch, Member } from "@/types/home";
 
 type RecentApprovedSectionProps = {
   catches: Catch[];
   allApprovedCatches: Catch[];
   isLoggedIn: boolean;
+  members: Member[];
   onImageClick: (imageUrl: string) => void;
 };
 
@@ -23,13 +24,15 @@ function getLocationLine(item: Catch, isLoggedIn: boolean) {
     return `Logga in för att se plats · ${formatCatchDateForDisplay(item.catch_date)}`;
   }
 
-  return `${item.location_name || "Plats ej angiven"} · ${formatCatchDateForDisplay(item.catch_date)}`;
+  const locationLabel = item.is_location_private && !item.location_name ? "Privat plats" : item.location_name || "Plats ej angiven";
+  return `${locationLabel} · ${formatCatchDateForDisplay(item.catch_date)}`;
 }
 
 function RecentApprovedSectionComponent({
   catches,
   allApprovedCatches,
   isLoggedIn,
+  members,
   onImageClick,
 }: RecentApprovedSectionProps) {
   return (
@@ -57,7 +60,7 @@ function RecentApprovedSectionComponent({
       ) : (
         <ul className="space-y-3">
           {catches.map((item) => {
-            const shareDetails = buildCatchShareDetails(item, allApprovedCatches);
+            const shareDetails = buildCatchShareDetails(item, allApprovedCatches, members);
 
             return (
               <li

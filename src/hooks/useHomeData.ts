@@ -9,18 +9,25 @@ export function useHomeData() {
   const [members, setMembers] = useState<Member[]>([]);
   const [approvedCatches, setApprovedCatches] = useState<Catch[]>([]);
   const [approvedFishingSpots, setApprovedFishingSpots] = useState<FishingSpot[]>([]);
-  const { isLoggedIn, membershipStatus, hasActiveMembership, member } = useAuthMember();
+  const { isLoggedIn, membershipStatus, hasActiveMembership, member, isSuperAdmin } = useAuthMember();
 
   const loadInitialData = useCallback(async () => {
     try {
-      const data = await fetchHomePageData({ includeFishingSpots: hasActiveMembership });
+      const data = await fetchHomePageData({
+        includeFishingSpots: hasActiveMembership,
+        viewer: {
+          isLoggedIn,
+          memberName: member?.name ?? null,
+          isSuperAdmin,
+        },
+      });
       setMembers(data.members);
       setApprovedCatches(data.approvedCatches);
       setApprovedFishingSpots(data.approvedFishingSpots);
     } catch (error) {
       console.error(error);
     }
-  }, [hasActiveMembership]);
+  }, [hasActiveMembership, isLoggedIn, isSuperAdmin, member?.name]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {

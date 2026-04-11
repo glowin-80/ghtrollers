@@ -32,6 +32,9 @@ export default function Home() {
     fineFishType,
     weight,
     catchDate,
+    fishingMethod,
+    caughtAbroad,
+    isLocationPrivate,
     locationName,
     latitude,
     longitude,
@@ -47,6 +50,9 @@ export default function Home() {
     handleFineFishTypeChange,
     handleWeightChange,
     handleCatchDateChange,
+    handleFishingMethodChange,
+    handleCaughtAbroadChange,
+    handleIsLocationPrivateChange,
     handleLocationNameChange,
     handleImageChange,
     handleCaughtForChange,
@@ -102,20 +108,20 @@ export default function Home() {
   }, [approvedCatches, selectedLeaderboardYear]);
 
   const leaderboard = useMemo(() => {
-    return buildLeaderboard(leaderboardCatches, filter);
-  }, [leaderboardCatches, filter]);
+    return buildLeaderboard(leaderboardCatches, filter, members);
+  }, [leaderboardCatches, filter, members]);
 
   const bigFiveBreakdowns = useMemo(() => {
-    return buildBigFiveBreakdowns(leaderboardCatches);
-  }, [leaderboardCatches]);
+    return buildBigFiveBreakdowns(leaderboardCatches, members);
+  }, [leaderboardCatches, members]);
 
   const allTimeHighlights = useMemo(() => {
-    return buildAllTimeHighlights(approvedCatches);
-  }, [approvedCatches]);
+    return buildAllTimeHighlights(approvedCatches, members);
+  }, [approvedCatches, members]);
 
   const recentApprovedCatches = useMemo(() => {
     return approvedCatches.slice(0, 8);
-  }, [approvedCatches]);
+  }, [approvedCatches, members]);
 
   const handleFilterChange = useCallback((value: LeaderboardFilter) => {
     setFilter(value);
@@ -174,6 +180,9 @@ export default function Home() {
               fineFishType={fineFishType}
               weight={weight}
               catchDate={catchDate}
+              fishingMethod={fishingMethod}
+              caughtAbroad={caughtAbroad}
+              isLocationPrivate={isLocationPrivate}
               locationName={locationName}
               latitude={latitude}
               longitude={longitude}
@@ -192,6 +201,9 @@ export default function Home() {
               onFineFishTypeChange={handleFineFishTypeChange}
               onWeightChange={handleWeightChange}
               onCatchDateChange={handleCatchDateChange}
+              onFishingMethodChange={handleFishingMethodChange}
+              onCaughtAbroadChange={handleCaughtAbroadChange}
+              onIsLocationPrivateChange={handleIsLocationPrivateChange}
               onLocationNameChange={handleLocationNameChange}
               onOpenLocationChooser={handleOpenLocationChooser}
               onCloseLocationChooser={handleCloseLocationChooser}
@@ -215,6 +227,7 @@ export default function Home() {
               catches={recentApprovedCatches}
               allApprovedCatches={approvedCatches}
               isLoggedIn={isLoggedIn}
+              members={members}
               onImageClick={handleImageClick}
             />
           </div>

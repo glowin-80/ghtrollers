@@ -10,6 +10,7 @@ import {
 } from "@/lib/catch-sharing";
 import {
   fetchAllApprovedCatches,
+  fetchPublicActiveMembers,
   fetchPublicApprovedCatchById,
 } from "@/lib/public-catch";
 
@@ -26,8 +27,8 @@ const getCatchPageData = cache(async (catchId: string) => {
     return null;
   }
 
-  const approvedCatches = await fetchAllApprovedCatches();
-  const shareDetails = buildCatchShareDetails(catchItem, approvedCatches);
+  const [approvedCatches, members] = await Promise.all([fetchAllApprovedCatches(), fetchPublicActiveMembers()]);
+  const shareDetails = buildCatchShareDetails(catchItem, approvedCatches, members);
 
   return {
     catchItem,

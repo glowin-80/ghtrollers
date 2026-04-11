@@ -29,10 +29,8 @@ function formatDate(dateString: string) {
 }
 
 function getLocationLabel(item: Catch, isLoggedIn: boolean) {
-  if (!isLoggedIn) {
-    return "Logga in för att se plats";
-  }
-
+  if (!isLoggedIn) return "Logga in för att se plats";
+  if (item.is_location_private && !item.location_name) return "Privat plats";
   return item.location_name || "Plats ej angiven";
 }
 

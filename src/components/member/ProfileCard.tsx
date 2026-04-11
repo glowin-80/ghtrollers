@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { MemberProfile } from "@/types/member-page";
 import ProfileImageUploader from "@/components/member/ProfileImageUploader";
+import { getAdminLevelLabel, getMemberRoleLabel } from "@/lib/ght-rules";
 
 type ProfileCardProps = {
   member?: MemberProfile | null;
@@ -19,7 +20,8 @@ export default function ProfileCard({
     return null;
   }
 
-  const memberTitle = "Fiskarn";
+  const memberTitle = getMemberRoleLabel(member.member_role);
+  const adminLabel = getAdminLevelLabel(member);
 
   return (
     <section className="relative overflow-visible rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_12px_36px_rgba(18,35,28,0.08)]">
@@ -68,7 +70,7 @@ export default function ProfileCard({
 
             <div className="shrink-0 -translate-y-1 pt-1">
               <span className="rounded-full bg-[#f2ede5] px-3 py-1 text-sm font-medium text-[#5c4d3f] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
-                {member.is_admin ? "Admin" : "Medlem"}
+                {adminLabel}
               </span>
             </div>
           </div>

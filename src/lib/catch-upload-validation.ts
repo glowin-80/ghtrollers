@@ -10,6 +10,7 @@ export type CatchUploadValidationInput = {
   fineFishType: string;
   weight: string;
   catchDate: string;
+  fishingMethod: string;
   locationName: string;
   imageFile: File | null;
   allowMissingLocation: boolean;
@@ -57,7 +58,8 @@ export function validateCatchUpload(
     !input.registeredBy.trim() ||
     !input.fishType.trim() ||
     !input.weight.trim() ||
-    !input.catchDate
+    !input.catchDate ||
+    !input.fishingMethod.trim()
   ) {
     return {
       ok: false,
