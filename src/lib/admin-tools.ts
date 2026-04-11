@@ -24,6 +24,7 @@ export type PendingCatch = {
   location_name: string | null;
   image_url: string | null;
   fishing_method: string | null;
+  live_scope: boolean | null;
   caught_abroad: boolean | null;
   is_location_private: boolean | null;
   status: string;
@@ -42,20 +43,20 @@ export async function fetchPendingMembers() {
     .order("created_at", { ascending: true });
 
   if (error) throw error;
-  return data || [];
+  return (data ?? []) as PendingMember[];
 }
 
 export async function fetchPendingCatches() {
   const { data, error } = await supabase
     .from("catches")
     .select(
-      "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, fishing_method, caught_abroad, is_location_private, status, created_at, original_image_size_bytes, compressed_image_size_bytes"
+      "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, fishing_method, live_scope, caught_abroad, is_location_private, status, created_at, original_image_size_bytes, compressed_image_size_bytes"
     )
     .eq("status", "pending")
     .order("created_at", { ascending: true });
 
   if (error) throw error;
-  return data || [];
+  return (data ?? []) as PendingCatch[];
 }
 
 export async function approvePendingMember(
