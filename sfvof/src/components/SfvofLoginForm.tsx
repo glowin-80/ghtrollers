@@ -63,7 +63,7 @@ export default function SfvofLoginForm() {
     <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-7">
       <h1 className="text-3xl font-bold text-[#1f2937]">🔐 Logga in</h1>
       <p className="mt-2 text-[#6b7280]">
-        Logga in med e-post och lösenord för att komma till SFVOF-delen.
+        Logga in med e-post och lösenord för att komma till SFVOFs sida.
       </p>
 
       {verified ? (
@@ -95,12 +95,21 @@ export default function SfvofLoginForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="sfvof-password"
-            className="mb-2 block text-sm font-semibold text-[#4b5563]"
-          >
-            Lösenord
-          </label>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <label
+              htmlFor="sfvof-password"
+              className="block text-sm font-semibold text-[#4b5563]"
+            >
+              Lösenord
+            </label>
+
+            <Link
+              href="/sfvof/glomt-losenord"
+              className="text-xs font-semibold uppercase tracking-[0.08em] text-[#4f6b45] transition hover:text-[#2f4728]"
+            >
+              Glömt lösenord?
+            </Link>
+          </div>
 
           <input
             id="sfvof-password"
@@ -122,7 +131,7 @@ export default function SfvofLoginForm() {
             href="/sfvof"
             className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
           >
-            Till SFVOF-start
+            Till startsidan
           </Link>
 
           <button
@@ -132,6 +141,15 @@ export default function SfvofLoginForm() {
           >
             {loading ? "Loggar in..." : "Logga in"}
           </button>
+        </div>
+
+        <div className="flex flex-wrap gap-x-8 gap-y-2 pt-1 text-sm font-semibold text-[#35542d] underline-offset-2">
+          <Link href="/sfvof/ansok-om-medlemskap" className="transition hover:text-[#253a1f] hover:underline">
+            Ansök om medlemskap
+          </Link>
+          <Link href="/sfvof/glomt-losenord" className="transition hover:text-[#253a1f] hover:underline">
+            Glömt lösenord?
+          </Link>
         </div>
       </form>
     </section>

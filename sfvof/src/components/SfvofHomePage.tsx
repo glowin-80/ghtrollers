@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getSfvofAccessState } from "@sfvof/lib/get-access-state";
+import { sfvofSupabase } from "@sfvof/lib/supabase";
+import type { SfvofAccessState } from "@sfvof/types";
 
 type PublicSection = {
   id: string;
@@ -40,9 +44,7 @@ const publicSections: PublicSection[] = [
   {
     id: "omraden",
     title: "Fiskeområden i närheten",
-    description:
-      "Snabblänkar till omkringliggande fiskeområden via iFiske.",
-
+    description: "Snabblänkar till omkringliggande fiskeområden via iFiske.",
     links: [
       {
         label: "Ottnaren och Ältebosjön med tillrinnande vattendrag",
@@ -67,6 +69,12 @@ const publicSections: PublicSection[] = [
     ],
   },
 ];
+
+const initialAccessState: SfvofAccessState = {
+  isLoggedIn: false,
+  member: null,
+  measurements: [],
+};
 
 function TopBubble({ label }: { label: string }) {
   return (
@@ -142,7 +150,7 @@ function PublicSectionCard({ section }: { section: PublicSection }) {
   return (
     <section
       id={section.id}
-      className="overflow-hidden rounded-[28px] border border-[#d6ddd5] bg-white shadow-[0_12px_32px_rgba(19,38,30,0.08)]"
+      className="scroll-mt-[124px] overflow-hidden rounded-[28px] border border-[#d6ddd5] bg-white shadow-[0_12px_32px_rgba(19,38,30,0.08)]"
     >
       <div className="border-b border-[#e7ede7] px-5 py-5 sm:px-6">
         <div className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#5d775f]">
@@ -170,7 +178,7 @@ function PublicSectionCard({ section }: { section: PublicSection }) {
         ) : null}
 
         {section.links?.length ? (
-          <div className={`${section.imageSrc ? 'mt-5 ' : ''}rounded-[22px] border border-[#dbe3db] bg-white px-4 py-4 shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5`}>
+          <div className={`${section.imageSrc ? "mt-5 " : ""}rounded-[22px] border border-[#dbe3db] bg-white px-4 py-4 shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5`}>
             <div className="text-[0.76rem] font-semibold uppercase tracking-[0.14em] text-[#5d775f]">
               Länkar
             </div>
@@ -194,8 +202,132 @@ function PublicSectionCard({ section }: { section: PublicSection }) {
   );
 }
 
+function MenuLinks({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <div className="grid gap-2 sm:grid-cols-2">
+      {publicSections.map((section) => (
+        <a
+          key={section.id}
+          href={`#${section.id}`}
+          onClick={onNavigate}
+          className="rounded-[16px] border border-[#d2bc8a] bg-[#fffef8] px-4 py-3 text-left text-sm font-semibold text-[#5c4c32] transition hover:bg-[#fff6df]"
+        >
+          {section.title}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function MemberStatusCard({
+  loading,
+  accessState,
+}: {
+  loading: boolean;
+  accessState: SfvofAccessState;
+}) {
+  if (loading) {
+    return (
+      <div className="rounded-[22px] border border-[#dbe3db] bg-white px-4 py-4 text-sm text-[#516257] shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5">
+        Kontrollerar SFVOF-inloggning...
+      </div>
+    );
+  }
+
+  if (!accessState.isLoggedIn) {
+    return (
+      <div className="rounded-[22px] border border-[#dbe3db] bg-white px-4 py-4 text-sm text-[#516257] shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5">
+        Du är inte inloggad i SFVOF just nu.
+      </div>
+    );
+  }
+
+  if (!accessState.member) {
+    return (
+      <div className="rounded-[22px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-800 shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5">
+        Du är inloggad med Supabase Auth, men saknar medlemsrad i <strong>sfvof.members</strong>.
+      </div>
+    );
+  }
+
+  if (!accessState.member.is_active) {
+    return (
+      <div className="rounded-[22px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-800 shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5">
+        Inloggad som <strong>{accessState.member.name}</strong>, men medlemskapet i SFVOF är inte aktivt ännu.
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-[22px] border border-[#cfe0ce] bg-[#f5fbf5] px-4 py-4 text-sm text-[#20402a] shadow-[0_8px_22px_rgba(19,38,30,0.05)] sm:px-5">
+      Inloggad som <strong>{accessState.member.name}</strong>
+      {accessState.member.is_admin ? " (admin)" : ""}. SFVOF hittade din medlemsrad och du kan nu använda den inloggade delen när vi bygger vidare den.
+    </div>
+  );
+}
+
 export default function SfvofHomePage() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [accessState, setAccessState] = useState<SfvofAccessState>(initialAccessState);
+  const [isLoadingAccessState, setIsLoadingAccessState] = useState(true);
+  const loginLabel = accessState.isLoggedIn ? "Logga ut" : "Login";
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadAccessState() {
+      try {
+        const nextState = await getSfvofAccessState();
+
+        if (!mounted) {
+          return;
+        }
+
+        setAccessState(nextState);
+      } catch (error) {
+        console.error(error);
+
+        if (!mounted) {
+          return;
+        }
+
+        setAccessState(initialAccessState);
+      } finally {
+        if (mounted) {
+          setIsLoadingAccessState(false);
+        }
+      }
+    }
+
+    void loadAccessState();
+
+    const {
+      data: { subscription },
+    } = sfvofSupabase.auth.onAuthStateChange(() => {
+      void loadAccessState();
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  async function handleAuthAction() {
+    if (accessState.isLoggedIn) {
+      await sfvofSupabase.auth.signOut();
+      setAccessState(initialAccessState);
+      router.refresh();
+      return;
+    }
+
+    router.push("/sfvof/login");
+  }
+
+  function handleMenuNavigate() {
+    setIsMenuOpen(false);
+  }
 
   return (
     <main className="min-h-screen bg-transparent pb-12 text-[#1f2937]">
@@ -229,19 +361,17 @@ export default function SfvofHomePage() {
                 showArrow
                 isExpanded={isMenuOpen}
               />
-              <TopButton label="Login" bubbleLabel="L" href="/sfvof/login" />
+              <TopButton label={loginLabel} bubbleLabel="L" onClick={handleAuthAction} />
             </div>
 
             <div
               className={[
                 "overflow-hidden transition-all duration-300 ease-out",
-                isMenuOpen ? "mt-3 max-h-[180px] opacity-100" : "mt-0 max-h-0 opacity-0",
+                isMenuOpen ? "mt-3 max-h-[420px] opacity-100" : "mt-0 max-h-0 opacity-0",
               ].join(" ")}
             >
               <div className="rounded-[22px] border border-[#cbb489] bg-[linear-gradient(180deg,rgba(252,246,235,0.96)_0%,rgba(235,224,202,0.93)_100%)] p-[10px] shadow-[0_16px_34px_rgba(0,0,0,0.16)]">
-                <div className="rounded-[18px] border border-dashed border-[#d2bc8a] bg-[#fff9ef] px-4 py-4 text-sm text-[#6c5b3d]">
-                  Menyn är tom just nu.
-                </div>
+                <MenuLinks onNavigate={handleMenuNavigate} />
               </div>
             </div>
           </div>
@@ -259,13 +389,13 @@ export default function SfvofHomePage() {
                   />
                 </div>
                 <div className="min-w-[220px] max-w-[260px] flex-1">
-                  <TopButton label="Login" bubbleLabel="L" href="/sfvof/login" />
+                  <TopButton label={loginLabel} bubbleLabel="L" onClick={handleAuthAction} />
                 </div>
               </div>
 
               {isMenuOpen ? (
-                <div className="mt-3 rounded-[18px] border border-dashed border-[#d2bc8a] bg-[#fff9ef] px-4 py-4 text-sm text-[#6c5b3d]">
-                  Menyn är tom just nu.
+                <div className="mt-3 rounded-[18px] border border-dashed border-[#d2bc8a] bg-[#fff9ef] p-4">
+                  <MenuLinks onNavigate={handleMenuNavigate} />
                 </div>
               ) : null}
             </div>
@@ -275,6 +405,8 @@ export default function SfvofHomePage() {
 
       <section className="px-4 pt-6 sm:px-5">
         <div className="mx-auto max-w-6xl space-y-6">
+          <MemberStatusCard loading={isLoadingAccessState} accessState={accessState} />
+
           {publicSections.map((section) => (
             <PublicSectionCard key={section.id} section={section} />
           ))}
