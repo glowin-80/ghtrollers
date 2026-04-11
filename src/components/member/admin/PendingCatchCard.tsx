@@ -45,7 +45,7 @@ export default function PendingCatchCard({
 
   const isGuestCatch = isGuestAnglerRole(item.owner_member_role);
   const competitionReason = isGuestCatch
-    ? "Gäst fiskare"
+    ? "Gästfiskare"
     : item.live_scope
       ? "Live-scope"
       : item.caught_abroad

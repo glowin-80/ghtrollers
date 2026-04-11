@@ -16,7 +16,7 @@ export function isGuestAnglerRole(role?: string | null) {
 
 export function getMemberRoleLabel(role?: string | null) {
   if (role === "guest_angler") {
-    return "Gäst fiskare";
+    return "Gästfiskare";
   }
 
   return "Medlem";
@@ -61,7 +61,7 @@ export function getCompetitionExclusionReason(
   const owner = memberLookupByName[catchItem.caught_for?.trim() || ""];
 
   if (owner && isGuestAnglerRole(owner.member_role)) {
-    return "Gäst fiskare";
+    return "Gästfiskare";
   }
   if (catchItem.live_scope) {
     return "Live-scope";
