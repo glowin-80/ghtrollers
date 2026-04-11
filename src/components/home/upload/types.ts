@@ -46,6 +46,8 @@ export type UploadCatchSectionProps = {
   gpsError: GpsErrorState | null;
   formMessage: UploadFeedbackMessage | null;
   confirmMissingLocationOpen: boolean;
+  successDialogOpen: boolean;
+  validationDialogMessage: string | null;
   mapOpen: boolean;
   locationChooserOpen: boolean;
   previewUrl: string | null;
@@ -74,4 +76,6 @@ export type UploadCatchSectionProps = {
   onFormMessageAction: () => void;
   onConfirmMissingLocation: () => void;
   onCancelMissingLocation: () => void;
+  onDismissSuccessDialog: () => void;
+  onDismissValidationDialog: () => void;
 };

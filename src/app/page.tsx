@@ -43,6 +43,8 @@ export default function Home() {
     gpsError,
     formMessage,
     confirmMissingLocationOpen,
+    successDialogOpen,
+    validationDialogMessage,
     mapOpen,
     locationChooserOpen,
     previewUrl,
@@ -71,6 +73,8 @@ export default function Home() {
     handleFormMessageAction,
     handleConfirmMissingLocation,
     handleCancelMissingLocation,
+    onDismissSuccessDialog,
+    onDismissValidationDialog,
   } = useCatchUpload({
     isLoggedIn,
     hasActiveMembership,
@@ -195,6 +199,8 @@ export default function Home() {
               gpsError={gpsError}
               formMessage={formMessage}
               confirmMissingLocationOpen={confirmMissingLocationOpen}
+              successDialogOpen={successDialogOpen}
+              validationDialogMessage={validationDialogMessage}
               mapOpen={mapOpen}
               locationChooserOpen={locationChooserOpen}
               previewUrl={previewUrl}
@@ -223,6 +229,8 @@ export default function Home() {
               onFormMessageAction={handleFormMessageAction}
               onConfirmMissingLocation={handleConfirmMissingLocation}
               onCancelMissingLocation={handleCancelMissingLocation}
+              onDismissSuccessDialog={onDismissSuccessDialog}
+              onDismissValidationDialog={onDismissValidationDialog}
             />
           </div>
 

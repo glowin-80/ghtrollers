@@ -65,6 +65,7 @@ export function useCatchUpload({
   const [formMessage, setFormMessage] = useState<UploadFeedbackMessage | null>(null);
   const [confirmMissingLocationOpen, setConfirmMissingLocationOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [validationDialogMessage, setValidationDialogMessage] = useState<string | null>(null);
 
   const resetLocationState = useCallback(() => {
     setLatitude(null);
@@ -82,6 +83,10 @@ export function useCatchUpload({
 
   const dismissFormMessage = useCallback(() => setFormMessage(null), []);
   const dismissSuccessDialog = useCallback(() => setSuccessDialogOpen(false), []);
+  const dismissValidationDialog = useCallback(
+    () => setValidationDialogMessage(null),
+    []
+  );
 
   const handleFormMessageAction = useCallback(() => {
     if (formMessage?.actionType === "login") router.push("/login");
@@ -181,12 +186,19 @@ export function useCatchUpload({
           setConfirmMissingLocationOpen(true);
           return;
         }
+
+        if (validationResult.missingSections?.length) {
+          setValidationDialogMessage(validationResult.message.message);
+          return;
+        }
+
         setFormMessage(validationResult.message);
         return;
       }
 
       setLoading(true);
       setFormMessage(null);
+      setValidationDialogMessage(null);
       setConfirmMissingLocationOpen(false);
 
       try {
@@ -207,10 +219,6 @@ export function useCatchUpload({
           imageFile: imageFile as File,
         });
         resetEntireForm();
-        setFormMessage({
-          variant: "success",
-          message: "Fångsten är rapporterad.",
-        });
         setSuccessDialogOpen(true);
       } catch (error) {
         console.error(error);
@@ -235,11 +243,11 @@ export function useCatchUpload({
       weight,
       catchDate,
       fishingMethod,
+      locationName,
+      imageFile,
       liveScope,
       caughtAbroad,
       isLocationPrivate,
-      locationName,
-      imageFile,
       latitude,
       longitude,
       resetEntireForm,
@@ -265,6 +273,7 @@ export function useCatchUpload({
     formMessage,
     confirmMissingLocationOpen,
     successDialogOpen,
+    validationDialogMessage,
     mapOpen,
     locationChooserOpen,
     previewUrl,
@@ -305,5 +314,6 @@ export function useCatchUpload({
       []
     ),
     onDismissSuccessDialog: dismissSuccessDialog,
+    onDismissValidationDialog: dismissValidationDialog,
   };
 }
