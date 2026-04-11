@@ -33,6 +33,7 @@ export async function fetchHomePageData(options?: {
   includeFishingSpots?: boolean;
   viewer?: {
     isLoggedIn?: boolean;
+    memberId?: string | null;
     memberName?: string | null;
     isSuperAdmin?: boolean;
   };
@@ -47,7 +48,7 @@ export async function fetchHomePageData(options?: {
     await Promise.allSettled([
       fetchActiveMembers(),
       fetchApprovedCatches(),
-      includeFishingSpots ? fetchApprovedFishingSpots() : Promise.resolve([]),
+      includeFishingSpots ? fetchApprovedFishingSpots({ memberId: options?.viewer?.memberId, isSuperAdmin: options?.viewer?.isSuperAdmin }) : Promise.resolve([]),
     ]);
 
   const members = membersResult.status === "fulfilled" ? membersResult.value : [];

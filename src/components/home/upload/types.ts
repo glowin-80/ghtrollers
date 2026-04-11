@@ -35,8 +35,10 @@ export type UploadCatchSectionProps = {
   weight: string;
   catchDate: string;
   fishingMethod: string;
+  liveScope: boolean;
   caughtAbroad: boolean;
   isLocationPrivate: boolean;
+  isGuestAngler?: boolean;
   locationName: string;
   latitude: number | null;
   longitude: number | null;
@@ -56,6 +58,7 @@ export type UploadCatchSectionProps = {
   onWeightChange: (value: string) => void;
   onCatchDateChange: (value: string) => void;
   onFishingMethodChange: (value: string) => void;
+  onLiveScopeChange: (value: boolean) => void;
   onCaughtAbroadChange: (value: boolean) => void;
   onIsLocationPrivateChange: (value: boolean) => void;
   onLocationNameChange: (value: string) => void;

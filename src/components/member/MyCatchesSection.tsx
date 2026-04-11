@@ -218,6 +218,9 @@ export default function MyCatchesSection({
                       <span className="rounded-full bg-[#eef6ea] px-3 py-1 text-[#355b2c]">
                         {item.fishing_method || "Ingen metod"}
                       </span>
+                      {item.live_scope ? (
+                        <span className="rounded-full bg-[#fff7ea] px-3 py-1 text-xs font-semibold text-[#7a5b1e]">Live-scope</span>
+                      ) : null}
                       {item.caught_abroad ? (
                         <span className="rounded-full bg-[#fff7ea] px-3 py-1 text-[#7a5b1e]">Utomlands</span>
                       ) : null}

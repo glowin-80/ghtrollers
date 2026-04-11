@@ -5,7 +5,7 @@ import type { MemberBigFiveBreakdown, MemberCatch } from "@/types/member-page";
 
 function getApprovedCatches(catches: MemberCatch[], memberRole?: string | null) {
   if (isGuestAnglerRole(memberRole)) return [];
-  return catches.filter((c) => c.status === "approved" && c.fishing_method !== "Live-scope" && !c.caught_abroad);
+  return catches.filter((c) => c.status === "approved" && !c.live_scope && !c.caught_abroad);
 }
 
 export function buildMemberBestBigFiveBreakdown(catches: MemberCatch[], memberRole?: string | null): MemberBigFiveBreakdown | null {

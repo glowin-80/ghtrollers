@@ -19,6 +19,7 @@ type EditDraft = {
   mapOpen: boolean;
   submitLoading: boolean;
   formMessage: FeedbackMessage | null;
+  isPrivate: boolean;
 };
 
 type MyFishingSpotsSectionProps = {
@@ -33,6 +34,7 @@ type MyFishingSpotsSectionProps = {
   onCancelEdit: () => void;
   onEditTitleChange: (value: string) => void;
   onEditNotesChange: (value: string) => void;
+  onEditIsPrivateChange: (value: boolean) => void;
   onEditGetGps: () => void;
   onEditOpenMap: () => void;
   onEditCloseMap: () => void;
@@ -62,7 +64,7 @@ function getStatusMeta(spot: FishingSpot) {
   return {
     text: "Godkänd",
     className: "bg-green-100 text-green-800 border border-green-200",
-    description: "Platsen är publicerad på kartan för aktiva medlemmar och admin.",
+    description: "Platsen är publicerad på kartan för dig.",
   };
 }
 
@@ -78,6 +80,7 @@ export default function MyFishingSpotsSection({
   onCancelEdit,
   onEditTitleChange,
   onEditNotesChange,
+  onEditIsPrivateChange,
   onEditGetGps,
   onEditOpenMap,
   onEditCloseMap,
@@ -106,31 +109,15 @@ export default function MyFishingSpotsSection({
         </div>
       </div>
 
-      {loading ? (
-        <div className="mt-5 rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-4 text-sm text-[#6b7280]">
-          Laddar dina fiskeplatser...
-        </div>
-      ) : null}
-
-      {error ? (
-        <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700">
-          {error}
-        </div>
-      ) : null}
-
-      {!loading && !error && spots.length === 0 ? (
-        <div className="mt-5 rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-4 text-sm text-[#6b7280]">
-          Du har inte sparat några fiskeplatser ännu.
-        </div>
-      ) : null}
+      {loading ? <div className="mt-5 rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-4 text-sm text-[#6b7280]">Laddar dina fiskeplatser...</div> : null}
+      {error ? <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700">{error}</div> : null}
+      {!loading && !error && spots.length === 0 ? <div className="mt-5 rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-4 text-sm text-[#6b7280]">Du har inte sparat några fiskeplatser ännu.</div> : null}
 
       {activeEditSpot ? (
         <div className="mt-5 space-y-4 rounded-[24px] border border-[#d8d2c7] bg-[#fffdfb] p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-lg font-bold text-[#1f2937]">
-                Editerar: {activeEditSpot.title?.trim() || "Namnlös fiskeplats"}
-              </div>
+              <div className="text-lg font-bold text-[#1f2937]">Editerar: {activeEditSpot.title?.trim() || "Namnlös fiskeplats"}</div>
               <div className="mt-1 text-sm text-[#6b7280]">
                 {activeEditSpot.status === "pending"
                   ? "Eftersom platsen ännu inte är publicerad uppdateras väntande versionen direkt."
@@ -138,13 +125,7 @@ export default function MyFishingSpotsSection({
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={onCancelEdit}
-              className="rounded-full border border-[#d8d2c7] px-4 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
-            >
-              Avbryt editering
-            </button>
+            <button type="button" onClick={onCancelEdit} className="rounded-full border border-[#d8d2c7] px-4 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]">Avbryt editering</button>
           </div>
 
           <FishingSpotForm
@@ -152,6 +133,8 @@ export default function MyFishingSpotsSection({
             hasActiveMembership={hasActiveMembership}
             title={editDraft.title}
             notes={editDraft.notes}
+            isPrivate={editDraft.isPrivate}
+            onIsPrivateChange={onEditIsPrivateChange}
             latitude={editDraft.latitude}
             longitude={editDraft.longitude}
             gpsLoading={editDraft.gpsLoading}
@@ -169,14 +152,8 @@ export default function MyFishingSpotsSection({
             mode="edit"
             heading="✏️ Editera vald fiskeplats"
             description="Justera koordinater, rubrik eller anteckning. Godkända platser skickar in en väntande ändring till admin, medan ännu ej godkända platser uppdateras direkt i sin väntande version."
-            statusLabel={
-              activeEditSpot.status === "pending"
-                ? "Fortfarande väntar på admin"
-                : "Ändring väntar på admin"
-            }
-            submitLabel={
-              activeEditSpot.status === "pending" ? "Uppdatera väntande plats" : "Skicka ändring"
-            }
+            statusLabel={activeEditSpot.status === "pending" ? "Fortfarande väntar på admin" : "Ändring väntar på admin"}
+            submitLabel={activeEditSpot.status === "pending" ? "Uppdatera väntande plats" : "Skicka ändring"}
             submitLoadingLabel="Sparar ändring..."
             helperText="Har du bråttom kan du bara justera koordinaten nu och fylla på text senare."
           />
@@ -198,101 +175,48 @@ export default function MyFishingSpotsSection({
               <div key={spot.id} className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <div className="text-lg font-bold text-[#1f2937]">
-                      {spot.title?.trim() || "Namnlös fiskeplats"}
-                    </div>
-
-                    <div className="mt-1 text-sm text-[#6b7280]">
-                      {new Date(spot.created_at).toLocaleString("sv-SE")}
+                    <div className="text-lg font-bold text-[#1f2937]">{spot.title?.trim() || "Namnlös fiskeplats"}</div>
+                    <div className="mt-1 text-sm text-[#6b7280]">{new Date(spot.created_at).toLocaleString("sv-SE")}</div>
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                      {spot.is_private ? <span className="rounded-full bg-[#f3f4f6] px-3 py-1 text-[#4b5563]">Privat plats</span> : null}
+                      {spot.pending_is_private ? <span className="rounded-full bg-[#eef2ff] px-3 py-1 text-[#4338ca]">Väntande privat ändring</span> : null}
                     </div>
                   </div>
 
-                  <span
-                    className={[
-                      "inline-flex rounded-full px-3 py-1 text-xs font-semibold",
-                      status.className,
-                    ].join(" ")}
-                  >
-                    {status.text}
-                  </span>
+                  <span className={["inline-flex rounded-full px-3 py-1 text-xs font-semibold", status.className].join(" ")}>{status.text}</span>
                 </div>
 
-                <div className="mt-3 rounded-2xl border border-[#e5ded2] bg-[#faf8f4] px-4 py-3 text-sm text-[#4b5563]">
-                  {status.description}
-                </div>
+                <div className="mt-3 rounded-2xl border border-[#e5ded2] bg-[#faf8f4] px-4 py-3 text-sm text-[#4b5563]">{status.description}</div>
 
                 <div className="mt-4 grid gap-2 text-sm text-[#374151] md:grid-cols-2">
-                  <div>
-                    <span className="font-semibold">Aktiva koordinater:</span>{" "}
-                    {spot.latitude.toFixed(6)}, {spot.longitude.toFixed(6)}
-                  </div>
-
-                  <div>
-                    <span className="font-semibold">Skapad av:</span> {spot.created_by_name}
-                  </div>
+                  <div><span className="font-semibold">Aktiva koordinater:</span> {spot.latitude.toFixed(6)}, {spot.longitude.toFixed(6)}</div>
+                  <div><span className="font-semibold">Skapad av:</span> {spot.created_by_name}</div>
                 </div>
 
-                {spot.notes?.trim() ? (
-                  <div className="mt-4 rounded-2xl border border-[#e5ded2] bg-[#faf8f4] px-4 py-3 text-sm text-[#4b5563]">
-                    {spot.notes}
-                  </div>
-                ) : null}
+                {spot.notes?.trim() ? <div className="mt-4 rounded-2xl border border-[#e5ded2] bg-[#faf8f4] px-4 py-3 text-sm text-[#4b5563]">{spot.notes}</div> : null}
 
                 {spot.has_pending_edit && hasPendingFields ? (
                   <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
                     <div className="font-semibold">Väntande ändring</div>
-                    <div className="mt-2">
-                      <span className="font-medium">Koordinater:</span>{" "}
-                      {spot.pending_latitude?.toFixed(6)}, {spot.pending_longitude?.toFixed(6)}
-                    </div>
-                    {spot.pending_title?.trim() ? (
-                      <div className="mt-1">
-                        <span className="font-medium">Rubrik:</span> {spot.pending_title}
-                      </div>
-                    ) : null}
-                    {spot.pending_notes?.trim() ? (
-                      <div className="mt-1 whitespace-pre-wrap">
-                        <span className="font-medium">Anteckning:</span> {spot.pending_notes}
-                      </div>
-                    ) : null}
+                    <div className="mt-2"><span className="font-medium">Koordinater:</span> {spot.pending_latitude?.toFixed(6)}, {spot.pending_longitude?.toFixed(6)}</div>
+                    {spot.pending_title?.trim() ? <div className="mt-1"><span className="font-medium">Rubrik:</span> {spot.pending_title}</div> : null}
+                    {spot.pending_notes?.trim() ? <div className="mt-1 whitespace-pre-wrap"><span className="font-medium">Anteckning:</span> {spot.pending_notes}</div> : null}
+                    {typeof spot.pending_is_private === "boolean" ? <div className="mt-1"><span className="font-medium">Privat:</span> {spot.pending_is_private ? "Ja" : "Nej"}</div> : null}
                   </div>
                 ) : null}
 
                 <div className="mt-4 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() => onStartEdit(spot)}
-                    className="rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
-                  >
-                    {editSpotId === spot.id ? "Editerar nu" : "Editera plats"}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setExpandedSpotId((prev) => (prev === spot.id ? null : spot.id))}
-                    className="rounded-full border border-[#d8d2c7] px-4 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
-                  >
-                    {isExpanded ? "Dölj detaljer" : "Visa detaljer"}
-                  </button>
+                  <button type="button" onClick={() => onStartEdit(spot)} className="rounded-full bg-[#324b2f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]">{editSpotId === spot.id ? "Editerar nu" : "Editera plats"}</button>
+                  <button type="button" onClick={() => setExpandedSpotId((prev) => (prev === spot.id ? null : spot.id))} className="rounded-full border border-[#d8d2c7] px-4 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]">{isExpanded ? "Dölj detaljer" : "Visa detaljer"}</button>
                 </div>
 
                 {isExpanded ? (
                   <div className="mt-4 grid gap-3 rounded-2xl border border-[#e5ded2] bg-[#faf8f4] p-4 text-sm text-[#4b5563] md:grid-cols-2">
-                    <div>
-                      <span className="font-semibold text-[#1f2937]">Publicerad:</span>{" "}
-                      {spot.approved_at ? new Date(spot.approved_at).toLocaleString("sv-SE") : "Inte ännu"}
-                    </div>
-                    <div>
-                      <span className="font-semibold text-[#1f2937]">Senast uppdaterad:</span>{" "}
-                      {spot.updated_at ? new Date(spot.updated_at).toLocaleString("sv-SE") : "Okänt"}
-                    </div>
-                    <div>
-                      <span className="font-semibold text-[#1f2937]">Intern statuskod:</span> {spot.status}
-                    </div>
-                    <div>
-                      <span className="font-semibold text-[#1f2937]">Har väntande edit:</span>{" "}
-                      {spot.has_pending_edit ? "Ja" : "Nej"}
-                    </div>
+                    <div><span className="font-semibold text-[#1f2937]">Publicerad:</span> {spot.approved_at ? new Date(spot.approved_at).toLocaleString("sv-SE") : "Inte ännu"}</div>
+                    <div><span className="font-semibold text-[#1f2937]">Senast uppdaterad:</span> {spot.updated_at ? new Date(spot.updated_at).toLocaleString("sv-SE") : "Okänt"}</div>
+                    <div><span className="font-semibold text-[#1f2937]">Intern statuskod:</span> {spot.status}</div>
+                    <div><span className="font-semibold text-[#1f2937]">Har väntande edit:</span> {spot.has_pending_edit ? "Ja" : "Nej"}</div>
+                    <div><span className="font-semibold text-[#1f2937]">Privat:</span> {spot.is_private ? "Ja" : "Nej"}</div>
                   </div>
                 ) : null}
               </div>

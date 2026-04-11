@@ -27,6 +27,11 @@ export default function PendingFishingSpotCard({
 
           <div className="mt-1 text-sm text-[#6b7280]">Inskickad av {item.created_by_name}</div>
 
+          <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            {item.is_private ? <span className="rounded-full bg-[#f3f4f6] px-3 py-1 text-[#4b5563]">Privat plats</span> : null}
+            {isEdit && item.pending_is_private ? <span className="rounded-full bg-[#eef2ff] px-3 py-1 text-[#4338ca]">Ändras till privat</span> : null}
+          </div>
+
           <div className="mt-3 grid gap-2 text-sm text-[#374151] md:grid-cols-2">
             <div>
               <span className="font-semibold">Latitude:</span> {item.latitude.toFixed(6)}
@@ -69,6 +74,11 @@ export default function PendingFishingSpotCard({
               {item.pending_notes?.trim() ? (
                 <div className="mt-1 whitespace-pre-wrap">
                   <span className="font-medium">Anteckning:</span> {item.pending_notes}
+                </div>
+              ) : null}
+              {typeof item.pending_is_private === "boolean" ? (
+                <div className="mt-1">
+                  <span className="font-medium">Privat:</span> {item.pending_is_private ? "Ja" : "Nej"}
                 </div>
               ) : null}
             </div>

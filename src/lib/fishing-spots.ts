@@ -2,14 +2,24 @@ import { supabase } from "@/lib/supabase";
 import type { FishingSpot, FishingSpotReviewType } from "@/types/fishing-spots";
 
 const FISHING_SPOT_SELECT =
-  "id, created_at, updated_at, created_by_member_id, created_by_name, latitude, longitude, title, notes, status, pending_latitude, pending_longitude, pending_title, pending_notes, has_pending_edit, approved_at, approved_by_member_id";
+  "id, created_at, updated_at, created_by_member_id, created_by_name, latitude, longitude, title, notes, is_private, status, pending_latitude, pending_longitude, pending_title, pending_notes, pending_is_private, has_pending_edit, approved_at, approved_by_member_id";
 
-export async function fetchApprovedFishingSpots(): Promise<FishingSpot[]> {
-  const { data, error } = await supabase
+export async function fetchApprovedFishingSpots(viewer?: { memberId?: string | null; isSuperAdmin?: boolean; }): Promise<FishingSpot[]> {
+  let query = supabase
     .from("fishing_spots")
     .select(FISHING_SPOT_SELECT)
     .eq("status", "approved")
     .order("created_at", { ascending: false });
+
+  if (!viewer?.isSuperAdmin) {
+    if (viewer?.memberId) {
+      query = query.or(`is_private.is.false,and(is_private.is.true,created_by_member_id.eq.${viewer.memberId})`);
+    } else {
+      query = query.or("is_private.is.false,is_private.is.null");
+    }
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw error;
@@ -39,6 +49,7 @@ export async function createPendingFishingSpot(input: {
   longitude: number;
   title: string | null;
   notes: string | null;
+  isPrivate: boolean;
 }) {
   const payload = {
     created_by_member_id: input.createdByMemberId,
@@ -47,6 +58,7 @@ export async function createPendingFishingSpot(input: {
     longitude: input.longitude,
     title: input.title,
     notes: input.notes,
+    is_private: input.isPrivate,
     status: "pending",
   };
 
@@ -69,6 +81,7 @@ export async function submitFishingSpotEdit(input: {
   longitude: number;
   title: string | null;
   notes: string | null;
+  isPrivate: boolean;
 }) {
   const { data, error } = await supabase.rpc("submit_fishing_spot_edit", {
     p_spot_id: input.spotId,
@@ -76,6 +89,7 @@ export async function submitFishingSpotEdit(input: {
     p_pending_longitude: input.longitude,
     p_pending_title: input.title,
     p_pending_notes: input.notes,
+    p_pending_is_private: input.isPrivate,
   });
 
   if (error) {
@@ -89,12 +103,18 @@ export type PendingFishingSpot = FishingSpot & {
   review_type: FishingSpotReviewType;
 };
 
-export async function fetchPendingFishingSpots(): Promise<PendingFishingSpot[]> {
-  const { data, error } = await supabase
+export async function fetchPendingFishingSpots(viewer?: { isSuperAdmin?: boolean }): Promise<PendingFishingSpot[]> {
+  let query = supabase
     .from("fishing_spots")
     .select(FISHING_SPOT_SELECT)
     .or("status.eq.pending,has_pending_edit.eq.true")
     .order("created_at", { ascending: true });
+
+  if (!viewer?.isSuperAdmin) {
+    query = query.not("is_private", "is", true).not("pending_is_private", "is", true);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw error;

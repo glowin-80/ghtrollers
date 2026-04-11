@@ -17,6 +17,7 @@ export function useHomeData() {
         includeFishingSpots: hasActiveMembership,
         viewer: {
           isLoggedIn,
+          memberId: member?.id ?? null,
           memberName: member?.name ?? null,
           isSuperAdmin,
         },
@@ -27,7 +28,7 @@ export function useHomeData() {
     } catch (error) {
       console.error(error);
     }
-  }, [hasActiveMembership, isLoggedIn, isSuperAdmin, member?.name]);
+  }, [hasActiveMembership, isLoggedIn, isSuperAdmin, member?.id, member?.name]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {

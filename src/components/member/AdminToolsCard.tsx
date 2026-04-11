@@ -8,7 +8,7 @@ import { useAdminQueues } from "@/hooks/useAdminQueues";
 
 export default function AdminToolsCard() {
   const { member, isSuperAdmin } = useAuthMember();
-  const { pendingMembers, pendingCatches, pendingFishingSpots, loadingMembers, loadingCatches, loadingFishingSpots, workingKey, error, pendingMembersCount, pendingCatchesCount, pendingFishingSpotsCount, approveMember, makeAdmin, rejectMember, approveCatch, rejectCatch, approveFishingSpot, rejectFishingSpot } = useAdminQueues(member?.id ?? null);
+  const { pendingMembers, pendingCatches, pendingFishingSpots, loadingMembers, loadingCatches, loadingFishingSpots, workingKey, error, pendingMembersCount, pendingCatchesCount, pendingFishingSpotsCount, approveMember, makeAdmin, rejectMember, approveCatch, rejectCatch, approveFishingSpot, rejectFishingSpot } = useAdminQueues(member?.id ?? null, isSuperAdmin);
 
   return (
     <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">

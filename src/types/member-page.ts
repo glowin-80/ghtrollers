@@ -41,6 +41,7 @@ export type MemberCatch = {
   latitude?: number | null;
   longitude?: number | null;
   fishing_method?: string | null;
+  live_scope?: boolean | null;
   caught_abroad?: boolean | null;
   is_location_private?: boolean | null;
   status: "pending" | "approved" | "rejected" | string;

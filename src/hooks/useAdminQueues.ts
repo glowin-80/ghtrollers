@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { approvePendingCatch, approvePendingMember, deletePendingCatch, deletePendingMember, fetchPendingCatches, fetchPendingMembers, makePendingMemberAdmin, type PendingCatch, type PendingMember } from "@/lib/admin-tools";
 import { approvePendingFishingSpot, approvePendingFishingSpotEdit, deletePendingFishingSpot, fetchPendingFishingSpots, rejectPendingFishingSpotEdit, type PendingFishingSpot } from "@/lib/fishing-spots";
 
-export function useAdminQueues(adminMemberId: string | null) {
+export function useAdminQueues(adminMemberId: string | null, isSuperAdmin = false) {
   const [pendingMembers, setPendingMembers] = useState<PendingMember[]>([]);
   const [pendingCatches, setPendingCatches] = useState<PendingCatch[]>([]);
   const [pendingFishingSpots, setPendingFishingSpots] = useState<PendingFishingSpot[]>([]);
@@ -17,7 +17,7 @@ export function useAdminQueues(adminMemberId: string | null) {
 
   const loadPendingMembers = useCallback(async () => { try { setLoadingMembers(true); setError(null); setPendingMembers(await fetchPendingMembers()); } catch (err) { console.error(err); setError("Kunde inte ladda väntande medlemsansökningar."); } finally { setLoadingMembers(false); } }, []);
   const loadPendingCatches = useCallback(async () => { try { setLoadingCatches(true); setError(null); setPendingCatches(await fetchPendingCatches()); } catch (err) { console.error(err); setError("Kunde inte ladda väntande fångster."); } finally { setLoadingCatches(false); } }, []);
-  const loadPendingFishingSpots = useCallback(async () => { try { setLoadingFishingSpots(true); setError(null); setPendingFishingSpots(await fetchPendingFishingSpots()); } catch (err) { console.error(err); setError("Kunde inte ladda väntande fiskeplatser."); } finally { setLoadingFishingSpots(false); } }, []);
+  const loadPendingFishingSpots = useCallback(async () => { try { setLoadingFishingSpots(true); setError(null); setPendingFishingSpots(await fetchPendingFishingSpots({ isSuperAdmin })); } catch (err) { console.error(err); setError("Kunde inte ladda väntande fiskeplatser."); } finally { setLoadingFishingSpots(false); } }, [isSuperAdmin]);
   useEffect(() => { void loadPendingMembers(); void loadPendingCatches(); void loadPendingFishingSpots(); }, [loadPendingMembers, loadPendingCatches, loadPendingFishingSpots]);
 
   const approveMember = useCallback(async (memberId: string, memberRole: "competition_member" | "guest_angler") => { try { setWorkingKey(`member-approve-${memberRole}-${memberId}`); setError(null); await approvePendingMember(memberId, memberRole); setPendingMembers((prev) => prev.filter((member) => member.id !== memberId)); } catch (err) { console.error(err); setError("Kunde inte godkänna medlemmen."); } finally { setWorkingKey(null); } }, []);

@@ -10,11 +10,13 @@ export type FishingSpot = {
   longitude: number;
   title: string | null;
   notes: string | null;
+  is_private?: boolean | null;
   status: FishingSpotStatus;
   pending_latitude?: number | null;
   pending_longitude?: number | null;
   pending_title?: string | null;
   pending_notes?: string | null;
+  pending_is_private?: boolean | null;
   has_pending_edit?: boolean;
   approved_at?: string | null;
   approved_by_member_id?: string | null;

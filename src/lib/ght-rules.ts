@@ -4,6 +4,7 @@ import type { MemberCatch, MemberProfile } from "@/types/member-page";
 export type GhtMemberRole = "competition_member" | "guest_angler" | string;
 
 export type LocationVisibilityViewer = {
+  memberId?: string | null;
   memberName?: string | null;
   isLoggedIn?: boolean;
   isSuperAdmin?: boolean;
@@ -18,7 +19,19 @@ export function getMemberRoleLabel(role?: string | null) {
     return "Gäst fiskare";
   }
 
-  return "Tävlingsmedlem";
+  return "Medlem";
+}
+
+export function getProfileRoleLabel(member?: Pick<MemberProfile, "member_role" | "is_admin" | "is_super_admin"> | null) {
+  if (member?.is_super_admin) {
+    return "Super admin";
+  }
+
+  if (member?.is_admin) {
+    return "Admin";
+  }
+
+  return getMemberRoleLabel(member?.member_role);
 }
 
 export function getAdminLevelLabel(member?: Pick<MemberProfile, "is_admin" | "is_super_admin"> | null) {
@@ -42,7 +55,7 @@ export function buildMemberLookupByName(members: Member[]) {
 }
 
 export function getCompetitionExclusionReason(
-  catchItem: Pick<Catch, "caught_for" | "fishing_method" | "caught_abroad">,
+  catchItem: Pick<Catch, "caught_for" | "live_scope" | "caught_abroad">,
   memberLookupByName: Record<string, Member>
 ): string | null {
   const owner = memberLookupByName[catchItem.caught_for?.trim() || ""];
@@ -50,7 +63,7 @@ export function getCompetitionExclusionReason(
   if (owner && isGuestAnglerRole(owner.member_role)) {
     return "Gäst fiskare";
   }
-  if (catchItem.fishing_method === "Live-scope") {
+  if (catchItem.live_scope) {
     return "Live-scope";
   }
   if (catchItem.caught_abroad) {
@@ -60,7 +73,7 @@ export function getCompetitionExclusionReason(
 }
 
 export function isCompetitionEligibleCatch(
-  catchItem: Pick<Catch, "caught_for" | "fishing_method" | "caught_abroad">,
+  catchItem: Pick<Catch, "caught_for" | "live_scope" | "caught_abroad">,
   memberLookupByName: Record<string, Member>
 ) {
   return getCompetitionExclusionReason(catchItem, memberLookupByName) === null;

@@ -28,6 +28,7 @@ type EditDraftState = {
   mapOpen: boolean;
   submitLoading: boolean;
   formMessage: FeedbackMessage | null;
+  isPrivate: boolean;
 };
 
 const DEFAULT_EDIT_DRAFT: EditDraftState = {
@@ -40,9 +41,10 @@ const DEFAULT_EDIT_DRAFT: EditDraftState = {
   mapOpen: false,
   submitLoading: false,
   formMessage: null,
+  isPrivate: false,
 };
 
-function getInitialEditValues(spot: FishingSpot): Pick<EditDraftState, "title" | "notes" | "latitude" | "longitude"> {
+function getInitialEditValues(spot: FishingSpot): Pick<EditDraftState, "title" | "notes" | "latitude" | "longitude" | "isPrivate"> {
   if (
     spot.has_pending_edit &&
     spot.pending_latitude !== null &&
@@ -55,6 +57,7 @@ function getInitialEditValues(spot: FishingSpot): Pick<EditDraftState, "title" |
       notes: spot.pending_notes ?? "",
       latitude: spot.pending_latitude,
       longitude: spot.pending_longitude,
+      isPrivate: spot.pending_is_private ?? spot.is_private ?? false,
     };
   }
 
@@ -63,6 +66,7 @@ function getInitialEditValues(spot: FishingSpot): Pick<EditDraftState, "title" |
     notes: spot.notes ?? "",
     latitude: spot.latitude,
     longitude: spot.longitude,
+    isPrivate: spot.is_private ?? false,
   };
 }
 
@@ -73,6 +77,7 @@ export default function MarkeraFiskeplatsPage() {
   const [notes, setNotes] = useState("");
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
+  const [isPrivate, setIsPrivate] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
@@ -179,6 +184,7 @@ export default function MarkeraFiskeplatsPage() {
           longitude,
           title: title.trim() ? title.trim() : null,
           notes: notes.trim() ? notes.trim() : null,
+          isPrivate,
         });
 
         setSpots((prev) => [createdSpot, ...prev]);
@@ -186,6 +192,7 @@ export default function MarkeraFiskeplatsPage() {
         setNotes("");
         setLatitude(null);
         setLongitude(null);
+        setIsPrivate(false);
         setMapOpen(false);
         setFormMessage({
           variant: "success",
@@ -201,7 +208,7 @@ export default function MarkeraFiskeplatsPage() {
         setSubmitLoading(false);
       }
     },
-    [hasActiveMembership, isLoggedIn, latitude, longitude, member, notes, title]
+    [hasActiveMembership, isLoggedIn, isPrivate, latitude, longitude, member, notes, title]
   );
 
   const handleStartEdit = useCallback((spot: FishingSpot) => {
@@ -321,6 +328,7 @@ export default function MarkeraFiskeplatsPage() {
           longitude: editDraft.longitude,
           title: editDraft.title.trim() ? editDraft.title.trim() : null,
           notes: editDraft.notes.trim() ? editDraft.notes.trim() : null,
+          isPrivate: editDraft.isPrivate,
         });
 
         const nextSpots = spots.map((spot) => {
@@ -339,6 +347,7 @@ export default function MarkeraFiskeplatsPage() {
               latitude: editDraft.latitude ?? spot.latitude,
               longitude: editDraft.longitude ?? spot.longitude,
               updated_at: new Date().toISOString(),
+              is_private: editDraft.isPrivate,
             };
           }
 
@@ -350,6 +359,7 @@ export default function MarkeraFiskeplatsPage() {
             pending_longitude: editDraft.longitude,
             has_pending_edit: true,
             updated_at: new Date().toISOString(),
+            pending_is_private: editDraft.isPrivate,
           };
         });
 
@@ -398,6 +408,8 @@ export default function MarkeraFiskeplatsPage() {
           formMessage={formMessage}
           onTitleChange={setTitle}
           onNotesChange={setNotes}
+          isPrivate={isPrivate}
+          onIsPrivateChange={setIsPrivate}
           onGetGps={handleGetGps}
           onOpenMap={() => setMapOpen(true)}
           onCloseMap={() => setMapOpen(false)}
@@ -446,6 +458,9 @@ export default function MarkeraFiskeplatsPage() {
             }
             onEditNotesChange={(value) =>
               setEditDraft((prev) => ({ ...prev, notes: value, formMessage: null }))
+            }
+            onEditIsPrivateChange={(value) =>
+              setEditDraft((prev) => ({ ...prev, isPrivate: value, formMessage: null }))
             }
             onEditGetGps={handleEditGetGps}
             onEditOpenMap={() =>

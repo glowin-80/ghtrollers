@@ -18,7 +18,7 @@ export default function MinSidaPage() {
   const [hideAbroad, setHideAbroad] = useState(false);
   const { pageLoading, catchesLoading, member, catches, error, catchesError, loadMemberCatches, handleProfileImageUploaded } = useMemberPageData();
 
-  const visibleCatches = useMemo(() => catches.filter((item) => !(hideLiveScope && item.fishing_method === "Live-scope") && !(hideAbroad && item.caught_abroad)), [catches, hideAbroad, hideLiveScope]);
+  const visibleCatches = useMemo(() => catches.filter((item) => !(hideLiveScope && item.live_scope) && !(hideAbroad && item.caught_abroad)), [catches, hideAbroad, hideLiveScope]);
   const selectedCatch = useMemo(() => visibleCatches.find((item) => item.id === selectedCatchId) || null, [visibleCatches, selectedCatchId]);
 
   async function handleLogout() { await signOutMember(); window.location.href = "/"; }

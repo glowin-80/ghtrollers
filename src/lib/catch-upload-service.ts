@@ -16,6 +16,7 @@ export type SubmitCatchPayload = {
   weight: string;
   catchDate: string;
   fishingMethod: string;
+  liveScope: boolean;
   caughtAbroad: boolean;
   isLocationPrivate: boolean;
   locationName: string;
@@ -62,6 +63,7 @@ export async function submitCatchWithImage(payload: SubmitCatchPayload) {
       weight_g: Number(payload.weight),
       catch_date: payload.catchDate,
       fishing_method: payload.fishingMethod.trim(),
+      live_scope: payload.liveScope,
       caught_abroad: payload.caughtAbroad,
       is_location_private: payload.isLocationPrivate,
       location_name: payload.locationName.trim() || null,

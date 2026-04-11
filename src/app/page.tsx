@@ -33,6 +33,7 @@ export default function Home() {
     weight,
     catchDate,
     fishingMethod,
+    liveScope,
     caughtAbroad,
     isLocationPrivate,
     locationName,
@@ -51,6 +52,7 @@ export default function Home() {
     handleWeightChange,
     handleCatchDateChange,
     handleFishingMethodChange,
+    handleLiveScopeChange,
     handleCaughtAbroadChange,
     handleIsLocationPrivateChange,
     handleLocationNameChange,
@@ -73,6 +75,7 @@ export default function Home() {
     isLoggedIn,
     hasActiveMembership,
     registeredByDefault: member?.name ?? "",
+    isGuestAngler: member?.member_role === "guest_angler",
   });
 
   const currentSwedenYear = useMemo(() => {
@@ -181,8 +184,10 @@ export default function Home() {
               weight={weight}
               catchDate={catchDate}
               fishingMethod={fishingMethod}
+              liveScope={liveScope}
               caughtAbroad={caughtAbroad}
               isLocationPrivate={isLocationPrivate}
+              isGuestAngler={member?.member_role === "guest_angler"}
               locationName={locationName}
               latitude={latitude}
               longitude={longitude}
@@ -202,6 +207,7 @@ export default function Home() {
               onWeightChange={handleWeightChange}
               onCatchDateChange={handleCatchDateChange}
               onFishingMethodChange={handleFishingMethodChange}
+              onLiveScopeChange={handleLiveScopeChange}
               onCaughtAbroadChange={handleCaughtAbroadChange}
               onIsLocationPrivateChange={handleIsLocationPrivateChange}
               onLocationNameChange={handleLocationNameChange}
