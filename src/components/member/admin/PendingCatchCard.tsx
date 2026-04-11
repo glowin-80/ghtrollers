@@ -4,7 +4,7 @@ import { isGuestAnglerRole } from "@/lib/ght-rules";
 import type { PendingCatch } from "@/lib/admin-tools";
 
 type PendingCatchCardProps = {
-  item: PendingCatch & { member_role?: string | null };
+  item: PendingCatch;
   workingKey: string | null;
   isSuperAdmin: boolean;
   onApprove: (catchId: string) => void;
@@ -43,7 +43,7 @@ export default function PendingCatchCard({
       ? `Fina fisken • ${item.fine_fish_type}`
       : item.fish_type;
 
-  const isGuestCatch = isGuestAnglerRole(item.member_role);
+  const isGuestCatch = isGuestAnglerRole(item.owner_member_role);
   const competitionReason = isGuestCatch
     ? "Gäst fiskare"
     : item.live_scope
