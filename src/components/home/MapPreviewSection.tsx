@@ -11,6 +11,7 @@ type MapPreviewSectionProps = {
   hasActiveMembership: boolean;
   catches: Catch[];
   fishingSpots: FishingSpot[];
+  isSuperAdmin?: boolean;
 };
 
 const toggleOptions: Array<{
@@ -27,11 +28,13 @@ function MapPreviewSectionComponent({
   hasActiveMembership,
   catches,
   fishingSpots,
+  isSuperAdmin = false,
 }: MapPreviewSectionProps) {
   const shouldLock = !isLoggedIn || !hasActiveMembership;
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const [shouldRenderMap, setShouldRenderMap] = useState(false);
   const [filter, setFilter] = useState<FishingSpotMapFilter>("all");
+  const [includePrivate, setIncludePrivate] = useState(false);
 
   useEffect(() => {
     if (shouldRenderMap) {
@@ -96,7 +99,7 @@ function MapPreviewSectionComponent({
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {toggleOptions.map((option) => {
               const isActive = filter === option.value;
 
@@ -116,12 +119,24 @@ function MapPreviewSectionComponent({
                 </button>
               );
             })}
+
+            {isSuperAdmin ? (
+              <label className="inline-flex items-center gap-2 rounded-full border border-[#d8d2c7] bg-white px-4 py-2 text-sm font-semibold text-[#374151]">
+                <input
+                  type="checkbox"
+                  checked={includePrivate}
+                  onChange={(event) => setIncludePrivate(event.target.checked)}
+                  className="h-4 w-4 rounded border-[#cfc6b8] text-[#324b2f] focus:ring-[#d9cfbf]"
+                />
+                <span>Visa även privata registreringar</span>
+              </label>
+            ) : null}
           </div>
         </div>
 
         <div className="mt-4 overflow-hidden rounded-2xl border border-[#d8d2c7]">
           {shouldRenderMap ? (
-            <CatchesMap catches={catches} fishingSpots={fishingSpots} filter={filter} />
+            <CatchesMap catches={catches} fishingSpots={fishingSpots} filter={filter} includePrivate={isSuperAdmin && includePrivate} />
           ) : (
             <div className="flex h-[420px] w-full items-center justify-center bg-white text-[#6b7280]">
               Laddar karta...

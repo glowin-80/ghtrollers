@@ -23,6 +23,7 @@ export default function Home() {
     isLoggedIn,
     hasActiveMembership,
     member,
+    isSuperAdmin,
   } = useHomeData();
 
   const {
@@ -246,6 +247,7 @@ export default function Home() {
               hasActiveMembership={hasActiveMembership}
               catches={approvedCatches}
               fishingSpots={approvedFishingSpots}
+              isSuperAdmin={isSuperAdmin}
             />
           </div>
 

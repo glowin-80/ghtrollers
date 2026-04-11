@@ -46,5 +46,6 @@ export function useHomeData() {
     membershipStatus,
     hasActiveMembership,
     member,
+    isSuperAdmin,
   };
 }

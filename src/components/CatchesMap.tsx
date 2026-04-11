@@ -8,6 +8,7 @@ type CatchesMapProps = {
   catches: Catch[];
   fishingSpots?: FishingSpot[];
   filter?: FishingSpotMapFilter;
+  includePrivate?: boolean;
 };
 
 const LeafletCatchesMap = dynamic(() => import("./LeafletCatchesMap"), {
@@ -23,12 +24,14 @@ export default function CatchesMap({
   catches,
   fishingSpots = [],
   filter = "all",
+  includePrivate = false,
 }: CatchesMapProps) {
   return (
     <LeafletCatchesMap
       catches={catches}
       fishingSpots={fishingSpots}
       filter={filter}
+      includePrivate={includePrivate}
     />
   );
 }

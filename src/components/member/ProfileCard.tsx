@@ -61,10 +61,10 @@ export default function ProfileCard({
               <h1 className="mt-1 text-[1.95rem] font-bold leading-[0.94] text-[#1f2937] sm:text-[2.15rem]">
                 {member.name}
               </h1>
+            </div>
 
-              <div className="mt-2 text-[1rem] font-medium text-[#74685a] sm:text-[1.05rem]">
-                {profileRoleLabel}
-              </div>
+            <div className="shrink-0 rounded-full border border-[#d8d2c7] bg-white px-3 py-1 text-sm font-semibold text-[#5c4d3f] shadow-[0_4px_10px_rgba(0,0,0,0.04)]">
+              {profileRoleLabel}
             </div>
           </div>
         </div>
