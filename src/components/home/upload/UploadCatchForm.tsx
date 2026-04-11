@@ -54,7 +54,7 @@ export default function UploadCatchForm({ members, caughtFor, registeredBy, fish
   const selectedFileName = previewUrl ? "Bild vald" : "Ingen bild vald";
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} noValidate className="space-y-4">
       {formMessage ? <InlineMessage variant={formMessage.variant} message={formMessage.message} actionLabel={formMessage.actionLabel} onAction={formMessage.actionLabel ? onFormMessageAction : undefined} onDismiss={onDismissFormMessage} /> : null}
       {isGuestAngler ? (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
