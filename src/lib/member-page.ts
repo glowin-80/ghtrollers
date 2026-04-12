@@ -10,6 +10,7 @@ export {
 export { buildMemberBestBigFiveBreakdown } from "@/lib/member-page-bigfive";
 export {
   findBestCatchByFishType,
+  findBestSwedishFineFishCatch,
   findBestFineFishBySpeciesCatchMap,
   calculateMemberStats,
 } from "@/lib/member-page-stats";

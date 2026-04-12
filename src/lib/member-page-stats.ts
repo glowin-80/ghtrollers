@@ -25,6 +25,14 @@ export function findBestCatchByFishType(
   return approved[0] || null;
 }
 
+export function findBestSwedishFineFishCatch(catches: MemberCatch[]): MemberCatch | null {
+  const approvedSwedishFineFish = getApprovedCatches(catches)
+    .filter((catchItem) => catchItem.fish_type === "Fina fisken" && !catchItem.caught_abroad)
+    .sort((a, b) => b.weight_g - a.weight_g);
+
+  return approvedSwedishFineFish[0] || null;
+}
+
 export function findBestFineFishBySpeciesCatchMap(
   catches: MemberCatch[]
 ): Record<string, MemberCatch> {
@@ -53,10 +61,11 @@ export function calculateMemberStats(catches: MemberCatch[], memberRole?: string
   const perch = approved.filter((c) => c.fish_type === "Abborre");
   const pike = approved.filter((c) => c.fish_type === "Gädda");
   const fine = approved.filter((c) => c.fish_type === "Fina fisken");
+  const swedishFine = fine.filter((c) => !c.caught_abroad);
 
   const biggestPike = pike.length > 0 ? Math.max(...pike.map((c) => c.weight_g)) : 0;
   const biggestPerch = perch.length > 0 ? Math.max(...perch.map((c) => c.weight_g)) : 0;
-  const bestFine = fine.length > 0 ? [...fine].sort((a, b) => b.weight_g - a.weight_g)[0] : null;
+  const bestFine = swedishFine.length > 0 ? [...swedishFine].sort((a, b) => b.weight_g - a.weight_g)[0] : null;
   const bestBigFiveBreakdown = buildMemberBestBigFiveBreakdown(catches, memberRole);
   const sum = (arr: MemberCatch[]) => arr.reduce((s, c) => s + c.weight_g, 0);
 
