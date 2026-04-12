@@ -22,7 +22,9 @@ export function getMemberRoleLabel(role?: string | null) {
   return "Medlem";
 }
 
-export function getProfileRoleLabel(member?: Pick<MemberProfile, "member_role" | "is_admin" | "is_super_admin"> | null) {
+export function getProfileRoleLabel(
+  member?: Pick<MemberProfile, "member_role" | "is_admin" | "is_super_admin"> | null
+) {
   if (member?.is_super_admin) {
     return "Super admin";
   }
@@ -34,7 +36,9 @@ export function getProfileRoleLabel(member?: Pick<MemberProfile, "member_role" |
   return getMemberRoleLabel(member?.member_role);
 }
 
-export function getAdminLevelLabel(member?: Pick<MemberProfile, "is_admin" | "is_super_admin"> | null) {
+export function getAdminLevelLabel(
+  member?: Pick<MemberProfile, "is_admin" | "is_super_admin"> | null
+) {
   if (member?.is_super_admin) {
     return "Super admin";
   }
@@ -44,6 +48,38 @@ export function getAdminLevelLabel(member?: Pick<MemberProfile, "is_admin" | "is
   }
 
   return "Medlem";
+}
+
+export function getAchievementTitle(catchCount: number) {
+  if (catchCount >= 1000) {
+    return "Gäddhängsikon";
+  }
+
+  if (catchCount >= 700) {
+    return "Fångstlegend";
+  }
+
+  if (catchCount >= 400) {
+    return "Mästerfiskarn";
+  }
+
+  if (catchCount >= 200) {
+    return "Sjöveteranen";
+  }
+
+  if (catchCount >= 100) {
+    return "Fångstjägaren";
+  }
+
+  if (catchCount >= 50) {
+    return "Storfiskarn";
+  }
+
+  if (catchCount >= 20) {
+    return "Fiskarn";
+  }
+
+  return "Fiskesugen";
 }
 
 export function buildMemberLookupByName(members: Member[]) {

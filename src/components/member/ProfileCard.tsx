@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { MemberProfile } from "@/types/member-page";
 import ProfileImageUploader from "@/components/member/ProfileImageUploader";
-import { getProfileRoleLabel } from "@/lib/ght-rules";
+import { getAchievementTitle, getProfileRoleLabel } from "@/lib/ght-rules";
 
 type ProfileCardProps = {
   member?: MemberProfile | null;
@@ -21,6 +21,7 @@ export default function ProfileCard({
   }
 
   const profileRoleLabel = getProfileRoleLabel(member);
+  const achievementTitle = getAchievementTitle(catchCount);
 
   return (
     <section className="relative overflow-visible rounded-[30px] border border-[#d8d2c7] bg-[#fcfbf8] shadow-[0_12px_36px_rgba(18,35,28,0.08)]">
@@ -67,6 +68,10 @@ export default function ProfileCard({
               <h1 className="mt-1 text-[1.95rem] font-bold leading-[0.94] text-[#1f2937] sm:text-[2.15rem]">
                 {member.name}
               </h1>
+
+              <div className="mt-2 text-[1rem] font-semibold tracking-[0.01em] text-[#6a5844] sm:text-[1.02rem]">
+                {achievementTitle}
+              </div>
             </div>
           </div>
         </div>
