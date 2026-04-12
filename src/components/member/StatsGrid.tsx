@@ -5,6 +5,7 @@ import {
   buildMemberBestBigFiveBreakdown,
   calculateMemberStats,
   findBestCatchByFishType,
+  findBestSwedishFineFishCatch,
   findBestFineFishBySpeciesCatchMap,
   formatDate,
   formatWeight,
@@ -269,7 +270,7 @@ export default function StatsGrid({ catches, memberRole, onSelectCatch }: Props)
     [filteredCatches]
   );
   const bestFineCatch = useMemo(
-    () => findBestCatchByFishType(filteredCatches, "Fina fisken"),
+    () => findBestSwedishFineFishCatch(filteredCatches),
     [filteredCatches]
   );
   const bestFineFishBySpeciesCatchMap = useMemo(

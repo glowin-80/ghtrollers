@@ -82,7 +82,7 @@ export default function ProfileCard({
           <div className="grid w-full max-w-[420px] grid-cols-2 gap-3">
             <Link
               href="/"
-              className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full border border-[#d8d2c7] bg-white px-5 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
+              className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full bg-[#324b2f] px-5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(50,75,47,0.22)] transition hover:bg-[#3e5d3b]"
             >
               Till startsidan
             </Link>
@@ -91,7 +91,7 @@ export default function ProfileCard({
               <button
                 type="button"
                 onClick={onLogout}
-                className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full bg-[#324b2f] px-5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(50,75,47,0.22)] transition hover:bg-[#3e5d3b]"
+                className="inline-flex h-[48px] items-center justify-center whitespace-nowrap rounded-full border border-[#d8d2c7] bg-white px-5 text-sm font-semibold text-[#374151] shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition hover:bg-[#f9f7f3]"
               >
                 Logga ut
               </button>
