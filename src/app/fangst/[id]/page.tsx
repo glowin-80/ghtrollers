@@ -8,11 +8,8 @@ import {
   formatCatchDateForDisplay,
   formatCatchWeightForDisplay,
 } from "@/lib/catch-sharing";
-import {
-  buildMemberLookupByName,
-  isCompetitionEligibleCatch,
-  isGuestAnglerRole,
-} from "@/lib/ght-rules";
+import { isCompetitionEligibleCatch, isGuestAnglerRole } from "@/lib/ght-rules";
+import { getCatchOwnerDisplayName, resolveCatchOwnerMember, buildMemberLookupById, buildMemberLookupByName } from "@/lib/catch-identity";
 import {
   fetchAllApprovedCatches,
   fetchPublicActiveMembers,
@@ -56,7 +53,7 @@ export async function generateMetadata({ params }: CatchPageProps): Promise<Meta
   }
 
   const { catchItem, shareDetails } = data;
-  const title = `${catchItem.caught_for} · ${shareDetails.fishLabel} · Gäddhäng Trollers`;
+  const title = `${getCatchOwnerDisplayName(catchItem, shareDetails.members)} · ${shareDetails.fishLabel} · Gäddhäng Trollers`;
   const description = shareDetails.shareText;
   const catchUrl = `/fangst/${catchItem.id}`;
 
@@ -77,7 +74,7 @@ export async function generateMetadata({ params }: CatchPageProps): Promise<Meta
         ? [
             {
               url: catchItem.image_url,
-              alt: `${catchItem.caught_for} med ${shareDetails.fishLabel}`,
+              alt: `${getCatchOwnerDisplayName(catchItem, shareDetails.members)} med ${shareDetails.fishLabel}`,
             },
           ]
         : undefined,
@@ -100,11 +97,12 @@ export default async function CatchPage({ params }: CatchPageProps) {
   }
 
   const { catchItem, shareDetails } = data;
-  const memberLookup = buildMemberLookupByName(shareDetails.members);
-  const owner = memberLookup[catchItem.caught_for?.trim() || ""];
+  const memberById = buildMemberLookupById(shareDetails.members);
+  const memberByName = buildMemberLookupByName(shareDetails.members);
+  const owner = resolveCatchOwnerMember(catchItem, { memberById, memberByName });
   const catchBadgeLabel = isGuestAnglerRole(owner?.member_role)
     ? "Privat fångst"
-    : isCompetitionEligibleCatch(catchItem, memberLookup)
+    : isCompetitionEligibleCatch(catchItem, shareDetails.members)
       ? "Tävlings fångst"
       : "Privat fångst";
   const yearlyRankLabel = shareDetails.yearlyRank
@@ -119,7 +117,7 @@ export default async function CatchPage({ params }: CatchPageProps) {
             <div className="aspect-[4/3] w-full overflow-hidden bg-[#ebe7de]">
               <img
                 src={catchItem.image_url}
-                alt={`${catchItem.caught_for} med ${shareDetails.fishLabel}`}
+                alt={`${getCatchOwnerDisplayName(catchItem, shareDetails.members)} med ${shareDetails.fishLabel}`}
                 className="h-full w-full object-cover"
                 decoding="async"
               />
@@ -133,7 +131,7 @@ export default async function CatchPage({ params }: CatchPageProps) {
                   {catchBadgeLabel}
                 </div>
                 <h1 className="mt-2 text-[2rem] font-bold leading-[0.96] text-[#1f2937] sm:text-[2.2rem]">
-                  {catchItem.caught_for}
+                  {getCatchOwnerDisplayName(catchItem, shareDetails.members)}
                 </h1>
                 <p className="mt-2 text-[1.05rem] text-[#5b6871]">
                   {shareDetails.fishLabel} · {formatCatchWeightForDisplay(catchItem.weight_g)}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { fetchCurrentMemberProfile, fetchMemberCatchesByName } from "@/lib/member-service";
+import { fetchCurrentMemberProfile, fetchMemberCatchesForMember } from "@/lib/member-service";
 import {
   achievementCategories,
   formatAchievementRange,
@@ -33,13 +33,13 @@ export default function AchievementsPage() {
 
         setMemberName(member?.name ?? null);
 
-        if (!member?.name) {
+        if (!member) {
           setCatchCount(0);
           setLoading(false);
           return;
         }
 
-        const catches = await fetchMemberCatchesByName(member.name);
+        const catches = await fetchMemberCatchesForMember(member);
 
         if (!mounted) return;
 
@@ -182,105 +182,105 @@ export default function AchievementsPage() {
             </div>
           </div>
 
-          <div className="mt-5 rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
-            <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
-              Vald kategori
+          <div className="mt-5 grid gap-3 lg:grid-cols-[1.3fr_0.9fr]">
+            <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
+              <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
+                Vald kategori
+              </div>
+              <div className="mt-2 text-[1.2rem] font-bold text-[#1f2937]">
+                {selectedCategory.label}
+              </div>
+              <p className="mt-2 max-w-3xl text-sm leading-7 text-[#6b7280]">
+                {selectedCategory.description}
+              </p>
             </div>
-            <div className="mt-2 text-[1.2rem] font-bold text-[#1f2937]">
-              {selectedCategory.label}
+
+            <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
+              <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
+                Din nivå
+              </div>
+              <div className="mt-2 text-[1.2rem] font-bold text-[#1f2937]">
+                {loading ? "Laddar..." : currentAchievement?.title ?? "Ingen nivå ännu"}
+              </div>
+              <p className="mt-2 text-sm leading-7 text-[#6b7280]">
+                {loading
+                  ? "Vi hämtar dina senaste achievement-data."
+                  : currentAchievement?.description ?? "När du börjar samla framsteg visas din nivå här."}
+              </p>
+              <div className="mt-4 text-sm font-semibold text-[#374151]">
+                {selectedCategory.label}: {catchCount}
+              </div>
+              {remainingToNext ? (
+                <div className="mt-2 text-sm text-[#6b7280]">
+                  {remainingToNext.remaining} kvar till nästa nivå
+                </div>
+              ) : (
+                <div className="mt-2 text-sm text-[#6b7280]">Du har nått högsta nivån.</div>
+              )}
             </div>
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-[#6b7280]">
-              {selectedCategory.description}
-            </p>
           </div>
 
           {selectedCategory.status === "coming_soon" ? (
-            <div className="mt-5 rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#fbfaf7] px-5 py-10 text-center">
-              <div className="text-[1.1rem] font-bold text-[#1f2937]">
-                Coming soon
-              </div>
-              <p className="mt-2 text-sm leading-7 text-[#6b7280]">
-                Den här achievement-kategorin kommer i ett senare steg. När den
-                släpps kommer både dina upplåsta märken och hela katalogen att
-                visas här.
-              </p>
+            <div className="mt-4 rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#fcfbf8] px-5 py-5 text-sm leading-7 text-[#6b7280]">
+              Den här achievement-kategorin kommer i ett senare steg. När den
+              blir live kommer dina framsteg att visas här.
             </div>
-          ) : (
-            <>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
-                  <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
-                    Nuvarande nivå
+          ) : null}
+
+          {selectedCategory.status === "active" ? (
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {resolvedAchievements.map((achievement) => (
+                <div
+                  key={achievement.id}
+                  className={[
+                    "rounded-[24px] border bg-[#fcfbf8] px-4 py-4 transition",
+                    achievement.current ? "border-[#cab98f]" : "border-[#e5ddd0]",
+                  ].join(" ")}
+                >
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={achievement.imageSrc}
+                      alt={achievement.title}
+                      className="h-16 w-16 shrink-0 object-contain"
+                      loading="lazy"
+                    />
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
+                        {achievement.current ? "Nuvarande nivå" : "Achievement"}
+                      </div>
+                      <div className="mt-1 text-lg font-bold leading-tight text-[#1f2937]">
+                        {achievement.title}
+                      </div>
+                    </div>
                   </div>
-                  <div className="mt-2 text-[1.1rem] font-bold text-[#1f2937]">
-                    {currentAchievement?.title ?? "Fiskesugen"}
+
+                  <p className="mt-4 text-sm leading-7 text-[#6b7280]">
+                    {achievement.description}
+                  </p>
+
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm">
+                    <span className="rounded-full bg-white px-3 py-1 font-semibold text-[#374151]">
+                      {formatAchievementRange(
+                        achievement.minValue,
+                        achievement.maxValue
+                      )}
+                    </span>
+
+                    <span
+                      className={[
+                        "rounded-full px-3 py-1 font-semibold",
+                        achievement.unlocked
+                          ? "bg-[#324b2f] text-white"
+                          : "bg-white text-[#6b7280]",
+                      ].join(" ")}
+                    >
+                      {achievement.unlocked ? "Upplåst" : "Ej upplåst"}
+                    </span>
                   </div>
                 </div>
-
-                <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
-                  <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
-                    Rapporterade fångster
-                  </div>
-                  <div className="mt-2 text-[2rem] font-bold leading-none text-[#1f2937]">
-                    {catchCount}
-                  </div>
-                  <div className="mt-2 text-sm text-[#6b7280]">
-                    {remainingToNext
-                      ? `${remainingToNext.remaining} fångster kvar till ${remainingToNext.title}`
-                      : "Du har nått högsta nivån i denna kategori."}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {resolvedAchievements.map((achievement) => (
-                  <article
-                    key={achievement.id}
-                    className={[
-                      "overflow-hidden rounded-[26px] border bg-[#fcfbf8] shadow-[0_6px_18px_rgba(18,35,28,0.05)]",
-                      achievement.current ? "border-[#cab98f]" : "border-[#e5ddd0]",
-                    ].join(" ")}
-                  >
-                    <div className="relative flex items-center justify-center px-4 pt-5">
-                      <img
-                        src={achievement.imageSrc}
-                        alt={achievement.title}
-                        className="h-[150px] w-[150px] object-contain"
-                        loading="lazy"
-                      />
-                      {!achievement.unlocked ? (
-                        <div className="absolute inset-0 bg-black/90" aria-hidden="true" />
-                      ) : null}
-                    </div>
-
-                    <div className="px-5 pb-5 pt-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="text-[1.15rem] font-bold leading-tight text-[#1f2937]">
-                          {achievement.title}
-                        </div>
-                        {achievement.current ? (
-                          <span className="rounded-full bg-[#324b2f] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-white">
-                            Du är här
-                          </span>
-                        ) : null}
-                      </div>
-
-                      <div className="mt-3 text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
-                        {formatAchievementRange(
-                          achievement.minValue,
-                          achievement.maxValue
-                        )}
-                      </div>
-
-                      <p className="mt-3 text-sm leading-7 text-[#6b7280]">
-                        {achievement.description}
-                      </p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </>
-          )}
+              ))}
+            </div>
+          ) : null}
         </section>
       </div>
     </main>

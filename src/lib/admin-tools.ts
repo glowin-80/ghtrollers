@@ -1,3 +1,4 @@
+import { resolveCatchOwnerMember, buildMemberLookupById, buildMemberLookupByName } from "@/lib/catch-identity";
 import { supabase } from "@/lib/supabase";
 import { getMemberRoleLabel } from "@/lib/ght-rules";
 
@@ -16,7 +17,9 @@ export type PendingMember = {
 export type PendingCatch = {
   id: string;
   caught_for: string;
+  caught_for_member_id?: string | null;
   registered_by: string;
+  registered_by_member_id?: string | null;
   fish_type: string;
   fine_fish_type: string | null;
   weight_g: number;
@@ -52,27 +55,24 @@ export async function fetchPendingCatches() {
     supabase
       .from("catches")
       .select(
-        "id, caught_for, registered_by, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, fishing_method, live_scope, caught_abroad, is_location_private, status, created_at, original_image_size_bytes, compressed_image_size_bytes"
+        "id, caught_for, caught_for_member_id, registered_by, registered_by_member_id, fish_type, fine_fish_type, weight_g, catch_date, location_name, image_url, fishing_method, live_scope, caught_abroad, is_location_private, status, created_at, original_image_size_bytes, compressed_image_size_bytes"
       )
       .eq("status", "pending")
       .order("created_at", { ascending: true }),
-    supabase.from("members").select("name, member_role"),
+    supabase.from("members").select("id, name, member_role"),
   ]);
 
   if (error) throw error;
   if (membersError) throw membersError;
 
-  const memberRoleByName = (members ?? []).reduce<Record<string, string | null>>((acc, member) => {
-    const key = member.name?.trim();
-    if (key) {
-      acc[key] = member.member_role ?? null;
-    }
-    return acc;
-  }, {});
+  const typedMembers = (members ?? []) as Array<{ id: string; name: string | null; member_role: string | null }> ;
+  const memberById = buildMemberLookupById(typedMembers);
+  const memberByName = buildMemberLookupByName(typedMembers);
 
   return ((data ?? []) as PendingCatch[]).map((item) => ({
     ...item,
-    owner_member_role: memberRoleByName[item.caught_for?.trim() ?? ""] ?? null,
+    owner_member_role:
+      resolveCatchOwnerMember(item, { memberById, memberByName })?.member_role ?? null,
   }));
 }
 

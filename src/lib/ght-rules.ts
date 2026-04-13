@@ -1,4 +1,10 @@
 import { getCurrentAchievementByValue } from "@/lib/achievements";
+import {
+  buildMemberLookupById,
+  buildMemberLookupByName,
+  normalizeIdentityValue,
+  resolveCatchOwnerMember,
+} from "@/lib/catch-identity";
 import type { Catch, Member } from "@/types/home";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
 
@@ -55,19 +61,16 @@ export function getAchievementTitle(catchCount: number) {
   return getCurrentAchievementByValue(catchCount, "reported_catches")?.title ?? "Fiskesugen";
 }
 
-export function buildMemberLookupByName(members: Member[]) {
-  return members.reduce<Record<string, Member>>((acc, member) => {
-    const key = member.name?.trim();
-    if (key) acc[key] = member;
-    return acc;
-  }, {});
-}
+export { buildMemberLookupById, buildMemberLookupByName };
 
 export function getCompetitionExclusionReason(
-  catchItem: Pick<Catch, "caught_for" | "live_scope" | "caught_abroad">,
-  memberLookupByName: Record<string, Member>
+  catchItem: Pick<Catch, "caught_for" | "caught_for_member_id" | "live_scope" | "caught_abroad">,
+  members: Member[]
 ): string | null {
-  const owner = memberLookupByName[catchItem.caught_for?.trim() || ""];
+  const owner = resolveCatchOwnerMember(catchItem, {
+    memberById: buildMemberLookupById(members),
+    memberByName: buildMemberLookupByName(members),
+  });
 
   if (owner && isGuestAnglerRole(owner.member_role)) {
     return "Gästfiskare";
@@ -82,25 +85,36 @@ export function getCompetitionExclusionReason(
 }
 
 export function isCompetitionEligibleCatch(
-  catchItem: Pick<Catch, "caught_for" | "live_scope" | "caught_abroad">,
-  memberLookupByName: Record<string, Member>
+  catchItem: Pick<Catch, "caught_for" | "caught_for_member_id" | "live_scope" | "caught_abroad">,
+  members: Member[]
 ) {
-  return getCompetitionExclusionReason(catchItem, memberLookupByName) === null;
+  return getCompetitionExclusionReason(catchItem, members) === null;
 }
 
 export function canViewerSeePrivateLocation(
-  catchItem: Pick<Catch, "caught_for" | "registered_by" | "is_location_private">,
+  catchItem: Pick<
+    Catch,
+    "caught_for" | "caught_for_member_id" | "registered_by" | "registered_by_member_id" | "is_location_private"
+  >,
   viewer: LocationVisibilityViewer
 ) {
   if (!catchItem.is_location_private) return true;
   if (viewer.isSuperAdmin) return true;
   if (!viewer.isLoggedIn) return false;
 
-  const viewerName = viewer.memberName?.trim();
+  const viewerId = normalizeIdentityValue(viewer.memberId);
+  const ownerId = normalizeIdentityValue(catchItem.caught_for_member_id);
+  const registrarId = normalizeIdentityValue(catchItem.registered_by_member_id);
+
+  if (viewerId && (viewerId === ownerId || viewerId === registrarId)) {
+    return true;
+  }
+
+  const viewerName = normalizeIdentityValue(viewer.memberName);
   return Boolean(
     viewerName &&
-      (viewerName === catchItem.caught_for?.trim() ||
-        viewerName === catchItem.registered_by?.trim())
+      (viewerName === normalizeIdentityValue(catchItem.caught_for) ||
+        viewerName === normalizeIdentityValue(catchItem.registered_by))
   );
 }
 

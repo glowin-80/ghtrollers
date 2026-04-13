@@ -26,7 +26,7 @@ export default function Home() {
   } = useHomeData();
 
   const {
-    caughtFor,
+    caughtForMemberId,
     registeredBy,
     fishType,
     fineFishType,
@@ -79,7 +79,9 @@ export default function Home() {
     isLoggedIn,
     hasActiveMembership,
     registeredByDefault: member?.name ?? "",
+    registeredByMemberId: member?.id ?? null,
     isGuestAngler: member?.member_role === "guest_angler",
+    members,
   });
 
   const currentSwedenYear = useMemo(() => {
@@ -181,7 +183,7 @@ export default function Home() {
               isLoggedIn={isLoggedIn}
               hasActiveMembership={hasActiveMembership}
               members={members}
-              caughtFor={caughtFor}
+              caughtForMemberId={caughtForMemberId}
               registeredBy={registeredBy}
               fishType={fishType}
               fineFishType={fineFishType}

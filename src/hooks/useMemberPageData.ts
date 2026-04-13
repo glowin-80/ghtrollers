@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   fetchCurrentMemberProfile,
-  fetchMemberCatchesByName,
+  fetchMemberCatchesForMember,
 } from "@/lib/member-service";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
 
@@ -23,14 +23,14 @@ export function useMemberPageData() {
     };
   }, []);
 
-  const loadMemberCatches = useCallback(async (memberName: string) => {
+  const loadMemberCatches = useCallback(async (resolvedMember: Pick<MemberProfile, "id" | "name">) => {
     try {
       if (mountedRef.current) {
         setCatchesLoading(true);
         setCatchesError(null);
       }
 
-      const catchesData = await fetchMemberCatchesByName(memberName);
+      const catchesData = await fetchMemberCatchesForMember(resolvedMember);
 
       if (!mountedRef.current) {
         return;
@@ -82,7 +82,7 @@ export function useMemberPageData() {
         return;
       }
 
-      await loadMemberCatches(resolvedMember.name || "");
+      await loadMemberCatches(resolvedMember);
     } catch (err) {
       console.error(err);
 
@@ -100,7 +100,7 @@ export function useMemberPageData() {
   }, [loadPage]);
 
   const handleProfileImageUploaded = useCallback((imageUrl: string) => {
-    setMember((prev) => {
+    setMember((prev: MemberProfile | null) => {
       if (!prev) {
         return prev;
       }

@@ -1,11 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { normalizeFineFishTypeInput } from "@/lib/home-upload";
 
-type UseCatchUploadFormOptions = { registeredByDefault: string };
+type UseCatchUploadFormOptions = {
+  registeredByDefault: string;
+  registeredByMemberIdDefault?: string | null;
+};
 
-export function useCatchUploadForm({ registeredByDefault }: UseCatchUploadFormOptions) {
-  const [caughtFor, setCaughtFor] = useState("");
+export function useCatchUploadForm({
+  registeredByDefault,
+  registeredByMemberIdDefault = null,
+}: UseCatchUploadFormOptions) {
+  const [caughtForMemberId, setCaughtForMemberId] = useState("");
   const [registeredBy, setRegisteredBy] = useState(registeredByDefault);
+  const [registeredByMemberId, setRegisteredByMemberId] = useState<string | null>(
+    registeredByMemberIdDefault
+  );
   const [fishType, setFishType] = useState("");
   const [fineFishType, setFineFishType] = useState("");
   const [weight, setWeight] = useState("");
@@ -31,9 +40,14 @@ export function useCatchUploadForm({ registeredByDefault }: UseCatchUploadFormOp
     setRegisteredBy(registeredByDefault);
   }, [registeredByDefault]);
 
+  useEffect(() => {
+    setRegisteredByMemberId(registeredByMemberIdDefault);
+  }, [registeredByMemberIdDefault]);
+
   const resetForm = useCallback(() => {
-    setCaughtFor("");
+    setCaughtForMemberId("");
     setRegisteredBy(registeredByDefault);
+    setRegisteredByMemberId(registeredByMemberIdDefault);
     setFishType("");
     setFineFishType("");
     setWeight("");
@@ -44,8 +58,8 @@ export function useCatchUploadForm({ registeredByDefault }: UseCatchUploadFormOp
     setIsLocationPrivate(false);
     setLocationName("");
     setImageFile(null);
-    setFileInputKey((prev) => prev + 1);
-  }, [registeredByDefault]);
+    setFileInputKey((prev: number) => prev + 1);
+  }, [registeredByDefault, registeredByMemberIdDefault]);
 
   const handleFishTypeChange = useCallback((value: string) => {
     setFishType(value);
@@ -55,8 +69,9 @@ export function useCatchUploadForm({ registeredByDefault }: UseCatchUploadFormOp
   }, []);
 
   return {
-    caughtFor,
+    caughtForMemberId,
     registeredBy,
+    registeredByMemberId,
     fishType,
     fineFishType,
     weight,
@@ -70,7 +85,7 @@ export function useCatchUploadForm({ registeredByDefault }: UseCatchUploadFormOp
     previewUrl,
     fileInputKey,
     resetForm,
-    handleCaughtForChange: useCallback((value: string) => setCaughtFor(value), []),
+    handleCaughtForChange: useCallback((value: string) => setCaughtForMemberId(value), []),
     handleFishTypeChange,
     handleFineFishTypeChange: useCallback(
       (value: string) => setFineFishType(normalizeFineFishTypeInput(value)),
