@@ -30,6 +30,13 @@ export const desktopGraphicItems: NavItem[] = [
     type: "route",
   },
   {
+    id: "achievements",
+    label: "Achievements",
+    href: "/achievements",
+    alt: "Achievements",
+    type: "route",
+  },
+  {
     id: "map",
     label: "Karta",
     section: "map-section",
@@ -82,6 +89,13 @@ export const mobileMenuItems: NavItem[] = [
     type: "route",
   },
   {
+    id: "achievements",
+    label: "Achievements",
+    href: "/achievements",
+    alt: "Achievements",
+    type: "route",
+  },
+  {
     id: "map",
     label: "Karta",
     section: "map-section",
@@ -130,6 +144,14 @@ export function getMobileCardTheme(itemId: string) {
         iconCircle:
           "bg-[linear-gradient(180deg,#a17849_0%,#784f28_100%)] text-[#f0d8a8]",
         arrow: "text-[#f0d8a8]",
+      };
+    case "achievements":
+      return {
+        outer:
+          "border-[#c3a766] bg-[linear-gradient(180deg,#746247_0%,#5a4a34_100%)] text-[#f6e8c8]",
+        iconCircle:
+          "bg-[linear-gradient(180deg,#90785a_0%,#6d583e_100%)] text-[#f0ddb1]",
+        arrow: "text-[#f0ddb1]",
       };
     case "map":
       return {
