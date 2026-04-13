@@ -2,15 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { fetchActiveAchievementMembers, type AchievementMemberSummary } from "@/lib/member-service";
 import {
   achievementCategories,
   getAchievementCategory,
   getCurrentAchievementByValue,
 } from "@/lib/achievements";
-import {
-  fetchActiveAchievementMembers,
-  type AchievementMemberSummary,
-} from "@/lib/member-service";
 
 type RankedAchievementMember = AchievementMemberSummary & {
   achievementTitle: string;
@@ -125,8 +122,7 @@ export default function GaddhangAchievementsPage() {
   }, [selectedCategoryId, selectedCategory.status]);
 
   const liveCategories = useMemo(
-    () =>
-      achievementCategories.filter((category) => category.status === "active"),
+    () => achievementCategories.filter((category) => category.status === "active"),
     []
   );
 
@@ -142,6 +138,8 @@ export default function GaddhangAchievementsPage() {
     () => members.reduce((sum, member) => sum + member.categoryValue, 0),
     [members]
   );
+
+  const topMember = members[0] ?? null;
 
   return (
     <main className="px-4 pb-8 pt-4">
@@ -207,8 +205,8 @@ export default function GaddhangAchievementsPage() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4 sm:col-span-3">
+          <div className="mt-5 grid gap-3 lg:grid-cols-[1.4fr_1fr]">
+            <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
               <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
                 Vald kategori
               </div>
@@ -222,19 +220,44 @@ export default function GaddhangAchievementsPage() {
 
             <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
               <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
-                Medlemmar i listan
-              </div>
-              <div className="mt-2 text-[1.1rem] font-bold text-[#1f2937]">
-                {formatMemberCount(members.length)}
-              </div>
-            </div>
-
-            <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
-              <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
                 Högsta nivå just nu
               </div>
-              <div className="mt-2 text-[1.1rem] font-bold text-[#1f2937]">
-                {getHighestAchievementTitle(members)}
+              {topMember ? (
+                <div className="mt-3 flex items-center gap-3">
+                  <img
+                    src={topMember.achievementImageSrc}
+                    alt={topMember.achievementTitle}
+                    className="h-14 w-14 shrink-0 object-contain"
+                    loading="lazy"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-[1rem] font-bold text-[#1f2937]">
+                      {topMember.achievementTitle}
+                    </div>
+                    <div className="mt-1 text-sm text-[#6b7280]">
+                      {topMember.name} ·{" "}
+                      {formatCategoryValue(selectedCategoryId, topMember.categoryValue)}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-2 text-[1rem] font-bold text-[#1f2937]">
+                  Ingen nivå ännu
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
+              <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
+                Medlemmar i listan
+              </div>
+              <div className="mt-2 text-[1.6rem] font-bold leading-none text-[#1f2937]">
+                {members.length}
+              </div>
+              <div className="mt-2 text-sm text-[#6b7280]">
+                {formatMemberCount(members.length)}
               </div>
             </div>
 
@@ -242,8 +265,23 @@ export default function GaddhangAchievementsPage() {
               <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
                 Total i kategorin
               </div>
-              <div className="mt-2 text-[1.1rem] font-bold text-[#1f2937]">
+              <div className="mt-2 text-[1.6rem] font-bold leading-none text-[#1f2937]">
+                {totalCategoryValue}
+              </div>
+              <div className="mt-2 text-sm text-[#6b7280]">
                 {formatCategoryValue(selectedCategoryId, totalCategoryValue)}
+              </div>
+            </div>
+
+            <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-4">
+              <div className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
+                Live-kategorier
+              </div>
+              <div className="mt-2 text-[1.6rem] font-bold leading-none text-[#1f2937]">
+                {liveCategories.length}
+              </div>
+              <div className="mt-2 text-sm text-[#6b7280]">
+                Aktiva just nu
               </div>
             </div>
           </div>
@@ -279,11 +317,6 @@ export default function GaddhangAchievementsPage() {
                   Nivåer i {selectedCategory.label}
                 </h2>
               </div>
-
-              <div className="hidden text-sm text-[#6b7280] sm:block">
-                {liveCategories.length} livekategori
-                {liveCategories.length === 1 ? "" : "er"}
-              </div>
             </div>
 
             <div className="mt-5 space-y-3">
@@ -294,83 +327,101 @@ export default function GaddhangAchievementsPage() {
               ) : null}
 
               {!loading &&
-                members.map((member) => (
-                  <details
-                    key={member.id}
-                    className="group overflow-hidden rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8]"
-                    open={expandedMemberId === member.id}
-                    onToggle={(event) => {
-                      const nextOpen = (event.currentTarget as HTMLDetailsElement)
-                        .open;
-                      setExpandedMemberId(nextOpen ? member.id : null);
-                    }}
-                  >
-                    <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-4">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#324b2f] text-sm font-bold text-white">
-                        {members.findIndex((row) => row.id === member.id) + 1}
-                      </div>
+                members.map((member, index) => {
+                  const isExpanded = expandedMemberId === member.id;
 
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d8d2c7] bg-[#efe7d7]">
-                        {member.profile_image_url ? (
-                          <img
-                            src={member.profile_image_url}
-                            alt={member.name || "Medlem"}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span className="text-xl">👤</span>
-                        )}
-                      </div>
+                  return (
+                    <article
+                      key={member.id}
+                      className="overflow-hidden rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] shadow-[0_4px_12px_rgba(18,35,28,0.04)]"
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpandedMemberId((current) =>
+                            current === member.id ? null : member.id
+                          )
+                        }
+                        className="flex w-full items-center gap-4 px-4 py-4 text-left transition hover:bg-[#faf7f1]"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#324b2f] text-sm font-bold text-white shadow-[0_6px_12px_rgba(50,75,47,0.18)]">
+                          {index + 1}
+                        </div>
 
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
-                          Namn: {member.name}
-                        </div>
-                        <div className="mt-1 text-[1.08rem] font-bold leading-tight text-[#1f2937]">
-                          {member.achievementTitle}
-                        </div>
-                        <div className="mt-1 text-sm text-[#6b7280]">
-                          {formatCategoryValue(
-                            selectedCategoryId,
-                            member.categoryValue
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d8d2c7] bg-[#efe7d7]">
+                          {member.profile_image_url ? (
+                            <img
+                              src={member.profile_image_url}
+                              alt={member.name || "Medlem"}
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <span className="text-xl">👤</span>
                           )}
                         </div>
-                      </div>
 
-                      <img
-                        src={member.achievementImageSrc}
-                        alt={member.achievementTitle}
-                        className="h-14 w-14 shrink-0 object-contain"
-                        loading="lazy"
-                      />
-                    </summary>
-
-                    <div className="border-t border-[#efe7d7] px-5 py-4 text-sm leading-7 text-[#6b7280]">
-                      <div className="flex items-start gap-4">
-                        <img
-                          src={member.achievementImageSrc}
-                          alt={member.achievementTitle}
-                          className="h-20 w-20 shrink-0 object-contain"
-                          loading="lazy"
-                        />
-
-                        <div className="min-w-0">
-                          <div className="font-semibold text-[#1f2937]">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[1rem] font-bold leading-tight text-[#1f2937]">
+                            {member.name}
+                          </div>
+                          <div className="mt-1 text-sm font-medium text-[#6b7280]">
                             {member.achievementTitle}
                           </div>
-                          <div className="mt-1 text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
+                          <div className="mt-1 text-sm text-[#8b7449]">
                             {formatCategoryValue(
                               selectedCategoryId,
                               member.categoryValue
                             )}
                           </div>
-                          <p className="mt-2">{member.achievementDescription}</p>
                         </div>
-                      </div>
-                    </div>
-                  </details>
-                ))}
+
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={member.achievementImageSrc}
+                            alt={member.achievementTitle}
+                            className="h-14 w-14 shrink-0 object-contain"
+                            loading="lazy"
+                          />
+                          <span className="hidden rounded-full border border-[#d8d2c7] bg-white px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#6b7280] sm:inline-flex">
+                            {isExpanded ? "Dölj" : "Visa mer"}
+                          </span>
+                        </div>
+                      </button>
+
+                      {isExpanded ? (
+                        <div className="border-t border-[#efe7d7] bg-white/70 px-5 py-4">
+                          <div className="flex items-start gap-4">
+                            <img
+                              src={member.achievementImageSrc}
+                              alt={member.achievementTitle}
+                              className="h-20 w-20 shrink-0 object-contain"
+                              loading="lazy"
+                            />
+
+                            <div className="min-w-0">
+                              <div className="text-[1rem] font-bold text-[#1f2937]">
+                                {member.achievementTitle}
+                              </div>
+                              <div className="mt-1 text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
+                                Namn: {member.name}
+                              </div>
+                              <div className="mt-1 text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8b7449]">
+                                {formatCategoryValue(
+                                  selectedCategoryId,
+                                  member.categoryValue
+                                )}
+                              </div>
+                              <p className="mt-3 text-sm leading-7 text-[#6b7280]">
+                                {member.achievementDescription}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </article>
+                  );
+                })}
 
               {!loading && !members.length ? (
                 <div className="rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-5 text-sm text-[#4b5563]">
