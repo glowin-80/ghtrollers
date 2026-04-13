@@ -6,7 +6,7 @@ export type MemberIdentitySource = {
 };
 
 export type CatchIdentitySource = {
-  id: string;
+  id?: string;
   caught_for?: string | null;
   caught_for_member_id?: string | null;
   registered_by?: string | null;
@@ -168,7 +168,7 @@ export function getCatchOwnerIdentityKey(
     return `name:${fallbackName}`;
   }
 
-  return `catch:${catchItem.id}`;
+  return catchItem.id ? `catch:${catchItem.id}` : "catch:unknown";
 }
 
 export function catchMatchesMemberIdentity(
