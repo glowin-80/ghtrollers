@@ -355,7 +355,9 @@ function LeaderboardSectionComponent({
   const memberImageMap = useMemo(() => {
     return members.reduce<Record<string, string | null>>((acc, member) => {
       acc[member.id] = member.profile_image_url || null;
+      acc[`member:${member.id}`] = member.profile_image_url || null;
       acc[member.name] = member.profile_image_url || null;
+      acc[`name:${member.name}`] = member.profile_image_url || null;
       return acc;
     }, {});
   }, [members]);
