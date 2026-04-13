@@ -179,22 +179,22 @@ export default function SignupForm() {
         ) : null}
 
         <div className="flex flex-wrap gap-3">
-          <Link
-            href="/login"
-            className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
-          >
-            Till login
-          </Link>
-
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Skapar konto..." : "Ansök om medlemskap"}
           </button>
+
+          <Link
+            href="/login"
+            className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
+          >
+            Till login
+          </Link>
         </div>
       </form>
     </section>
   );
-  }
+}

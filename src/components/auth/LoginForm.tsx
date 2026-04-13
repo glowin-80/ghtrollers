@@ -116,20 +116,20 @@ export default function LoginForm() {
         ) : null}
 
         <div className="flex flex-wrap gap-3 pt-2">
-          <Link
-            href="/"
-            className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
-          >
-            Till startsidan
-          </Link>
-
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Loggar in..." : "Logga in"}
           </button>
+
+          <Link
+            href="/"
+            className="inline-flex rounded-full border border-[#d8d2c7] bg-white px-5 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9f7f3]"
+          >
+            Till startsidan
+          </Link>
         </div>
 
         <div className="flex flex-wrap gap-x-4 gap-y-2 pt-2 text-sm">
