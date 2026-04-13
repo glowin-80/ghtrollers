@@ -22,6 +22,7 @@ export default function MinSidaPage() {
     catchesLoading,
     member,
     catches,
+    members,
     error,
     catchesError,
     loadMemberCatches,
@@ -187,6 +188,7 @@ export default function MinSidaPage() {
 
               <MyCatchesSection
                 catches={visibleCatches}
+                members={members}
                 targetCatchId={reportTargetCatchId}
                 onTargetHandled={() => setReportTargetCatchId(null)}
               />
@@ -197,6 +199,7 @@ export default function MinSidaPage() {
 
       <MemberCatchSpotlightModal
         catchItem={selectedCatch}
+        members={members}
         onClose={() => setSelectedCatchId(null)}
         onNavigateToCatchReport={(catchId) => {
           setSelectedCatchId(null);

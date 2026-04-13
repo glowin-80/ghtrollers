@@ -298,7 +298,10 @@ export default function AllTimeHighPage() {
 
   const memberImageMap = useMemo(() => {
     return members.reduce<Record<string, string | null>>((acc, member) => {
+      acc[member.id] = member.profile_image_url || null;
+      acc[`member:${member.id}`] = member.profile_image_url || null;
       acc[member.name] = member.profile_image_url || null;
+      acc[`name:${member.name}`] = member.profile_image_url || null;
       return acc;
     }, {});
   }, [members]);
@@ -367,7 +370,7 @@ export default function AllTimeHighPage() {
                 <AllTimeCard
                   key={section.value}
                   item={highlight}
-                  profileImage={memberImageMap[highlight.winnerName] || null}
+                  profileImage={memberImageMap[highlight.identityKey ?? highlight.winnerName] || null}
                   bigFiveBreakdown={
                     section.value === "bigfive"
                       ? allTimeBigFiveLeader?.breakdown

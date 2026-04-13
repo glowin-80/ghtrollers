@@ -6,16 +6,23 @@ import {
   formatWeight,
   getDisplayFishName,
 } from "@/lib/member-page";
+import {
+  getCatchOwnerDisplayName,
+  getCatchRegistrarDisplayName,
+} from "@/lib/catch-identity";
+import type { Member } from "@/types/home";
 import type { MemberCatch } from "@/types/member-page";
 
 type MemberCatchSpotlightModalProps = {
   catchItem: MemberCatch | null;
+  members: Member[];
   onClose: () => void;
   onNavigateToCatchReport: (catchId: string) => void;
 };
 
 export default function MemberCatchSpotlightModal({
   catchItem,
+  members,
   onClose,
   onNavigateToCatchReport,
 }: MemberCatchSpotlightModalProps) {
@@ -67,6 +74,8 @@ export default function MemberCatchSpotlightModal({
   }
 
   const displayFishName = getDisplayFishName(catchItem);
+  const ownerName = getCatchOwnerDisplayName(catchItem, members);
+  const registrarName = getCatchRegistrarDisplayName(catchItem, members);
 
   return (
     <>
@@ -103,7 +112,7 @@ export default function MemberCatchSpotlightModal({
               </h2>
 
               <div className="mt-1 text-[0.9rem] font-medium leading-tight text-[#74685a]">
-                {catchItem.caught_for}
+                {ownerName}
               </div>
             </div>
 
@@ -164,7 +173,7 @@ export default function MemberCatchSpotlightModal({
                   Fångad av
                 </div>
                 <div className="mt-1 text-[0.88rem] font-semibold leading-snug text-[#374151]">
-                  {catchItem.caught_for}
+                  {ownerName}
                 </div>
               </div>
 
@@ -182,7 +191,7 @@ export default function MemberCatchSpotlightModal({
                   Registrerad av
                 </div>
                 <div className="mt-1 text-[0.88rem] font-semibold leading-snug text-[#374151]">
-                  {catchItem.registered_by}
+                  {registrarName}
                 </div>
               </div>
             </div>

@@ -9,10 +9,16 @@ import {
   getStatusClasses,
   getStatusLabel,
 } from "@/lib/member-page";
+import {
+  getCatchOwnerDisplayName,
+  getCatchRegistrarDisplayName,
+} from "@/lib/catch-identity";
+import type { Member } from "@/types/home";
 import type { MemberCatch } from "@/types/member-page";
 
 type MyCatchesSectionProps = {
   catches: MemberCatch[];
+  members: Member[];
   targetCatchId?: string | null;
   onTargetHandled?: () => void;
 };
@@ -21,6 +27,7 @@ type CatchYearFilter = "all" | string;
 
 export default function MyCatchesSection({
   catches,
+  members,
   targetCatchId = null,
   onTargetHandled,
 }: MyCatchesSectionProps) {
@@ -182,6 +189,8 @@ export default function MyCatchesSection({
         <div className="mt-4 space-y-3">
           {filteredCatches.map((item) => {
             const isHighlighted = highlightedCatchId === item.id;
+            const ownerName = getCatchOwnerDisplayName(item, members);
+            const registrarName = getCatchRegistrarDisplayName(item, members);
 
             return (
               <div
@@ -210,33 +219,35 @@ export default function MyCatchesSection({
                     </div>
 
                     <div className="mt-1 text-sm leading-6 text-[#6b7280]">
-                      Fångad av: {item.caught_for} • Registrerad av:{" "}
-                      {item.registered_by}
+                      Fångad av: {ownerName} • Registrerad av: {registrarName}
                     </div>
 
                     <div className="mt-2 flex flex-wrap gap-2 text-xs">
                       <span className="rounded-full bg-[#eef6ea] px-3 py-1 text-[#355b2c]">
                         {item.fishing_method || "Ingen metod"}
                       </span>
+
                       {item.live_scope ? (
-                        <span className="rounded-full bg-[#fff7ea] px-3 py-1 text-xs font-semibold text-[#7a5b1e]">Live-scope</span>
+                        <span className="rounded-full bg-[#e8eefb] px-3 py-1 text-[#365892]">
+                          Live-scope
+                        </span>
                       ) : null}
+
                       {item.caught_abroad ? (
-                        <span className="rounded-full bg-[#fff7ea] px-3 py-1 text-[#7a5b1e]">Utomlands</span>
+                        <span className="rounded-full bg-[#fff1e6] px-3 py-1 text-[#9a4f1f]">
+                          Utomlands
+                        </span>
                       ) : null}
-                      {item.is_location_private ? (
-                        <span className="rounded-full bg-[#f3f4f6] px-3 py-1 text-[#4b5563]">Privat plats</span>
-                      ) : null}
+
+                      <span
+                        className={`shrink-0 rounded-full px-3 py-1 text-sm font-semibold ${getStatusClasses(
+                          item.status
+                        )}`}
+                      >
+                        {getStatusLabel(item.status)}
+                      </span>
                     </div>
                   </div>
-
-                  <span
-                    className={`inline-flex shrink-0 rounded-full px-3 py-1 text-sm font-semibold ${getStatusClasses(
-                      item.status
-                    )}`}
-                  >
-                    {getStatusLabel(item.status)}
-                  </span>
                 </div>
               </div>
             );

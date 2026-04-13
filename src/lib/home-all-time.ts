@@ -1,5 +1,5 @@
 import { buildAllTimeBigFiveLeader } from "@/lib/home-bigfive";
-import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
+import { getCatchOwnerDisplayName, getCatchOwnerIdentityKey } from "@/lib/catch-identity";
 import { isCompetitionEligibleCatch } from "@/lib/ght-rules";
 import type { AllTimeHighlight, Catch, Member } from "@/types/home";
 
@@ -11,9 +11,9 @@ export function buildAllTimeHighlights(catches: Catch[], members: Member[]): All
   const largestFineFish = [...eligibleCatches].filter((catchItem) => catchItem.fish_type === "Fina fisken").sort((a, b) => b.weight_g - a.weight_g)[0];
 
   const highlights: AllTimeHighlight[] = [];
-  if (bigFiveLeader) highlights.push({ filter: "bigfive", title: "Big Five", winnerName: bigFiveLeader.winnerName, total: bigFiveLeader.total, sourceCount: bigFiveLeader.sourceCount, catchDate: bigFiveLeader.catchDate, catchImageUrl: bigFiveLeader.catchImageUrl, bestYear: bigFiveLeader.bestYear });
-  if (largestPerch) highlights.push({ filter: "abborre", title: "Abborre", winnerName: getCatchOwnerDisplayName(largestPerch, members), total: largestPerch.weight_g, catchDate: largestPerch.catch_date, locationName: largestPerch.location_name || null, catchImageUrl: largestPerch.image_url || null });
-  if (largestPike) highlights.push({ filter: "gädda", title: "Gädda", winnerName: getCatchOwnerDisplayName(largestPike, members), total: largestPike.weight_g, catchDate: largestPike.catch_date, locationName: largestPike.location_name || null, catchImageUrl: largestPike.image_url || null });
-  if (largestFineFish) highlights.push({ filter: "fina", title: "Fina fisken", winnerName: getCatchOwnerDisplayName(largestFineFish, members), total: largestFineFish.weight_g, detail: largestFineFish.fine_fish_type || null, catchDate: largestFineFish.catch_date, locationName: largestFineFish.location_name || null, catchImageUrl: largestFineFish.image_url || null });
+  if (bigFiveLeader) highlights.push({ filter: "bigfive", identityKey: bigFiveLeader.identityKey, title: "Big Five", winnerName: bigFiveLeader.winnerName, total: bigFiveLeader.total, sourceCount: bigFiveLeader.sourceCount, catchDate: bigFiveLeader.catchDate, catchImageUrl: bigFiveLeader.catchImageUrl, bestYear: bigFiveLeader.bestYear });
+  if (largestPerch) highlights.push({ filter: "abborre", identityKey: getCatchOwnerIdentityKey(largestPerch), title: "Abborre", winnerName: getCatchOwnerDisplayName(largestPerch, members), total: largestPerch.weight_g, catchDate: largestPerch.catch_date, locationName: largestPerch.location_name || null, catchImageUrl: largestPerch.image_url || null });
+  if (largestPike) highlights.push({ filter: "gädda", identityKey: getCatchOwnerIdentityKey(largestPike), title: "Gädda", winnerName: getCatchOwnerDisplayName(largestPike, members), total: largestPike.weight_g, catchDate: largestPike.catch_date, locationName: largestPike.location_name || null, catchImageUrl: largestPike.image_url || null });
+  if (largestFineFish) highlights.push({ filter: "fina", identityKey: getCatchOwnerIdentityKey(largestFineFish), title: "Fina fisken", winnerName: getCatchOwnerDisplayName(largestFineFish, members), total: largestFineFish.weight_g, detail: largestFineFish.fine_fish_type || null, catchDate: largestFineFish.catch_date, locationName: largestFineFish.location_name || null, catchImageUrl: largestFineFish.image_url || null });
   return highlights;
 }
