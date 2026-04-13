@@ -1,4 +1,4 @@
-import { useCallback, useState, type FormEvent } from "react";
+import { useCallback, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { getGeolocationErrorState } from "@/lib/home-upload";
 import { useCatchUploadForm } from "@/hooks/useCatchUploadForm";
@@ -7,6 +7,7 @@ import {
   CatchUploadDatabaseError,
   submitCatchWithImage,
 } from "@/lib/catch-upload-service";
+import type { Member } from "@/types/home";
 import type {
   GpsErrorState,
   UploadFeedbackMessage,
@@ -16,19 +17,24 @@ type UseCatchUploadOptions = {
   isLoggedIn: boolean;
   hasActiveMembership: boolean;
   registeredByDefault: string;
+  registeredByMemberId?: string | null;
   isGuestAngler?: boolean;
+  members: Member[];
 };
 
 export function useCatchUpload({
   isLoggedIn,
   hasActiveMembership,
   registeredByDefault,
+  registeredByMemberId = null,
   isGuestAngler = false,
+  members,
 }: UseCatchUploadOptions) {
   const router = useRouter();
   const {
-    caughtFor,
+    caughtForMemberId,
     registeredBy,
+    registeredByMemberId: currentRegisteredByMemberId,
     fishType,
     fineFishType,
     weight,
@@ -53,7 +59,16 @@ export function useCatchUpload({
     handleIsLocationPrivateChange,
     handleLocationNameChange,
     handleImageChange,
-  } = useCatchUploadForm({ registeredByDefault });
+  } = useCatchUploadForm({
+    registeredByDefault,
+    registeredByMemberIdDefault: registeredByMemberId,
+  });
+
+  const caughtForMember = useMemo(
+    () => members.find((member) => member.id === caughtForMemberId) ?? null,
+    [members, caughtForMemberId]
+  );
+  const caughtForName = caughtForMember?.name ?? "";
 
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
@@ -169,7 +184,7 @@ export function useCatchUpload({
       const validationResult = validateCatchUpload({
         isLoggedIn,
         hasActiveMembership,
-        caughtFor,
+        caughtFor: caughtForName,
         registeredBy,
         fishType,
         fineFishType,
@@ -203,8 +218,10 @@ export function useCatchUpload({
 
       try {
         await submitCatchWithImage({
-          caughtFor,
+          caughtFor: caughtForName,
+          caughtForMemberId: caughtForMember?.id ?? null,
           registeredBy,
+          registeredByMemberId: currentRegisteredByMemberId,
           fishType,
           fineFishType: validationResult.normalizedFineFishType,
           weight,
@@ -236,8 +253,10 @@ export function useCatchUpload({
     [
       isLoggedIn,
       hasActiveMembership,
-      caughtFor,
+      caughtForName,
+      caughtForMember,
       registeredBy,
+      currentRegisteredByMemberId,
       fishType,
       fineFishType,
       weight,
@@ -255,7 +274,7 @@ export function useCatchUpload({
   );
 
   return {
-    caughtFor,
+    caughtForMemberId,
     registeredBy,
     fishType,
     fineFishType,

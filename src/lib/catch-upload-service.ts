@@ -10,7 +10,9 @@ export class CatchUploadDatabaseError extends Error {
 
 export type SubmitCatchPayload = {
   caughtFor: string;
+  caughtForMemberId?: string | null;
   registeredBy: string;
+  registeredByMemberId?: string | null;
   fishType: string;
   fineFishType: string;
   weight: string;
@@ -56,7 +58,9 @@ export async function submitCatchWithImage(payload: SubmitCatchPayload) {
   const { error } = await supabase.from("catches").insert([
     {
       caught_for: payload.caughtFor.trim(),
+      caught_for_member_id: payload.caughtForMemberId?.trim() || null,
       registered_by: payload.registeredBy.trim(),
+      registered_by_member_id: payload.registeredByMemberId?.trim() || null,
       fish_type: payload.fishType,
       fine_fish_type:
         payload.fishType === "Fina fisken" ? payload.fineFishType : null,

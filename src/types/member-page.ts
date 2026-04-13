@@ -31,7 +31,9 @@ export type SpeciesAggregateStat = {
 export type MemberCatch = {
   id: string;
   caught_for: string;
+  caught_for_member_id?: string | null;
   registered_by: string;
+  registered_by_member_id?: string | null;
   fish_type: string;
   fine_fish_type?: string | null;
   weight_g: number;

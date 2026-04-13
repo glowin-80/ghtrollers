@@ -66,6 +66,7 @@ export async function fetchHomePageData(options?: {
   const approvedCatches = approvedCatchesResult.value.map((catchItem) =>
     sanitizeCatchLocationForViewer(catchItem, {
       isLoggedIn: options?.viewer?.isLoggedIn,
+      memberId: options?.viewer?.memberId,
       memberName: options?.viewer?.memberName,
       isSuperAdmin: options?.viewer?.isSuperAdmin,
     })

@@ -49,9 +49,13 @@ export async function fetchAllApprovedCatches(): Promise<Catch[]> {
 
   return data ?? [];
 }
+
 export async function fetchPublicActiveMembers(): Promise<Member[]> {
   const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase.from("members").select("id, name, category, profile_image_url, member_role, is_admin, is_super_admin").eq("is_active", true);
+  const { data, error } = await supabase
+    .from("members")
+    .select("id, name, category, profile_image_url, member_role, is_admin, is_super_admin")
+    .eq("is_active", true);
   if (error) throw error;
   return data ?? [];
 }

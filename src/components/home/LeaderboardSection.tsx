@@ -349,13 +349,12 @@ function LeaderboardSectionComponent({
   bigFiveBreakdowns,
 }: LeaderboardSectionProps) {
   const topThree = useMemo(() => leaderboard.slice(0, 3), [leaderboard]);
-  const [expandedBigFiveName, setExpandedBigFiveName] = useState<string | null>(
-    null
-  );
+  const [expandedBigFiveKey, setExpandedBigFiveKey] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const memberImageMap = useMemo(() => {
     return members.reduce<Record<string, string | null>>((acc, member) => {
+      acc[member.id] = member.profile_image_url || null;
       acc[member.name] = member.profile_image_url || null;
       return acc;
     }, {});
@@ -363,8 +362,8 @@ function LeaderboardSectionComponent({
 
   const hasAnyAllTimeData = allTimeHighlights.length > 0;
 
-  const handleToggleExpanded = (name: string) => {
-    setExpandedBigFiveName((current) => (current === name ? null : name));
+  const handleToggleExpanded = (identityKey: string) => {
+    setExpandedBigFiveKey((current) => (current === identityKey ? null : identityKey));
   };
 
   return (
@@ -452,18 +451,20 @@ function LeaderboardSectionComponent({
           <div className="space-y-3">
             {topThree.map((entry, index) => (
               <LeaderboardRow
-                key={`${entry.name}-${index}`}
+                key={`${entry.identityKey ?? entry.name}-${index}`}
                 entry={entry}
                 index={index}
                 filter={filter}
-                imageUrl={memberImageMap[entry.name] || null}
+                imageUrl={memberImageMap[entry.identityKey ?? entry.name] || null}
                 bigFiveBreakdown={
-                  filter === "bigfive" ? bigFiveBreakdowns[entry.name] : undefined
+                  filter === "bigfive" && entry.identityKey
+                    ? bigFiveBreakdowns[entry.identityKey]
+                    : undefined
                 }
-                isExpanded={expandedBigFiveName === entry.name}
+                isExpanded={expandedBigFiveKey === (entry.identityKey ?? entry.name)}
                 onToggleExpanded={
                   filter === "bigfive"
-                    ? () => handleToggleExpanded(entry.name)
+                    ? () => handleToggleExpanded(entry.identityKey ?? entry.name)
                     : undefined
                 }
                 onImageClick={setSelectedImage}

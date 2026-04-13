@@ -16,7 +16,9 @@ export type Member = {
 export type Catch = {
   id: string;
   caught_for: string;
+  caught_for_member_id?: string | null;
   registered_by: string;
+  registered_by_member_id?: string | null;
   fish_type: string;
   fine_fish_type?: string | null;
   weight_g: number;
@@ -40,6 +42,7 @@ export type { FishingSpot };
 export type LeaderboardFilter = "bigfive" | "abborre" | "gädda" | "fina";
 
 export type LeaderboardEntry = {
+  identityKey?: string;
   name: string;
   total: number;
   detail?: string | null;
@@ -57,6 +60,7 @@ export type BigFiveBreakdownItem = {
 };
 
 export type BigFiveBreakdown = {
+  identityKey?: string;
   name: string;
   total: number;
   items: BigFiveBreakdownItem[];

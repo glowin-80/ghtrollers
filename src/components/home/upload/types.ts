@@ -28,7 +28,7 @@ export type UploadCatchSectionProps = {
   isLoggedIn: boolean;
   hasActiveMembership: boolean;
   members: Member[];
-  caughtFor: string;
+  caughtForMemberId: string;
   registeredBy: string;
   fishType: string;
   fineFishType: string;
