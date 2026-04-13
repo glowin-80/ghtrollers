@@ -79,11 +79,28 @@ export function getCatchOwnerDisplayName(
 ) {
   const memberById = buildMemberLookupById(members);
   const memberByName = buildMemberLookupByName(members);
+  const fallbackName = normalizeIdentityValue(catchItem.caught_for);
+
   return (
     resolveCatchOwnerMember(catchItem, { memberById, memberByName })?.name ??
-    normalizeIdentityValue(catchItem.caught_for) ??
+    fallbackName ||
     "Okänd medlem"
-  ) || "Okänd medlem";
+  );
+}
+
+export function getCatchRegistrarDisplayName(
+  catchItem: Pick<CatchIdentitySource, "registered_by" | "registered_by_member_id">,
+  members: Member[]
+) {
+  const memberById = buildMemberLookupById(members);
+  const memberByName = buildMemberLookupByName(members);
+  const fallbackName = normalizeIdentityValue(catchItem.registered_by);
+
+  return (
+    resolveCatchRegistrarMember(catchItem, { memberById, memberByName })?.name ??
+    fallbackName ||
+    "Okänd medlem"
+  );
 }
 
 export function doesCatchBelongToMember(

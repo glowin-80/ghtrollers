@@ -68,6 +68,7 @@ export type BigFiveBreakdown = {
 
 export type AllTimeHighlight = {
   filter: LeaderboardFilter;
+  identityKey?: string;
   title: string;
   winnerName: string;
   total: number;

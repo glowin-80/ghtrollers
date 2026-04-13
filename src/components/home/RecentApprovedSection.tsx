@@ -9,6 +9,7 @@ import {
   formatCatchWeightForDisplay,
   getCatchCategoryLabel,
 } from "@/lib/catch-sharing";
+import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
 import type { Catch, Member } from "@/types/home";
 
 type RecentApprovedSectionProps = {
@@ -61,6 +62,7 @@ function RecentApprovedSectionComponent({
         <ul className="space-y-3">
           {catches.map((item) => {
             const shareDetails = buildCatchShareDetails(item, allApprovedCatches, members);
+            const ownerName = getCatchOwnerDisplayName(item, members);
 
             return (
               <li
@@ -73,12 +75,12 @@ function RecentApprovedSectionComponent({
                     onClick={() => item.image_url && onImageClick(item.image_url)}
                     className="h-[104px] w-[104px] shrink-0 overflow-hidden bg-[#ebe7de] disabled:cursor-default"
                     disabled={!item.image_url}
-                    aria-label={`Öppna bild för ${item.caught_for}`}
+                    aria-label={`Öppna bild för ${ownerName}`}
                   >
                     {item.image_url ? (
                       <img
                         src={item.image_url}
-                        alt={`${item.caught_for} fångst`}
+                        alt={`${ownerName} fångst`}
                         className="h-full w-full object-cover"
                         loading="lazy"
                         decoding="async"
@@ -93,7 +95,7 @@ function RecentApprovedSectionComponent({
                   <div className="flex min-w-0 flex-1 flex-col justify-between px-3.5 py-3">
                     <div>
                       <div className="truncate text-[0.98rem] font-bold leading-tight text-[#1d2934]">
-                        {item.caught_for}
+                        {ownerName}
                       </div>
 
                       <div className="mt-1 line-clamp-2 text-[0.9rem] leading-snug text-[#2f3f49]">

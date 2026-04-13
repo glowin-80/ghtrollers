@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { fetchActiveMembers } from "@/lib/home-service";
 import {
   fetchCurrentMemberProfile,
   fetchMemberCatchesForMember,
 } from "@/lib/member-service";
+import type { Member } from "@/types/home";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
 
 export function useMemberPageData() {
@@ -11,6 +13,7 @@ export function useMemberPageData() {
   const [pageLoading, setPageLoading] = useState(true);
   const [catchesLoading, setCatchesLoading] = useState(false);
   const [member, setMember] = useState<MemberProfile | null>(null);
+  const [members, setMembers] = useState<Member[]>([]);
   const [catches, setCatches] = useState<MemberCatch[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [catchesError, setCatchesError] = useState<string | null>(null);
@@ -61,11 +64,19 @@ export function useMemberPageData() {
         setCatchesError(null);
       }
 
-      const resolvedMember = await fetchCurrentMemberProfile();
+      const [resolvedMember, activeMembers] = await Promise.all([
+        fetchCurrentMemberProfile(),
+        fetchActiveMembers().catch((err) => {
+          console.warn("Could not load active members for member page", err);
+          return [];
+        }),
+      ]);
 
       if (!mountedRef.current) {
         return;
       }
+
+      setMembers(activeMembers);
 
       if (!resolvedMember) {
         setMember(null);
@@ -116,6 +127,7 @@ export function useMemberPageData() {
     pageLoading,
     catchesLoading,
     member,
+    members,
     catches,
     error,
     catchesError,

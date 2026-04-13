@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useHomeData } from "@/hooks/useHomeData";
+import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
 import type { Catch } from "@/types/home";
 
 function getCatchLabel(item: Catch) {
@@ -35,7 +36,7 @@ function getLocationLabel(item: Catch, isLoggedIn: boolean) {
 }
 
 export default function GalleriPage() {
-  const { approvedCatches, isLoggedIn } = useHomeData();
+  const { approvedCatches, isLoggedIn, members } = useHomeData();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const currentSwedenYear = useMemo(() => {
@@ -132,7 +133,10 @@ export default function GalleriPage() {
             </div>
           ) : (
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {filteredCatches.map((item) => (
+              {filteredCatches.map((item) => {
+                const ownerName = getCatchOwnerDisplayName(item, members);
+
+                return (
                 <article
                   key={item.id}
                   className="overflow-hidden rounded-[22px] border border-[#d8d2c7] bg-[#fffdf9] shadow-sm"
@@ -141,12 +145,12 @@ export default function GalleriPage() {
                     type="button"
                     onClick={() => item.image_url && setSelectedImage(item.image_url)}
                     className="block w-full bg-[#ebe7de] text-left"
-                    aria-label={`Öppna bild för ${item.caught_for}`}
+                    aria-label={`Öppna bild för ${ownerName}`}
                   >
                     {item.image_url ? (
                       <img
                         src={item.image_url}
-                        alt={`${item.caught_for} fångst`}
+                        alt={`${ownerName} fångst`}
                         className="h-40 w-full object-cover"
                         loading="lazy"
                         decoding="async"
@@ -160,7 +164,7 @@ export default function GalleriPage() {
 
                   <div className="space-y-1 px-3 py-3">
                     <div className="truncate text-sm font-bold text-[#1f2937]">
-                      {item.caught_for}
+                      {ownerName}
                     </div>
                     <div className="text-[0.82rem] leading-snug text-[#374151]">
                       {getCatchLabel(item)}
@@ -176,7 +180,7 @@ export default function GalleriPage() {
                     </div>
                   </div>
                 </article>
-              ))}
+              )})}
             </div>
           )}
         </section>
