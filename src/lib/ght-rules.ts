@@ -1,6 +1,6 @@
+import { getCurrentAchievementByValue } from "@/lib/achievements";
 import type { Catch, Member } from "@/types/home";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
-import { getCatchAchievement } from "@/lib/achievements";
 
 export type GhtMemberRole = "competition_member" | "guest_angler" | string;
 
@@ -52,7 +52,7 @@ export function getAdminLevelLabel(
 }
 
 export function getAchievementTitle(catchCount: number) {
-  return getCatchAchievement(catchCount).title;
+  return getCurrentAchievementByValue(catchCount, "reported_catches")?.title ?? "Fiskesugen";
 }
 
 export function buildMemberLookupByName(members: Member[]) {

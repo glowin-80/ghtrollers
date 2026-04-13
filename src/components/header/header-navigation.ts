@@ -45,8 +45,8 @@ function navigateToHref(href: string, pathname: string, router: AppRouterInstanc
 
 export function getPathActiveItem(pathname: string): string | null {
   if (pathname === "/galleri") return "gallery";
-  if (pathname === "/achievements") return "achievements";
   if (pathname === "/markera-fiskeplats") return "markera-fiskeplats";
+  if (pathname === "/achievements" || pathname === "/achievements/gaddhang") return "achievements";
   return null;
 }
 

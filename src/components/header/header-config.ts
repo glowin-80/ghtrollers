@@ -148,10 +148,10 @@ export function getMobileCardTheme(itemId: string) {
     case "achievements":
       return {
         outer:
-          "border-[#c3a766] bg-[linear-gradient(180deg,#746247_0%,#5a4a34_100%)] text-[#f6e8c8]",
+          "border-[#c3a766] bg-[linear-gradient(180deg,#6d5941_0%,#4e3c27_100%)] text-[#f5e4bc]",
         iconCircle:
-          "bg-[linear-gradient(180deg,#90785a_0%,#6d583e_100%)] text-[#f0ddb1]",
-        arrow: "text-[#f0ddb1]",
+          "bg-[linear-gradient(180deg,#8a7252_0%,#674d33_100%)] text-[#f1dca7]",
+        arrow: "text-[#f1dca7]",
       };
     case "map":
       return {
