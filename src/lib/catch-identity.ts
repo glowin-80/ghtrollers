@@ -1,137 +1,210 @@
-import type { Catch, Member } from "@/types/home";
-import type { MemberCatch, MemberProfile } from "@/types/member-page";
+export type MemberIdentitySource = {
+  id: string;
+  name: string;
+  member_role?: string | null;
+  profile_image_url?: string | null;
+};
 
-type CatchIdentitySource = Pick<
-  Catch,
-  "caught_for" | "registered_by" | "caught_for_member_id" | "registered_by_member_id"
->;
+export type CatchIdentitySource = {
+  id: string;
+  caught_for?: string | null;
+  caught_for_member_id?: string | null;
+  registered_by?: string | null;
+  registered_by_member_id?: string | null;
+};
 
-type MemberIdentitySource = Pick<Member, "id" | "name">;
-type MemberProfileIdentitySource = Pick<MemberProfile, "id" | "name">;
+type MemberLookupById = Record<string, MemberIdentitySource>;
+type MemberLookupByName = Record<string, MemberIdentitySource>;
 
-export function normalizeIdentityValue(value?: string | null) {
+type MemberLookupMaps = {
+  memberById: MemberLookupById;
+  memberByName: MemberLookupByName;
+};
+
+function normalizeValue(value?: string | null) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-export function buildMemberLookupById<T extends MemberIdentitySource>(members: T[]) {
-  return members.reduce<Record<string, T>>((acc, member) => {
-    const key = normalizeIdentityValue(member.id);
-    if (key) {
-      acc[key] = member;
+export function buildMemberLookupById(
+  members: MemberIdentitySource[]
+): MemberLookupById {
+  return members.reduce<MemberLookupById>((acc, member) => {
+    const id = normalizeValue(member.id);
+
+    if (!id) {
+      return acc;
     }
+
+    acc[id] = member;
     return acc;
   }, {});
 }
 
-export function buildMemberLookupByName<T extends MemberIdentitySource>(members: T[]) {
-  return members.reduce<Record<string, T>>((acc, member) => {
-    const key = normalizeIdentityValue(member.name);
-    if (key) {
-      acc[key] = member;
+export function buildMemberLookupByName(
+  members: MemberIdentitySource[]
+): MemberLookupByName {
+  return members.reduce<MemberLookupByName>((acc, member) => {
+    const name = normalizeValue(member.name);
+
+    if (!name) {
+      return acc;
     }
+
+    acc[name] = member;
     return acc;
   }, {});
 }
 
-export function getCatchOwnerIdentityKey(catchItem: Pick<CatchIdentitySource, "caught_for" | "caught_for_member_id">) {
-  return normalizeIdentityValue(catchItem.caught_for_member_id) || normalizeIdentityValue(catchItem.caught_for);
+export function resolveCatchOwnerMember(
+  catchItem: CatchIdentitySource,
+  lookups: MemberLookupMaps
+): MemberIdentitySource | null {
+  const memberId = normalizeValue(catchItem.caught_for_member_id);
+
+  if (memberId && lookups.memberById[memberId]) {
+    return lookups.memberById[memberId];
+  }
+
+  const fallbackName = normalizeValue(catchItem.caught_for);
+
+  if (fallbackName && lookups.memberByName[fallbackName]) {
+    return lookups.memberByName[fallbackName];
+  }
+
+  return null;
 }
 
-export function getCatchRegistrarIdentityKey(catchItem: Pick<CatchIdentitySource, "registered_by" | "registered_by_member_id">) {
-  return normalizeIdentityValue(catchItem.registered_by_member_id) || normalizeIdentityValue(catchItem.registered_by);
-}
+export function resolveCatchRegistrarMember(
+  catchItem: CatchIdentitySource,
+  lookups: MemberLookupMaps
+): MemberIdentitySource | null {
+  const memberId = normalizeValue(catchItem.registered_by_member_id);
 
-export function resolveCatchOwnerMember<T extends MemberIdentitySource>(
-  catchItem: Pick<CatchIdentitySource, "caught_for" | "caught_for_member_id">,
-  lookups: {
-    memberById: Record<string, T>;
-    memberByName: Record<string, T>;
-  }
-): T | null {
-  const ownerId = normalizeIdentityValue(catchItem.caught_for_member_id);
-  if (ownerId && lookups.memberById[ownerId]) {
-    return lookups.memberById[ownerId];
+  if (memberId && lookups.memberById[memberId]) {
+    return lookups.memberById[memberId];
   }
 
-  const ownerName = normalizeIdentityValue(catchItem.caught_for);
-  return ownerName ? lookups.memberByName[ownerName] ?? null : null;
-}
+  const fallbackName = normalizeValue(catchItem.registered_by);
 
-export function resolveCatchRegistrarMember<T extends MemberIdentitySource>(
-  catchItem: Pick<CatchIdentitySource, "registered_by" | "registered_by_member_id">,
-  lookups: {
-    memberById: Record<string, T>;
-    memberByName: Record<string, T>;
-  }
-): T | null {
-  const registrarId = normalizeIdentityValue(catchItem.registered_by_member_id);
-  if (registrarId && lookups.memberById[registrarId]) {
-    return lookups.memberById[registrarId];
+  if (fallbackName && lookups.memberByName[fallbackName]) {
+    return lookups.memberByName[fallbackName];
   }
 
-  const registrarName = normalizeIdentityValue(catchItem.registered_by);
-  return registrarName ? lookups.memberByName[registrarName] ?? null : null;
+  return null;
 }
 
 export function getCatchOwnerDisplayName(
-  catchItem: Pick<CatchIdentitySource, "caught_for" | "caught_for_member_id">,
-  members: Member[]
+  catchItem: CatchIdentitySource,
+  members: MemberIdentitySource[]
 ) {
   const memberById = buildMemberLookupById(members);
   const memberByName = buildMemberLookupByName(members);
-  const fallbackName = normalizeIdentityValue(catchItem.caught_for);
+  const fallbackName = catchItem.caught_for?.trim();
 
   return (
     resolveCatchOwnerMember(catchItem, { memberById, memberByName })?.name ??
-    fallbackName ||
-    "Okänd medlem"
+    (fallbackName || "Okänd medlem")
   );
 }
 
 export function getCatchRegistrarDisplayName(
-  catchItem: Pick<CatchIdentitySource, "registered_by" | "registered_by_member_id">,
-  members: Member[]
+  catchItem: CatchIdentitySource,
+  members: MemberIdentitySource[]
 ) {
   const memberById = buildMemberLookupById(members);
   const memberByName = buildMemberLookupByName(members);
-  const fallbackName = normalizeIdentityValue(catchItem.registered_by);
+  const fallbackName = catchItem.registered_by?.trim();
 
   return (
     resolveCatchRegistrarMember(catchItem, { memberById, memberByName })?.name ??
-    fallbackName ||
-    "Okänd medlem"
+    (fallbackName || "Okänd medlem")
   );
 }
 
-export function doesCatchBelongToMember(
-  catchItem: Pick<CatchIdentitySource, "caught_for" | "caught_for_member_id">,
-  member: MemberProfileIdentitySource
-) {
-  const memberId = normalizeIdentityValue(member.id);
-  const catchOwnerId = normalizeIdentityValue(catchItem.caught_for_member_id);
+export function getMemberIdentityKey(member: Pick<MemberIdentitySource, "id" | "name">) {
+  const memberId = normalizeValue(member.id);
 
-  if (memberId && catchOwnerId) {
-    return memberId === catchOwnerId;
+  if (memberId) {
+    return `member:${memberId}`;
   }
 
-  return normalizeIdentityValue(member.name) !== "" && normalizeIdentityValue(member.name) === normalizeIdentityValue(catchItem.caught_for);
+  const memberName = normalizeValue(member.name);
+
+  if (memberName) {
+    return `name:${memberName}`;
+  }
+
+  return "unknown";
 }
 
-export function getMemberIdentityCount<T extends CatchIdentitySource>(
-  catches: T[],
-  member: MemberProfileIdentitySource
+export function getCatchOwnerIdentityKey(
+  catchItem: CatchIdentitySource,
+  members?: MemberIdentitySource[]
 ) {
-  return catches.filter((catchItem) => doesCatchBelongToMember(catchItem, member)).length;
+  const memberId = normalizeValue(catchItem.caught_for_member_id);
+
+  if (memberId) {
+    return `member:${memberId}`;
+  }
+
+  if (members?.length) {
+    const resolvedName = getCatchOwnerDisplayName(catchItem, members);
+    const resolvedMember = members.find(
+      (member) => normalizeValue(member.name) === normalizeValue(resolvedName)
+    );
+
+    if (resolvedMember?.id) {
+      return `member:${resolvedMember.id}`;
+    }
+  }
+
+  const fallbackName = normalizeValue(catchItem.caught_for);
+
+  if (fallbackName) {
+    return `name:${fallbackName}`;
+  }
+
+  return `catch:${catchItem.id}`;
 }
 
-export function dedupeCatchesById<T extends Pick<Catch | MemberCatch, "id">>(catches: T[]) {
-  const seen = new Set<string>();
-  return catches.filter((catchItem) => {
-    const key = normalizeIdentityValue(catchItem.id);
-    if (!key || seen.has(key)) {
-      return false;
-    }
-    seen.add(key);
+export function catchMatchesMemberIdentity(
+  catchItem: CatchIdentitySource,
+  member: Pick<MemberIdentitySource, "id" | "name">
+) {
+  const memberId = normalizeValue(member.id);
+  const memberName = normalizeValue(member.name);
+
+  if (memberId && normalizeValue(catchItem.caught_for_member_id) === memberId) {
     return true;
-  });
+  }
+
+  if (memberName && normalizeValue(catchItem.caught_for) === memberName) {
+    return true;
+  }
+
+  return false;
+}
+
+export function getMemberIdentityCount(
+  catches: CatchIdentitySource[],
+  member: Pick<MemberIdentitySource, "id" | "name">
+) {
+  return catches.filter((catchItem) => catchMatchesMemberIdentity(catchItem, member))
+    .length;
+}
+
+export function dedupeCatchesById<T extends { id: string }>(catches: T[]) {
+  const seen = new Set<string>();
+  const deduped: T[] = [];
+
+  for (const catchItem of catches) {
+    if (!catchItem?.id || seen.has(catchItem.id)) {
+      continue;
+    }
+
+    seen.add(catchItem.id);
+    deduped.push(catchItem);
+  }
+
+  return deduped;
 }
