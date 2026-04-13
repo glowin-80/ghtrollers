@@ -21,7 +21,7 @@ type MemberLookupMaps = {
   memberByName: MemberLookupByName;
 };
 
-function normalizeValue(value?: string | null) {
+export function normalizeIdentityValue(value?: string | null) {
   return typeof value === "string" ? value.trim() : "";
 }
 
@@ -29,7 +29,7 @@ export function buildMemberLookupById(
   members: MemberIdentitySource[]
 ): MemberLookupById {
   return members.reduce<MemberLookupById>((acc, member) => {
-    const id = normalizeValue(member.id);
+    const id = normalizeIdentityValue(member.id);
 
     if (!id) {
       return acc;
@@ -44,7 +44,7 @@ export function buildMemberLookupByName(
   members: MemberIdentitySource[]
 ): MemberLookupByName {
   return members.reduce<MemberLookupByName>((acc, member) => {
-    const name = normalizeValue(member.name);
+    const name = normalizeIdentityValue(member.name);
 
     if (!name) {
       return acc;
@@ -59,13 +59,13 @@ export function resolveCatchOwnerMember(
   catchItem: CatchIdentitySource,
   lookups: MemberLookupMaps
 ): MemberIdentitySource | null {
-  const memberId = normalizeValue(catchItem.caught_for_member_id);
+  const memberId = normalizeIdentityValue(catchItem.caught_for_member_id);
 
   if (memberId && lookups.memberById[memberId]) {
     return lookups.memberById[memberId];
   }
 
-  const fallbackName = normalizeValue(catchItem.caught_for);
+  const fallbackName = normalizeIdentityValue(catchItem.caught_for);
 
   if (fallbackName && lookups.memberByName[fallbackName]) {
     return lookups.memberByName[fallbackName];
@@ -78,13 +78,13 @@ export function resolveCatchRegistrarMember(
   catchItem: CatchIdentitySource,
   lookups: MemberLookupMaps
 ): MemberIdentitySource | null {
-  const memberId = normalizeValue(catchItem.registered_by_member_id);
+  const memberId = normalizeIdentityValue(catchItem.registered_by_member_id);
 
   if (memberId && lookups.memberById[memberId]) {
     return lookups.memberById[memberId];
   }
 
-  const fallbackName = normalizeValue(catchItem.registered_by);
+  const fallbackName = normalizeIdentityValue(catchItem.registered_by);
 
   if (fallbackName && lookups.memberByName[fallbackName]) {
     return lookups.memberByName[fallbackName];
@@ -121,14 +121,16 @@ export function getCatchRegistrarDisplayName(
   );
 }
 
-export function getMemberIdentityKey(member: Pick<MemberIdentitySource, "id" | "name">) {
-  const memberId = normalizeValue(member.id);
+export function getMemberIdentityKey(
+  member: Pick<MemberIdentitySource, "id" | "name">
+) {
+  const memberId = normalizeIdentityValue(member.id);
 
   if (memberId) {
     return `member:${memberId}`;
   }
 
-  const memberName = normalizeValue(member.name);
+  const memberName = normalizeIdentityValue(member.name);
 
   if (memberName) {
     return `name:${memberName}`;
@@ -141,7 +143,7 @@ export function getCatchOwnerIdentityKey(
   catchItem: CatchIdentitySource,
   members?: MemberIdentitySource[]
 ) {
-  const memberId = normalizeValue(catchItem.caught_for_member_id);
+  const memberId = normalizeIdentityValue(catchItem.caught_for_member_id);
 
   if (memberId) {
     return `member:${memberId}`;
@@ -150,7 +152,9 @@ export function getCatchOwnerIdentityKey(
   if (members?.length) {
     const resolvedName = getCatchOwnerDisplayName(catchItem, members);
     const resolvedMember = members.find(
-      (member) => normalizeValue(member.name) === normalizeValue(resolvedName)
+      (member) =>
+        normalizeIdentityValue(member.name) ===
+        normalizeIdentityValue(resolvedName)
     );
 
     if (resolvedMember?.id) {
@@ -158,7 +162,7 @@ export function getCatchOwnerIdentityKey(
     }
   }
 
-  const fallbackName = normalizeValue(catchItem.caught_for);
+  const fallbackName = normalizeIdentityValue(catchItem.caught_for);
 
   if (fallbackName) {
     return `name:${fallbackName}`;
@@ -171,14 +175,20 @@ export function catchMatchesMemberIdentity(
   catchItem: CatchIdentitySource,
   member: Pick<MemberIdentitySource, "id" | "name">
 ) {
-  const memberId = normalizeValue(member.id);
-  const memberName = normalizeValue(member.name);
+  const memberId = normalizeIdentityValue(member.id);
+  const memberName = normalizeIdentityValue(member.name);
 
-  if (memberId && normalizeValue(catchItem.caught_for_member_id) === memberId) {
+  if (
+    memberId &&
+    normalizeIdentityValue(catchItem.caught_for_member_id) === memberId
+  ) {
     return true;
   }
 
-  if (memberName && normalizeValue(catchItem.caught_for) === memberName) {
+  if (
+    memberName &&
+    normalizeIdentityValue(catchItem.caught_for) === memberName
+  ) {
     return true;
   }
 
@@ -189,8 +199,9 @@ export function getMemberIdentityCount(
   catches: CatchIdentitySource[],
   member: Pick<MemberIdentitySource, "id" | "name">
 ) {
-  return catches.filter((catchItem) => catchMatchesMemberIdentity(catchItem, member))
-    .length;
+  return catches.filter((catchItem) =>
+    catchMatchesMemberIdentity(catchItem, member)
+  ).length;
 }
 
 export function dedupeCatchesById<T extends { id: string }>(catches: T[]) {
