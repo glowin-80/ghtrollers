@@ -21,42 +21,41 @@ export async function fetchMemberCatchesForMember(
   const memberId = member.id?.trim();
   const memberName = member.name?.trim();
 
-  const queries: Promise<{ data: MemberCatch[] | null; error: Error | null }>[] = [];
+  const results: MemberCatch[][] = [];
 
   if (memberId) {
-    queries.push(
-      supabase
-        .from("catches")
-        .select(MEMBER_CATCHES_SELECT)
-        .eq("caught_for_member_id", memberId)
-        .order("catch_date", { ascending: false })
-    );
+    const { data, error } = await supabase
+      .from("catches")
+      .select(MEMBER_CATCHES_SELECT)
+      .eq("caught_for_member_id", memberId)
+      .order("catch_date", { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    results.push((data ?? []) as MemberCatch[]);
   }
 
   if (memberName) {
-    queries.push(
-      supabase
-        .from("catches")
-        .select(MEMBER_CATCHES_SELECT)
-        .eq("caught_for", memberName)
-        .order("catch_date", { ascending: false })
-    );
+    const { data, error } = await supabase
+      .from("catches")
+      .select(MEMBER_CATCHES_SELECT)
+      .eq("caught_for", memberName)
+      .order("catch_date", { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    results.push((data ?? []) as MemberCatch[]);
   }
 
-  if (!queries.length) {
+  if (!results.length) {
     return [];
   }
 
-  const results = await Promise.all(queries);
-  const firstError = results.find((result) => result.error)?.error;
-
-  if (firstError) {
-    throw firstError;
-  }
-
-  return dedupeCatchesById(
-    results.flatMap((result) => result.data ?? [])
-  ).sort((a, b) => {
+  return dedupeCatchesById(results.flat()).sort((a, b) => {
     const left = a.catch_date ? new Date(a.catch_date).getTime() : 0;
     const right = b.catch_date ? new Date(b.catch_date).getTime() : 0;
     return right - left;
@@ -84,14 +83,20 @@ export async function fetchActiveAchievementMembers(): Promise<AchievementMember
 
   const { data: catches, error: catchesError } = await supabase
     .from("catches")
-    .select("id, caught_for, caught_for_member_id");
+    .select("id, caught_for, caught_for_member_id, registered_by, registered_by_member_id");
 
   if (catchesError) {
     throw catchesError;
   }
 
-  return (members ?? []).map((member: MemberProfile) => ({
+  return ((members ?? []) as MemberProfile[]).map((member) => ({
     ...member,
-    catchCount: getMemberIdentityCount(catches ?? [], member),
+    catchCount: getMemberIdentityCount(
+      (catches ?? []) as Pick<
+        MemberCatch,
+        "id" | "caught_for" | "caught_for_member_id" | "registered_by" | "registered_by_member_id"
+      >[],
+      member
+    ),
   }));
 }
