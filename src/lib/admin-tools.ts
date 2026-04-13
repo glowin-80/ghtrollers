@@ -65,9 +65,19 @@ export async function fetchPendingCatches() {
   if (error) throw error;
   if (membersError) throw membersError;
 
-  const typedMembers = (members ?? []) as Array<{ id: string; name: string | null; member_role: string | null }> ;
-  const memberById = buildMemberLookupById(typedMembers);
-  const memberByName = buildMemberLookupByName(typedMembers);
+const typedMembers = (members ?? []) as Array<{
+  id: string;
+  name: string | null;
+  member_role: string | null;
+}>;
+
+const membersWithName = typedMembers.filter(
+  (member): member is { id: string; name: string; member_role: string | null } =>
+    typeof member.name === "string" && member.name.trim().length > 0
+);
+
+const memberById = buildMemberLookupById(membersWithName);
+const memberByName = buildMemberLookupByName(membersWithName);
 
   return ((data ?? []) as PendingCatch[]).map((item) => ({
     ...item,
