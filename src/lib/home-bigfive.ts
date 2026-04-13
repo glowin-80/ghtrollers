@@ -1,4 +1,8 @@
-import { buildBigFiveBreakdownForCatches, getBigFiveScore, getCatchYearKey } from "@/lib/big-five";
+import {
+  buildBigFiveBreakdownForCatches,
+  getBigFiveScore,
+  getCatchYearKey,
+} from "@/lib/big-five";
 import {
   getCatchOwnerDisplayName,
   getCatchOwnerIdentityKey,
@@ -6,10 +10,15 @@ import {
 import { isCompetitionEligibleCatch } from "@/lib/ght-rules";
 import type { BigFiveBreakdown, Catch, Member } from "@/types/home";
 
-export function buildBigFiveBreakdowns(catches: Catch[], members: Member[]): Record<string, BigFiveBreakdown> {
+export function buildBigFiveBreakdowns(
+  catches: Catch[],
+  members: Member[]
+): Record<string, BigFiveBreakdown> {
   if (!catches.length) return {};
 
-  const eligibleCatches = catches.filter((catchItem) => isCompetitionEligibleCatch(catchItem, members));
+  const eligibleCatches = catches.filter((catchItem) =>
+    isCompetitionEligibleCatch(catchItem, members)
+  );
   const groupedCatches: Record<string, Catch[]> = {};
 
   eligibleCatches.forEach((catchItem) => {
@@ -21,7 +30,9 @@ export function buildBigFiveBreakdowns(catches: Catch[], members: Member[]): Rec
 
   return Object.fromEntries(
     Object.entries(groupedCatches).map(([identityKey, memberCatches]) => {
-      const displayName = getCatchOwnerDisplayName(memberCatches[0], members) || identityKey;
+      const displayName =
+        getCatchOwnerDisplayName(memberCatches[0], members) || identityKey;
+
       return [
         identityKey,
         {
@@ -34,7 +45,11 @@ export function buildBigFiveBreakdowns(catches: Catch[], members: Member[]): Rec
   );
 }
 
-export function buildAllTimeBigFiveLeader(catches: Catch[], members: Member[]): {
+export function buildAllTimeBigFiveLeader(
+  catches: Catch[],
+  members: Member[]
+): {
+  identityKey: string;
   winnerName: string;
   bestYear: string;
   total: number;
@@ -45,13 +60,17 @@ export function buildAllTimeBigFiveLeader(catches: Catch[], members: Member[]): 
 } | null {
   if (!catches.length) return null;
 
-  const eligibleCatches = catches.filter((catchItem) => isCompetitionEligibleCatch(catchItem, members));
+  const eligibleCatches = catches.filter((catchItem) =>
+    isCompetitionEligibleCatch(catchItem, members)
+  );
   const groupedByMemberYear: Record<string, Catch[]> = {};
 
   eligibleCatches.forEach((catchItem) => {
     const year = getCatchYearKey(catchItem);
     const ownerKey = getCatchOwnerIdentityKey(catchItem);
+
     if (!year || !ownerKey) return;
+
     const key = `${ownerKey}__${year}`;
     if (!groupedByMemberYear[key]) groupedByMemberYear[key] = [];
     groupedByMemberYear[key].push(catchItem);
@@ -61,17 +80,28 @@ export function buildAllTimeBigFiveLeader(catches: Catch[], members: Member[]): 
     .map(([key, memberYearCatches]) => {
       const [identityKey, bestYear] = key.split("__");
       const winnerName = getCatchOwnerDisplayName(memberYearCatches[0], members);
-      const breakdown = {
+
+      const breakdown: BigFiveBreakdown = {
         ...buildBigFiveBreakdownForCatches(winnerName, memberYearCatches),
         identityKey,
         name: winnerName,
       };
-      const latestTopFiveDate = [...breakdown.items]
-        .map((item) => item.catchDate)
-        .filter(Boolean)
-        .sort((a, b) => new Date(b as string).getTime() - new Date(a as string).getTime())[0] || null;
-      const topCatch = [...memberYearCatches].sort((a, b) => getBigFiveScore(b) - getBigFiveScore(a))[0];
+
+      const latestTopFiveDate =
+        [...breakdown.items]
+          .map((item) => item.catchDate)
+          .filter(Boolean)
+          .sort(
+            (a, b) =>
+              new Date(b as string).getTime() - new Date(a as string).getTime()
+          )[0] || null;
+
+      const topCatch = [...memberYearCatches].sort(
+        (a, b) => getBigFiveScore(b) - getBigFiveScore(a)
+      )[0];
+
       return {
+        identityKey,
         winnerName,
         bestYear,
         total: breakdown.total,
