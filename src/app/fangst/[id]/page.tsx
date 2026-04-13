@@ -9,7 +9,12 @@ import {
   formatCatchWeightForDisplay,
 } from "@/lib/catch-sharing";
 import { isCompetitionEligibleCatch, isGuestAnglerRole } from "@/lib/ght-rules";
-import { getCatchOwnerDisplayName, resolveCatchOwnerMember, buildMemberLookupById, buildMemberLookupByName } from "@/lib/catch-identity";
+import {
+  getCatchOwnerDisplayName,
+  resolveCatchOwnerMember,
+  buildMemberLookupById,
+  buildMemberLookupByName,
+} from "@/lib/catch-identity";
 import {
   fetchAllApprovedCatches,
   fetchPublicActiveMembers,
@@ -29,7 +34,11 @@ const getCatchPageData = cache(async (catchId: string) => {
     return null;
   }
 
-  const [approvedCatches, members] = await Promise.all([fetchAllApprovedCatches(), fetchPublicActiveMembers()]);
+  const [approvedCatches, members] = await Promise.all([
+    fetchAllApprovedCatches(),
+    fetchPublicActiveMembers(),
+  ]);
+
   const shareDetails = buildCatchShareDetails(catchItem, approvedCatches, members);
 
   return {
@@ -41,7 +50,9 @@ const getCatchPageData = cache(async (catchId: string) => {
   };
 });
 
-export async function generateMetadata({ params }: CatchPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: CatchPageProps): Promise<Metadata> {
   const { id } = await params;
   const data = await getCatchPageData(id);
 
@@ -53,9 +64,16 @@ export async function generateMetadata({ params }: CatchPageProps): Promise<Meta
   }
 
   const { catchItem, shareDetails } = data;
-  const title = `${getCatchOwnerDisplayName(catchItem, shareDetails.members)} · ${shareDetails.fishLabel} · Gäddhäng Trollers`;
+  const ownerDisplayName = getCatchOwnerDisplayName(
+    catchItem,
+    shareDetails.members
+  );
+  const title = `${ownerDisplayName} · ${shareDetails.fishLabel} · Gäddhäng Trollers`;
   const description = shareDetails.shareText;
   const catchUrl = `/fangst/${catchItem.id}`;
+  const shareImageUrl = catchItem.image_url
+    ? `/api/catch-image/${catchItem.id}`
+    : undefined;
 
   return {
     title,
@@ -70,20 +88,20 @@ export async function generateMetadata({ params }: CatchPageProps): Promise<Meta
       siteName: "Gäddhäng Trollers",
       type: "article",
       locale: "sv_SE",
-      images: catchItem.image_url
+      images: shareImageUrl
         ? [
             {
-              url: catchItem.image_url,
-              alt: `${getCatchOwnerDisplayName(catchItem, shareDetails.members)} med ${shareDetails.fishLabel}`,
+              url: shareImageUrl,
+              alt: `${ownerDisplayName} med ${shareDetails.fishLabel}`,
             },
           ]
         : undefined,
     },
     twitter: {
-      card: catchItem.image_url ? "summary_large_image" : "summary",
+      card: shareImageUrl ? "summary_large_image" : "summary",
       title,
       description,
-      images: catchItem.image_url ? [catchItem.image_url] : undefined,
+      images: shareImageUrl ? [shareImageUrl] : undefined,
     },
   };
 }
@@ -100,13 +118,17 @@ export default async function CatchPage({ params }: CatchPageProps) {
   const memberById = buildMemberLookupById(shareDetails.members);
   const memberByName = buildMemberLookupByName(shareDetails.members);
   const owner = resolveCatchOwnerMember(catchItem, { memberById, memberByName });
+
   const catchBadgeLabel = isGuestAnglerRole(owner?.member_role)
     ? "Privat fångst"
     : isCompetitionEligibleCatch(catchItem, shareDetails.members)
       ? "Tävlings fångst"
       : "Privat fångst";
+
   const yearlyRankLabel = shareDetails.yearlyRank
-    ? `Plats ${shareDetails.yearlyRank}${shareDetails.yearlyRankYear ? ` · ${shareDetails.yearlyRankYear}` : ""}`
+    ? `Plats ${shareDetails.yearlyRank}${
+        shareDetails.yearlyRankYear ? ` · ${shareDetails.yearlyRankYear}` : ""
+      }`
     : "Placering saknas";
 
   return (
@@ -117,7 +139,10 @@ export default async function CatchPage({ params }: CatchPageProps) {
             <div className="aspect-[4/3] w-full overflow-hidden bg-[#ebe7de]">
               <img
                 src={catchItem.image_url}
-                alt={`${getCatchOwnerDisplayName(catchItem, shareDetails.members)} med ${shareDetails.fishLabel}`}
+                alt={`${getCatchOwnerDisplayName(
+                  catchItem,
+                  shareDetails.members
+                )} med ${shareDetails.fishLabel}`}
                 className="h-full w-full object-cover"
                 decoding="async"
               />
@@ -134,7 +159,8 @@ export default async function CatchPage({ params }: CatchPageProps) {
                   {getCatchOwnerDisplayName(catchItem, shareDetails.members)}
                 </h1>
                 <p className="mt-2 text-[1.05rem] text-[#5b6871]">
-                  {shareDetails.fishLabel} · {formatCatchWeightForDisplay(catchItem.weight_g)}
+                  {shareDetails.fishLabel} ·{" "}
+                  {formatCatchWeightForDisplay(catchItem.weight_g)}
                 </p>
               </div>
 
@@ -159,7 +185,9 @@ export default async function CatchPage({ params }: CatchPageProps) {
                 <div className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#7a6540]">
                   Årsplacering
                 </div>
-                <div className="mt-2 text-[1rem] font-semibold text-[#1f2937]">{yearlyRankLabel}</div>
+                <div className="mt-2 text-[1rem] font-semibold text-[#1f2937]">
+                  {yearlyRankLabel}
+                </div>
               </div>
             </div>
 
@@ -169,7 +197,8 @@ export default async function CatchPage({ params }: CatchPageProps) {
                   All-Time-High
                 </div>
                 <div className="mt-2 text-[1rem] font-semibold leading-snug">
-                  Den här fångsten är just nu etta i All-Time-High för {shareDetails.categoryLabel}.
+                  Den här fångsten är just nu etta i All-Time-High för{" "}
+                  {shareDetails.categoryLabel}.
                 </div>
               </div>
             ) : null}
@@ -178,7 +207,9 @@ export default async function CatchPage({ params }: CatchPageProps) {
               <div className="text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[#7a6540]">
                 Delningstext
               </div>
-              <p className="mt-2 text-sm leading-6 text-[#374151]">{shareDetails.shareText}</p>
+              <p className="mt-2 text-sm leading-6 text-[#374151]">
+                {shareDetails.shareText}
+              </p>
             </div>
 
             <div className="mt-5 flex flex-wrap gap-3">
