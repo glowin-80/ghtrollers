@@ -1,3 +1,4 @@
+import { getCurrentAchievementByValue } from "@/lib/achievements";
 import type { Catch, Member } from "@/types/home";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
 
@@ -51,35 +52,7 @@ export function getAdminLevelLabel(
 }
 
 export function getAchievementTitle(catchCount: number) {
-  if (catchCount >= 1000) {
-    return "Gäddhängsikon";
-  }
-
-  if (catchCount >= 700) {
-    return "Fångstlegend";
-  }
-
-  if (catchCount >= 400) {
-    return "Mästerfiskarn";
-  }
-
-  if (catchCount >= 200) {
-    return "Sjöveteranen";
-  }
-
-  if (catchCount >= 100) {
-    return "Fångstjägaren";
-  }
-
-  if (catchCount >= 50) {
-    return "Storfiskarn";
-  }
-
-  if (catchCount >= 20) {
-    return "Fiskarn";
-  }
-
-  return "Fiskesugen";
+  return getCurrentAchievementByValue(catchCount, "reported_catches")?.title ?? "Fiskesugen";
 }
 
 export function buildMemberLookupByName(members: Member[]) {
