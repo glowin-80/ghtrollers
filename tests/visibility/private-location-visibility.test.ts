@@ -4,8 +4,9 @@ import {
   canViewerSeePrivateLocation,
   sanitizeCatchLocationForViewer,
 } from '@/lib/ght-rules';
+import type { Catch } from '@/types/home';
 
-const baseCatch = {
+const baseCatch: Catch = {
   id: 'catch-1',
   caught_for: 'Anna Andersson',
   caught_for_member_id: 'member-anna',
@@ -16,9 +17,14 @@ const baseCatch = {
   catch_date: '2026-06-01',
   status: 'approved',
   location_name: 'Hemlig vik',
+  image_url: 'catch-1.jpg',
   latitude: 59.1,
   longitude: 18.1,
+  fishing_method: 'Spinnfiske',
+  live_scope: false,
+  caught_abroad: false,
   is_location_private: true,
+  created_at: '2026-06-01T10:00:00Z',
 };
 
 describe('private location visibility', () => {
@@ -64,7 +70,7 @@ describe('private location visibility', () => {
   });
 
   it('falls back to trimmed legacy names when member ids are missing', () => {
-    const legacyCatch = {
+    const legacyCatch: Catch = {
       ...baseCatch,
       caught_for_member_id: null,
       registered_by_member_id: null,
@@ -95,7 +101,7 @@ describe('private location visibility', () => {
   });
 
   it('sanitizes location fields when viewer should not see them', () => {
-    const sanitized = sanitizeCatchLocationForViewer(baseCatch as any, {
+    const sanitized = sanitizeCatchLocationForViewer(baseCatch, {
       isLoggedIn: true,
       memberId: 'someone-else',
     });
@@ -108,7 +114,7 @@ describe('private location visibility', () => {
   });
 
   it('preserves location fields when viewer is allowed to see them', () => {
-    const sanitized = sanitizeCatchLocationForViewer(baseCatch as any, {
+    const sanitized = sanitizeCatchLocationForViewer(baseCatch, {
       isLoggedIn: true,
       memberId: 'member-anna',
     });

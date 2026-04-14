@@ -13,9 +13,11 @@ import {
   normalizeIdentityValue,
   resolveCatchOwnerMember,
   resolveCatchRegistrarMember,
+  type CatchIdentitySource,
+  type MemberIdentitySource,
 } from "@/lib/catch-identity";
 
-const members = [
+const members: MemberIdentitySource[] = [
   {
     id: "member-1",
     name: "Anna Andersson",
@@ -28,7 +30,7 @@ const members = [
     member_role: "guest_angler",
     profile_image_url: "bertil.jpg",
   },
-] as const;
+];
 
 describe("catch identity", () => {
   it("normalizes identity values safely", () => {
@@ -39,12 +41,12 @@ describe("catch identity", () => {
   });
 
   it("builds member lookups by id and by name", () => {
-    expect(buildMemberLookupById(members as any)).toEqual({
+    expect(buildMemberLookupById(members)).toEqual({
       "member-1": members[0],
       "member-2": members[1],
     });
 
-    expect(buildMemberLookupByName(members as any)).toEqual({
+    expect(buildMemberLookupByName(members)).toEqual({
       "Anna Andersson": members[0],
       "Bertil Berg": members[1],
     });
@@ -52,11 +54,11 @@ describe("catch identity", () => {
 
   it("resolves catch owner and registrar by member id first, then falls back to name", () => {
     const lookups = {
-      memberById: buildMemberLookupById(members as any),
-      memberByName: buildMemberLookupByName(members as any),
+      memberById: buildMemberLookupById(members),
+      memberByName: buildMemberLookupByName(members),
     };
 
-    const idMatchedCatch = {
+    const idMatchedCatch: CatchIdentitySource = {
       id: "catch-1",
       caught_for: "Old Name",
       caught_for_member_id: "member-1",
@@ -67,7 +69,7 @@ describe("catch identity", () => {
     expect(resolveCatchOwnerMember(idMatchedCatch, lookups)?.name).toBe("Anna Andersson");
     expect(resolveCatchRegistrarMember(idMatchedCatch, lookups)?.name).toBe("Bertil Berg");
 
-    const fallbackByNameCatch = {
+    const fallbackByNameCatch: CatchIdentitySource = {
       id: "catch-2",
       caught_for: "Bertil Berg",
       registered_by: "Anna Andersson",
@@ -85,7 +87,7 @@ describe("catch identity", () => {
           caught_for: "Old Name",
           caught_for_member_id: "member-1",
         },
-        members as any
+        members
       )
     ).toBe("Anna Andersson");
 
@@ -95,7 +97,7 @@ describe("catch identity", () => {
           id: "catch-2",
           registered_by: "Legacy Registrar",
         },
-        members as any
+        members
       )
     ).toBe("Legacy Registrar");
 
@@ -105,7 +107,7 @@ describe("catch identity", () => {
           id: "catch-3",
           caught_for: null,
         },
-        members as any
+        members
       )
     ).toBe("Okänd medlem");
   });
@@ -121,7 +123,7 @@ describe("catch identity", () => {
           caught_for: "Old Name",
           caught_for_member_id: "member-1",
         },
-        members as any
+        members
       )
     ).toBe("member:member-1");
 
@@ -131,7 +133,7 @@ describe("catch identity", () => {
           id: "catch-2",
           caught_for: "Anna Andersson",
         },
-        members as any
+        members
       )
     ).toBe("member:member-1");
 

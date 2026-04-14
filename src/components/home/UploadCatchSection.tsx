@@ -59,6 +59,7 @@ export default function UploadCatchSection({
   ...formProps
 }: UploadCatchSectionProps) {
   const shouldLock = !isLoggedIn || !hasActiveMembership;
+  const locationModalKey = `${locationChooserOpen ? "open" : "closed"}:${formProps.locationName}`;
 
   return (
     <section className="relative rounded-[28px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
@@ -77,19 +78,13 @@ export default function UploadCatchSection({
         />
       ) : null}
 
-      <div
-        className={shouldLock ? "pointer-events-none select-none blur-[5px]" : ""}
-      >
-        <h2 className="mb-4 text-2xl font-bold text-[#1f2937]">
-          📸 Ladda upp fångst
-        </h2>
+      <div className={shouldLock ? "pointer-events-none select-none blur-[5px]" : ""}>
+        <h2 className="mb-4 text-2xl font-bold text-[#1f2937]">📸 Ladda upp fångst</h2>
 
-        <UploadCatchForm
-          {...formProps}
-          onOpenLocationChooser={onOpenLocationChooser}
-        />
+        <UploadCatchForm {...formProps} onOpenLocationChooser={onOpenLocationChooser} />
 
         <LocationMethodModal
+          key={locationModalKey}
           open={locationChooserOpen}
           initialLocationName={formProps.locationName}
           gpsLoading={formProps.gpsLoading}
@@ -99,11 +94,7 @@ export default function UploadCatchSection({
           onSelectMap={formProps.onOpenMap}
         />
 
-        <MapPickerModal
-          open={mapOpen}
-          onClose={onCloseMap}
-          onSelect={onMapSelect}
-        />
+        <MapPickerModal open={mapOpen} onClose={onCloseMap} onSelect={onMapSelect} />
       </div>
 
       <ConfirmDialog
