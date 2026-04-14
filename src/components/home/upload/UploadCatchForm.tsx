@@ -111,7 +111,7 @@ export default function UploadCatchForm({
 
       {isGuestAngler ? (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Du är ej aktiv medlem i tävlingen "Gäddhäng Trollers", denna fångst
+          Du är ej aktiv medlem i tävlingen &quot;Gäddhäng Trollers&quot;, denna fångst
           kommer inte registreras under leaderboard och all-time-high. Den
           kommer fortfarande registreras under Mina sidor.
         </div>

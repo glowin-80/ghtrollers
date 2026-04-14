@@ -1,0 +1,1330 @@
+npm verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+npm info using npm@10.9.7
+npm info using node@v22.22.2
+npm timing npm:load:whichnode Completed in 1ms
+npm silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+npm silly config load:file:C:\Users\46730\ghtrollers\.npmrc
+npm silly config load:file:C:\Users\46730\.npmrc
+npm silly config load:file:C:\Users\46730\AppData\Roaming\npm\etc\npmrc
+npm timing npm:load:configload Completed in 10ms
+npm timing config:load:flatten Completed in 2ms
+npm timing npm:load:mkdirpcache Completed in 1ms
+npm timing npm:load:mkdirplogs Completed in 1ms
+npm verbose title npm ci
+npm verbose argv "ci" "--no-audit" "--no-fund" "--timing" "--loglevel" "silly"
+npm timing npm:load:setTitle Completed in 1ms
+npm verbose logfile logs-max:10 dir:C:\Users\46730\AppData\Local\npm-cache\_logs\2026-04-14T11_34_13_345Z-
+npm verbose logfile C:\Users\46730\AppData\Local\npm-cache\_logs\2026-04-14T11_34_13_345Z-debug-0.log
+npm timing npm:load Completed in 39ms
+npm silly logfile start cleaning logs, removing 1 files
+npm silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+npm timing arborist:ctor Completed in 1ms
+npm silly logfile done cleaning log files
+npm timing idealTree:init Completed in 102ms
+npm timing idealTree:userRequests Completed in 0ms
+npm silly idealTree buildDeps
+npm timing idealTree:#root Completed in 1ms
+npm timing idealTree:node_modules/@tailwindcss/oxide-wasm32-wasi Completed in 0ms
+npm timing idealTree:buildDeps Completed in 2ms
+npm timing idealTree:fixDepFlags Completed in 0ms
+npm timing idealTree Completed in 110ms
+npm timing npm-ci:rm Completed in 3377ms
+npm timing reify:loadTrees Completed in 5ms
+npm timing reify:diffTrees Completed in 5ms
+npm silly reify moves {}
+npm timing reify:retireShallow Completed in 0ms
+npm timing reify:createSparse Completed in 181ms
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-wasm32-wasi
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-wasm32-wasi'
+npm silly reify ]
+npm timing reifyNode:node_modules/@tailwindcss/oxide-wasm32-wasi Completed in 2ms
+npm timing arborist:ctor Completed in 0ms
+npm timing reify:diffTrees Completed in 3ms
+npm timing reify:loadBundles Completed in 8ms
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-win32-arm64-msvc
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-win32-arm64-msvc'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-linux-x64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-linux-x64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-linux-x64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-linux-x64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-linux-arm64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-linux-arm64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-linux-arm64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-linux-arm64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-linux-arm-gnueabihf
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-linux-arm-gnueabihf'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-freebsd-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-freebsd-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-darwin-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-darwin-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-darwin-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-darwin-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\lightningcss-android-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\lightningcss-android-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\fsevents
+npm silly reify mark deleted [ 'C:\\Users\\46730\\ghtrollers\\node_modules\\fsevents' ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-win32-ia32-msvc
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-win32-ia32-msvc'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-win32-arm64-msvc
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-win32-arm64-msvc'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-wasm32-wasi
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-wasm32-wasi'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-x64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-x64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-x64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-x64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-s390x-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-s390x-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-riscv64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-riscv64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-riscv64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-riscv64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-ppc64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-ppc64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-arm64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-arm64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-arm64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-arm64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-arm-musleabihf
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-arm-musleabihf'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-linux-arm-gnueabihf
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-linux-arm-gnueabihf'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-freebsd-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-freebsd-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-darwin-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-darwin-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-darwin-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-darwin-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-android-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-android-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@unrs\resolver-binding-android-arm-eabi
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@unrs\\resolver-binding-android-arm-eabi'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-win32-arm64-msvc
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-win32-arm64-msvc'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-linux-x64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-linux-x64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-linux-x64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-linux-x64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-linux-arm64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-linux-arm64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-linux-arm64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-linux-arm64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-linux-arm-gnueabihf
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-linux-arm-gnueabihf'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-freebsd-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-freebsd-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-darwin-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-darwin-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-darwin-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-darwin-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@tailwindcss\oxide-android-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@tailwindcss\\oxide-android-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-win32-arm64-msvc
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-win32-arm64-msvc'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-wasm32-wasi
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-wasm32-wasi'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-wasm32-wasi\node_modules\@napi-rs\wasm-runtime
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-wasm32-wasi\\node_modules\\@napi-rs\\wasm-runtime'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-openharmony-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-openharmony-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-linux-x64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-linux-x64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-linux-x64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-linux-x64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-linux-s390x-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-linux-s390x-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-linux-ppc64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-linux-ppc64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-linux-arm64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-linux-arm64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-linux-arm64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-linux-arm64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-linux-arm-gnueabihf
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-linux-arm-gnueabihf'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-freebsd-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-freebsd-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-darwin-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-darwin-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-darwin-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-darwin-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@rolldown\binding-android-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@rolldown\\binding-android-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@next\swc-win32-arm64-msvc
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@next\\swc-win32-arm64-msvc'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@next\swc-linux-x64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@next\\swc-linux-x64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@next\swc-linux-x64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@next\\swc-linux-x64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@next\swc-linux-arm64-musl
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@next\\swc-linux-arm64-musl'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@next\swc-linux-arm64-gnu
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@next\\swc-linux-arm64-gnu'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@next\swc-darwin-x64
+npm silly reify mark deleted [ 'C:\\Users\\46730\\ghtrollers\\node_modules\\@next\\swc-darwin-x64' ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@next\swc-darwin-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@next\\swc-darwin-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-win32-ia32
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-win32-ia32'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-win32-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-win32-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-wasm32
+npm silly reify mark deleted [ 'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-wasm32' ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-linuxmusl-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-linuxmusl-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-linuxmusl-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-linuxmusl-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-linux-x64
+npm silly reify mark deleted [ 'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-linux-x64' ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-linux-s390x
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-linux-s390x'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-linux-riscv64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-linux-riscv64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-linux-ppc64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-linux-ppc64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-linux-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-linux-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-linux-arm
+npm silly reify mark deleted [ 'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-linux-arm' ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-linuxmusl-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-linuxmusl-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-linuxmusl-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-linuxmusl-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-linux-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-linux-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-linux-s390x
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-linux-s390x'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-linux-riscv64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-linux-riscv64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-linux-ppc64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-linux-ppc64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-linux-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-linux-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-linux-arm
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-linux-arm'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-darwin-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-darwin-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-libvips-darwin-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-libvips-darwin-arm64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-darwin-x64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-darwin-x64'
+npm silly reify ]
+npm verbose reify failed optional dependency C:\Users\46730\ghtrollers\node_modules\@img\sharp-darwin-arm64
+npm silly reify mark deleted [
+npm silly reify   'C:\\Users\\46730\\ghtrollers\\node_modules\\@img\\sharp-darwin-arm64'
+npm silly reify ]
+npm timing reifyNode:node_modules/lightningcss-win32-arm64-msvc Completed in 48ms
+npm timing reifyNode:node_modules/lightningcss-linux-x64-musl Completed in 48ms
+npm timing reifyNode:node_modules/lightningcss-linux-x64-gnu Completed in 48ms
+npm timing reifyNode:node_modules/lightningcss-linux-arm64-musl Completed in 48ms
+npm timing reifyNode:node_modules/lightningcss-linux-arm64-gnu Completed in 48ms
+npm timing reifyNode:node_modules/lightningcss-linux-arm-gnueabihf Completed in 48ms
+npm timing reifyNode:node_modules/lightningcss-freebsd-x64 Completed in 48ms
+npm timing reifyNode:node_modules/lightningcss-darwin-x64 Completed in 48ms
+npm timing reifyNode:node_modules/lightningcss-darwin-arm64 Completed in 48ms
+npm timing reifyNode:node_modules/lightningcss-android-arm64 Completed in 48ms
+npm timing reifyNode:node_modules/fsevents Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-win32-ia32-msvc Completed in 47ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-win32-arm64-msvc Completed in 47ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-wasm32-wasi Completed in 47ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-x64-musl Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-x64-gnu Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-s390x-gnu Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-riscv64-musl Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-riscv64-gnu Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-ppc64-gnu Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-arm64-musl Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-arm64-gnu Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-arm-musleabihf Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-linux-arm-gnueabihf Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-freebsd-x64 Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-darwin-x64 Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-darwin-arm64 Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-android-arm64 Completed in 48ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-android-arm-eabi Completed in 48ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-win32-arm64-msvc Completed in 48ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-linux-x64-musl Completed in 48ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-linux-x64-gnu Completed in 48ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-linux-arm64-musl Completed in 48ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-linux-arm64-gnu Completed in 48ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-linux-arm-gnueabihf Completed in 49ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-freebsd-x64 Completed in 49ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-darwin-x64 Completed in 49ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-darwin-arm64 Completed in 49ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-android-arm64 Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-win32-arm64-msvc Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-wasm32-wasi Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-openharmony-arm64 Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-linux-x64-musl Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-linux-x64-gnu Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-linux-s390x-gnu Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-linux-ppc64-gnu Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-linux-arm64-musl Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-linux-arm64-gnu Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-linux-arm-gnueabihf Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-freebsd-x64 Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-darwin-x64 Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-darwin-arm64 Completed in 49ms
+npm timing reifyNode:node_modules/@rolldown/binding-android-arm64 Completed in 49ms
+npm timing reifyNode:node_modules/@next/swc-win32-arm64-msvc Completed in 49ms
+npm timing reifyNode:node_modules/@next/swc-linux-x64-musl Completed in 50ms
+npm timing reifyNode:node_modules/@next/swc-linux-x64-gnu Completed in 50ms
+npm timing reifyNode:node_modules/@next/swc-linux-arm64-musl Completed in 50ms
+npm timing reifyNode:node_modules/@next/swc-linux-arm64-gnu Completed in 50ms
+npm timing reifyNode:node_modules/@next/swc-darwin-x64 Completed in 50ms
+npm timing reifyNode:node_modules/@next/swc-darwin-arm64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-win32-ia32 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-win32-arm64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-wasm32 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-linuxmusl-x64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-linuxmusl-arm64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-linux-x64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-linux-s390x Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-linux-riscv64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-linux-ppc64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-linux-arm64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-linux-arm Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-linuxmusl-x64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-linuxmusl-arm64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-linux-x64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-linux-s390x Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-linux-riscv64 Completed in 51ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-linux-ppc64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-linux-arm64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-linux-arm Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-darwin-x64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-libvips-darwin-arm64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-darwin-x64 Completed in 50ms
+npm timing reifyNode:node_modules/@img/sharp-darwin-arm64 Completed in 50ms
+npm http cache zod-validation-error@https://registry.npmjs.org/zod-validation-error/-/zod-validation-error-4.0.2.tgz 1ms (cache hit)
+npm http cache zod@https://registry.npmjs.org/zod/-/zod-4.3.6.tgz 0ms (cache hit)
+npm http cache yocto-queue@https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz 0ms (cache hit)
+npm http cache ws@https://registry.npmjs.org/ws/-/ws-8.20.0.tgz 0ms (cache hit)
+npm http cache yallist@https://registry.npmjs.org/yallist/-/yallist-3.1.1.tgz 0ms (cache hit)
+npm http cache word-wrap@https://registry.npmjs.org/word-wrap/-/word-wrap-1.2.5.tgz 0ms (cache hit)
+npm http cache why-is-node-running@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/why-is-node-running/-/why-is-node-running-2.3.0.tgz 0ms (cache hit)
+npm http cache which-collection@https://registry.npmjs.org/which-collection/-/which-collection-1.0.2.tgz 0ms (cache hit)
+npm http cache which-typed-array@https://registry.npmjs.org/which-typed-array/-/which-typed-array-1.1.20.tgz 0ms (cache hit)
+npm http cache which-boxed-primitive@https://registry.npmjs.org/which-boxed-primitive/-/which-boxed-primitive-1.1.1.tgz 0ms (cache hit)
+npm http cache which@https://registry.npmjs.org/which/-/which-2.0.2.tgz 0ms (cache hit)
+npm http cache which-builtin-type@https://registry.npmjs.org/which-builtin-type/-/which-builtin-type-1.2.1.tgz 0ms (cache hit)
+npm http cache vitest@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vitest/-/vitest-4.1.4.tgz 0ms (cache hit)
+npm http cache vite@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vite/-/vite-8.0.8.tgz 0ms (cache hit)
+npm http cache update-browserslist-db@https://registry.npmjs.org/update-browserslist-db/-/update-browserslist-db-1.2.3.tgz 0ms (cache hit)
+npm http cache unrs-resolver@https://registry.npmjs.org/unrs-resolver/-/unrs-resolver-1.11.1.tgz 0ms (cache hit)
+npm http cache undici-types@https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz 0ms (cache hit)
+npm http cache unbox-primitive@https://registry.npmjs.org/unbox-primitive/-/unbox-primitive-1.1.0.tgz 0ms (cache hit)
+npm http cache typescript-eslint@https://registry.npmjs.org/typescript-eslint/-/typescript-eslint-8.57.2.tgz 0ms (cache hit)
+npm http cache typescript@https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz 0ms (cache hit)
+npm http cache uri-js@https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz 0ms (cache hit)
+npm http cache typed-array-length@https://registry.npmjs.org/typed-array-length/-/typed-array-length-1.0.7.tgz 0ms (cache hit)
+npm http cache typed-array-byte-offset@https://registry.npmjs.org/typed-array-byte-offset/-/typed-array-byte-offset-1.0.4.tgz 0ms (cache hit)
+npm http cache type-check@https://registry.npmjs.org/type-check/-/type-check-0.4.0.tgz 0ms (cache hit)
+npm http cache typed-array-byte-length@https://registry.npmjs.org/typed-array-byte-length/-/typed-array-byte-length-1.0.3.tgz 0ms (cache hit)
+npm http cache tslib@https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz 0ms (cache hit)
+npm http cache typed-array-buffer@https://registry.npmjs.org/typed-array-buffer/-/typed-array-buffer-1.0.3.tgz 0ms (cache hit)
+npm http cache tsconfig-paths@https://registry.npmjs.org/tsconfig-paths/-/tsconfig-paths-3.15.0.tgz 0ms (cache hit)
+npm http cache ts-api-utils@https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-2.5.0.tgz 0ms (cache hit)
+npm http cache to-regex-range@https://registry.npmjs.org/to-regex-range/-/to-regex-range-5.0.1.tgz 0ms (cache hit)
+npm http cache tinyglobby@https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.15.tgz 0ms (cache hit)
+npm http cache tinyrainbow@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyrainbow/-/tinyrainbow-3.1.0.tgz 0ms (cache hit)
+npm http cache tinyexec@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyexec/-/tinyexec-1.1.1.tgz 0ms (cache hit)
+npm http cache tinybench@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinybench/-/tinybench-2.9.0.tgz 0ms (cache hit)
+npm http cache tapable@https://registry.npmjs.org/tapable/-/tapable-2.3.2.tgz 0ms (cache hit)
+npm http cache supports-color@https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz 0ms (cache hit)
+npm http cache tailwindcss@https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.2.2.tgz 0ms (cache hit)
+npm http cache styled-jsx@https://registry.npmjs.org/styled-jsx/-/styled-jsx-5.1.6.tgz 0ms (cache hit)
+npm http cache supports-preserve-symlinks-flag@https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz 0ms (cache hit)
+npm http cache strip-json-comments@https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-3.1.1.tgz 0ms (cache hit)
+npm http cache string.prototype.trimstart@https://registry.npmjs.org/string.prototype.trimstart/-/string.prototype.trimstart-1.0.8.tgz 0ms (cache hit)
+npm http cache strip-bom@https://registry.npmjs.org/strip-bom/-/strip-bom-3.0.0.tgz 0ms (cache hit)
+npm http cache string.prototype.trimend@https://registry.npmjs.org/string.prototype.trimend/-/string.prototype.trimend-1.0.9.tgz 0ms (cache hit)
+npm http cache string.prototype.trim@https://registry.npmjs.org/string.prototype.trim/-/string.prototype.trim-1.2.10.tgz 0ms (cache hit)
+npm http cache string.prototype.repeat@https://registry.npmjs.org/string.prototype.repeat/-/string.prototype.repeat-1.0.0.tgz 0ms (cache hit)
+npm http cache string.prototype.matchall@https://registry.npmjs.org/string.prototype.matchall/-/string.prototype.matchall-4.0.12.tgz 0ms (cache hit)
+npm http cache string.prototype.includes@https://registry.npmjs.org/string.prototype.includes/-/string.prototype.includes-2.0.1.tgz 0ms (cache hit)
+npm http cache stop-iteration-iterator@https://registry.npmjs.org/stop-iteration-iterator/-/stop-iteration-iterator-1.1.0.tgz 0ms (cache hit)
+npm http cache std-env@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/std-env/-/std-env-4.0.0.tgz 0ms (cache hit)
+npm http cache stable-hash@https://registry.npmjs.org/stable-hash/-/stable-hash-0.0.5.tgz 0ms (cache hit)
+npm http cache stackback@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/stackback/-/stackback-0.0.2.tgz 0ms (cache hit)
+npm http cache source-map-js@https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz 0ms (cache hit)
+npm http cache siginfo@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/siginfo/-/siginfo-2.0.0.tgz 0ms (cache hit)
+npm http cache side-channel-weakmap@https://registry.npmjs.org/side-channel-weakmap/-/side-channel-weakmap-1.0.2.tgz 0ms (cache hit)
+npm http cache side-channel-map@https://registry.npmjs.org/side-channel-map/-/side-channel-map-1.0.1.tgz 0ms (cache hit)
+npm http cache side-channel-list@https://registry.npmjs.org/side-channel-list/-/side-channel-list-1.0.0.tgz 0ms (cache hit)
+npm http cache side-channel@https://registry.npmjs.org/side-channel/-/side-channel-1.1.0.tgz 0ms (cache hit)
+npm http cache shebang-regex@https://registry.npmjs.org/shebang-regex/-/shebang-regex-3.0.0.tgz 0ms (cache hit)
+npm http cache shebang-command@https://registry.npmjs.org/shebang-command/-/shebang-command-2.0.0.tgz 0ms (cache hit)
+npm http cache set-proto@https://registry.npmjs.org/set-proto/-/set-proto-1.0.0.tgz 0ms (cache hit)
+npm http cache set-function-name@https://registry.npmjs.org/set-function-name/-/set-function-name-2.0.2.tgz 0ms (cache hit)
+npm http cache set-function-length@https://registry.npmjs.org/set-function-length/-/set-function-length-1.2.2.tgz 0ms (cache hit)
+npm http cache semver@https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 0ms (cache hit)
+npm http cache scheduler@https://registry.npmjs.org/scheduler/-/scheduler-0.27.0.tgz 0ms (cache hit)
+npm http cache sharp@https://registry.npmjs.org/sharp/-/sharp-0.34.5.tgz 0ms (cache hit)
+npm http cache safe-regex-test@https://registry.npmjs.org/safe-regex-test/-/safe-regex-test-1.1.0.tgz 0ms (cache hit)
+npm http cache safe-push-apply@https://registry.npmjs.org/safe-push-apply/-/safe-push-apply-1.0.0.tgz 0ms (cache hit)
+npm http cache safe-array-concat@https://registry.npmjs.org/safe-array-concat/-/safe-array-concat-1.1.3.tgz 1ms (cache hit)
+npm http cache run-parallel@https://registry.npmjs.org/run-parallel/-/run-parallel-1.2.0.tgz 0ms (cache hit)
+npm http cache rolldown@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/rolldown/-/rolldown-1.0.0-rc.15.tgz 0ms (cache hit)
+npm http cache reusify@https://registry.npmjs.org/reusify/-/reusify-1.1.0.tgz 0ms (cache hit)
+npm http cache resolve-pkg-maps@https://registry.npmjs.org/resolve-pkg-maps/-/resolve-pkg-maps-1.0.0.tgz 0ms (cache hit)
+npm http cache resolve-from@https://registry.npmjs.org/resolve-from/-/resolve-from-4.0.0.tgz 0ms (cache hit)
+npm http cache resolve@https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz 0ms (cache hit)
+npm http cache regexp.prototype.flags@https://registry.npmjs.org/regexp.prototype.flags/-/regexp.prototype.flags-1.5.4.tgz 0ms (cache hit)
+npm http cache reflect.getprototypeof@https://registry.npmjs.org/reflect.getprototypeof/-/reflect.getprototypeof-1.0.10.tgz 0ms (cache hit)
+npm http cache react-leaflet@https://registry.npmjs.org/react-leaflet/-/react-leaflet-5.0.0.tgz 0ms (cache hit)
+npm http cache react-leaflet-cluster@https://registry.npmjs.org/react-leaflet-cluster/-/react-leaflet-cluster-4.0.0.tgz 0ms (cache hit)
+npm http cache react-easy-crop@https://registry.npmjs.org/react-easy-crop/-/react-easy-crop-5.5.7.tgz 0ms (cache hit)
+npm http cache react-is@https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz 0ms (cache hit)
+npm http cache react-dom@https://registry.npmjs.org/react-dom/-/react-dom-19.2.4.tgz 0ms (cache hit)
+npm http cache queue-microtask@https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz 0ms (cache hit)
+npm http cache react@https://registry.npmjs.org/react/-/react-19.2.4.tgz 0ms (cache hit)
+npm http cache punycode@https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz 0ms (cache hit)
+npm http cache prelude-ls@https://registry.npmjs.org/prelude-ls/-/prelude-ls-1.2.1.tgz 0ms (cache hit)
+npm http cache prop-types@https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz 0ms (cache hit)
+npm http cache postcss@https://registry.npmjs.org/postcss/-/postcss-8.5.8.tgz 0ms (cache hit)
+npm http cache possible-typed-array-names@https://registry.npmjs.org/possible-typed-array-names/-/possible-typed-array-names-1.1.0.tgz 0ms (cache hit)
+npm http cache picomatch@https://registry.npmjs.org/picomatch/-/picomatch-2.3.2.tgz 0ms (cache hit)
+npm http cache pathe@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/pathe/-/pathe-2.0.3.tgz 0ms (cache hit)
+npm http cache picocolors@https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz 0ms (cache hit)
+npm http cache path-parse@https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz 0ms (cache hit)
+npm http cache path-key@https://registry.npmjs.org/path-key/-/path-key-3.1.1.tgz 0ms (cache hit)
+npm http cache parent-module@https://registry.npmjs.org/parent-module/-/parent-module-1.0.1.tgz 0ms (cache hit)
+npm http cache path-exists@https://registry.npmjs.org/path-exists/-/path-exists-4.0.0.tgz 0ms (cache hit)
+npm http cache p-locate@https://registry.npmjs.org/p-locate/-/p-locate-5.0.0.tgz 0ms (cache hit)
+npm http cache p-limit@https://registry.npmjs.org/p-limit/-/p-limit-3.1.0.tgz 0ms (cache hit)
+npm http cache own-keys@https://registry.npmjs.org/own-keys/-/own-keys-1.0.1.tgz 0ms (cache hit)
+npm http cache optionator@https://registry.npmjs.org/optionator/-/optionator-0.9.4.tgz 0ms (cache hit)
+npm http cache object.values@https://registry.npmjs.org/object.values/-/object.values-1.2.1.tgz 0ms (cache hit)
+npm http cache obug@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/obug/-/obug-2.1.1.tgz 0ms (cache hit)
+npm http cache object.groupby@https://registry.npmjs.org/object.groupby/-/object.groupby-1.0.3.tgz 0ms (cache hit)
+npm http cache object.entries@https://registry.npmjs.org/object.entries/-/object.entries-1.1.9.tgz 0ms (cache hit)
+npm http cache object.fromentries@https://registry.npmjs.org/object.fromentries/-/object.fromentries-2.0.8.tgz 0ms (cache hit)
+npm http cache object-keys@https://registry.npmjs.org/object-keys/-/object-keys-1.1.1.tgz 0ms (cache hit)
+npm http cache object.assign@https://registry.npmjs.org/object.assign/-/object.assign-4.1.7.tgz 0ms (cache hit)
+npm http cache object-inspect@https://registry.npmjs.org/object-inspect/-/object-inspect-1.13.4.tgz 0ms (cache hit)
+npm http cache node-releases@https://registry.npmjs.org/node-releases/-/node-releases-2.0.36.tgz 0ms (cache hit)
+npm http cache normalize-wheel@https://registry.npmjs.org/normalize-wheel/-/normalize-wheel-1.0.1.tgz 0ms (cache hit)
+npm http cache object-assign@https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz 0ms (cache hit)
+npm http cache next@https://registry.npmjs.org/next/-/next-16.2.1.tgz 0ms (cache hit)
+npm http cache node-exports-info@https://registry.npmjs.org/node-exports-info/-/node-exports-info-1.6.0.tgz 0ms (cache hit)
+npm http cache nanoid@https://registry.npmjs.org/nanoid/-/nanoid-3.3.11.tgz 0ms (cache hit)
+npm http cache napi-postinstall@https://registry.npmjs.org/napi-postinstall/-/napi-postinstall-0.3.4.tgz 0ms (cache hit)
+npm http cache natural-compare@https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz 0ms (cache hit)
+npm http cache ms@https://registry.npmjs.org/ms/-/ms-2.1.3.tgz 0ms (cache hit)
+npm http cache micromatch@https://registry.npmjs.org/micromatch/-/micromatch-4.0.8.tgz 0ms (cache hit)
+npm http cache minimatch@https://registry.npmjs.org/minimatch/-/minimatch-3.1.5.tgz 0ms (cache hit)
+npm http cache minimist@https://registry.npmjs.org/minimist/-/minimist-1.2.8.tgz 0ms (cache hit)
+npm http cache merge2@https://registry.npmjs.org/merge2/-/merge2-1.4.1.tgz 0ms (cache hit)
+npm http cache math-intrinsics@https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz 0ms (cache hit)
+npm http cache magic-string@https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz 0ms (cache hit)
+npm http cache lru-cache@https://registry.npmjs.org/lru-cache/-/lru-cache-5.1.1.tgz 0ms (cache hit)
+npm http cache lodash.merge@https://registry.npmjs.org/lodash.merge/-/lodash.merge-4.6.2.tgz 0ms (cache hit)
+npm http cache loose-envify@https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz 0ms (cache hit)
+npm http cache lightningcss-win32-x64-msvc@https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.32.0.tgz 0ms (cache hit)
+npm http cache lightningcss@https://registry.npmjs.org/lightningcss/-/lightningcss-1.32.0.tgz 0ms (cache hit)
+npm http cache locate-path@https://registry.npmjs.org/locate-path/-/locate-path-6.0.0.tgz 0ms (cache hit)
+npm http cache levn@https://registry.npmjs.org/levn/-/levn-0.4.1.tgz 0ms (cache hit)
+npm http cache leaflet@https://registry.npmjs.org/leaflet/-/leaflet-1.9.4.tgz 0ms (cache hit)
+npm http cache leaflet.markercluster@https://registry.npmjs.org/leaflet.markercluster/-/leaflet.markercluster-1.5.3.tgz 0ms (cache hit)
+npm http cache language-tags@https://registry.npmjs.org/language-tags/-/language-tags-1.0.9.tgz 0ms (cache hit)
+npm http cache language-subtag-registry@https://registry.npmjs.org/language-subtag-registry/-/language-subtag-registry-0.3.23.tgz 0ms (cache hit)
+npm http cache jsx-ast-utils@https://registry.npmjs.org/jsx-ast-utils/-/jsx-ast-utils-3.3.5.tgz 0ms (cache hit)
+npm http cache keyv@https://registry.npmjs.org/keyv/-/keyv-4.5.4.tgz 0ms (cache hit)
+npm http cache json-schema-traverse@https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz 0ms (cache hit)
+npm http cache json5@https://registry.npmjs.org/json5/-/json5-2.2.3.tgz 0ms (cache hit)
+npm http cache json-stable-stringify-without-jsonify@https://registry.npmjs.org/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz 0ms (cache hit)
+npm http cache json-buffer@https://registry.npmjs.org/json-buffer/-/json-buffer-3.0.1.tgz 0ms (cache hit)
+npm http cache jsesc@https://registry.npmjs.org/jsesc/-/jsesc-3.1.0.tgz 0ms (cache hit)
+npm http cache js-yaml@https://registry.npmjs.org/js-yaml/-/js-yaml-4.1.1.tgz 0ms (cache hit)
+npm http cache js-tokens@https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz 0ms (cache hit)
+npm http cache iterator.prototype@https://registry.npmjs.org/iterator.prototype/-/iterator.prototype-1.1.5.tgz 0ms (cache hit)
+npm http cache jiti@https://registry.npmjs.org/jiti/-/jiti-2.6.1.tgz 0ms (cache hit)
+npm http cache isexe@https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz 0ms (cache hit)
+npm http cache is-weakset@https://registry.npmjs.org/is-weakset/-/is-weakset-2.0.4.tgz 0ms (cache hit)
+npm http cache isarray@https://registry.npmjs.org/isarray/-/isarray-2.0.5.tgz 0ms (cache hit)
+npm http cache is-symbol@https://registry.npmjs.org/is-symbol/-/is-symbol-1.1.1.tgz 0ms (cache hit)
+npm http cache is-weakref@https://registry.npmjs.org/is-weakref/-/is-weakref-1.1.1.tgz 0ms (cache hit)
+npm http cache is-typed-array@https://registry.npmjs.org/is-typed-array/-/is-typed-array-1.1.15.tgz 0ms (cache hit)
+npm http cache is-regex@https://registry.npmjs.org/is-regex/-/is-regex-1.2.1.tgz 0ms (cache hit)
+npm http cache is-set@https://registry.npmjs.org/is-set/-/is-set-2.0.3.tgz 0ms (cache hit)
+npm http cache is-weakmap@https://registry.npmjs.org/is-weakmap/-/is-weakmap-2.0.2.tgz 0ms (cache hit)
+npm http cache is-shared-array-buffer@https://registry.npmjs.org/is-shared-array-buffer/-/is-shared-array-buffer-1.0.4.tgz 0ms (cache hit)
+npm http cache is-negative-zero@https://registry.npmjs.org/is-negative-zero/-/is-negative-zero-2.0.3.tgz 0ms (cache hit)
+npm http cache is-string@https://registry.npmjs.org/is-string/-/is-string-1.1.1.tgz 0ms (cache hit)
+npm http cache is-number-object@https://registry.npmjs.org/is-number-object/-/is-number-object-1.1.1.tgz 0ms (cache hit)
+npm http cache is-map@https://registry.npmjs.org/is-map/-/is-map-2.0.3.tgz 0ms (cache hit)
+npm http cache is-number@https://registry.npmjs.org/is-number/-/is-number-7.0.0.tgz 0ms (cache hit)
+npm http cache is-finalizationregistry@https://registry.npmjs.org/is-finalizationregistry/-/is-finalizationregistry-1.1.1.tgz 0ms (cache hit)
+npm http cache is-glob@https://registry.npmjs.org/is-glob/-/is-glob-4.0.3.tgz 0ms (cache hit)
+npm http cache is-generator-function@https://registry.npmjs.org/is-generator-function/-/is-generator-function-1.1.2.tgz 0ms (cache hit)
+npm http cache is-extglob@https://registry.npmjs.org/is-extglob/-/is-extglob-2.1.1.tgz 0ms (cache hit)
+npm http cache is-date-object@https://registry.npmjs.org/is-date-object/-/is-date-object-1.1.0.tgz 0ms (cache hit)
+npm http cache is-data-view@https://registry.npmjs.org/is-data-view/-/is-data-view-1.0.2.tgz 0ms (cache hit)
+npm http cache is-core-module@https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz 0ms (cache hit)
+npm http cache is-callable@https://registry.npmjs.org/is-callable/-/is-callable-1.2.7.tgz 0ms (cache hit)
+npm http cache is-boolean-object@https://registry.npmjs.org/is-boolean-object/-/is-boolean-object-1.2.2.tgz 0ms (cache hit)
+npm http cache is-async-function@https://registry.npmjs.org/is-async-function/-/is-async-function-2.1.1.tgz 0ms (cache hit)
+npm http cache is-bigint@https://registry.npmjs.org/is-bigint/-/is-bigint-1.1.0.tgz 0ms (cache hit)
+npm http cache is-bun-module@https://registry.npmjs.org/is-bun-module/-/is-bun-module-2.0.0.tgz 0ms (cache hit)
+npm http cache imurmurhash@https://registry.npmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz 0ms (cache hit)
+npm http cache import-fresh@https://registry.npmjs.org/import-fresh/-/import-fresh-3.3.1.tgz 0ms (cache hit)
+npm http cache is-array-buffer@https://registry.npmjs.org/is-array-buffer/-/is-array-buffer-3.0.5.tgz 0ms (cache hit)
+npm http cache internal-slot@https://registry.npmjs.org/internal-slot/-/internal-slot-1.1.0.tgz 0ms (cache hit)
+npm http cache hermes-estree@https://registry.npmjs.org/hermes-estree/-/hermes-estree-0.25.1.tgz 0ms (cache hit)
+npm http cache hermes-parser@https://registry.npmjs.org/hermes-parser/-/hermes-parser-0.25.1.tgz 0ms (cache hit)
+npm http cache ignore@https://registry.npmjs.org/ignore/-/ignore-5.3.2.tgz 0ms (cache hit)
+npm http cache iceberg-js@https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz 0ms (cache hit)
+npm http cache has-tostringtag@https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.2.tgz 0ms (cache hit)
+npm http cache hasown@https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz 0ms (cache hit)
+npm http cache has-proto@https://registry.npmjs.org/has-proto/-/has-proto-1.2.0.tgz 0ms (cache hit)
+npm http cache has-symbols@https://registry.npmjs.org/has-symbols/-/has-symbols-1.1.0.tgz 0ms (cache hit)
+npm http cache has-bigints@https://registry.npmjs.org/has-bigints/-/has-bigints-1.1.0.tgz 0ms (cache hit)
+npm http cache has-property-descriptors@https://registry.npmjs.org/has-property-descriptors/-/has-property-descriptors-1.0.2.tgz 0ms (cache hit)
+npm http cache graceful-fs@https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz 0ms (cache hit)
+npm http cache gopd@https://registry.npmjs.org/gopd/-/gopd-1.2.0.tgz 0ms (cache hit)
+npm http cache globalthis@https://registry.npmjs.org/globalthis/-/globalthis-1.0.4.tgz 0ms (cache hit)
+npm http cache has-flag@https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz 0ms (cache hit)
+npm http cache glob-parent@https://registry.npmjs.org/glob-parent/-/glob-parent-6.0.2.tgz 0ms (cache hit)
+npm http cache globals@https://registry.npmjs.org/globals/-/globals-14.0.0.tgz 0ms (cache hit)
+npm http cache get-symbol-description@https://registry.npmjs.org/get-symbol-description/-/get-symbol-description-1.1.0.tgz 0ms (cache hit)
+npm http cache get-proto@https://registry.npmjs.org/get-proto/-/get-proto-1.0.1.tgz 0ms (cache hit)
+npm http cache get-intrinsic@https://registry.npmjs.org/get-intrinsic/-/get-intrinsic-1.3.0.tgz 0ms (cache hit)
+npm http cache gensync@https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz 0ms (cache hit)
+npm http cache get-tsconfig@https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.13.7.tgz 0ms (cache hit)
+npm http cache function.prototype.name@https://registry.npmjs.org/function.prototype.name/-/function.prototype.name-1.1.8.tgz 0ms (cache hit)
+npm http cache functions-have-names@https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.3.tgz 0ms (cache hit)
+npm http cache generator-function@https://registry.npmjs.org/generator-function/-/generator-function-2.0.1.tgz 0ms (cache hit)
+npm http cache function-bind@https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz 0ms (cache hit)
+npm http cache for-each@https://registry.npmjs.org/for-each/-/for-each-0.3.5.tgz 0ms (cache hit)
+npm http cache flatted@https://registry.npmjs.org/flatted/-/flatted-3.4.2.tgz 0ms (cache hit)
+npm http cache flat-cache@https://registry.npmjs.org/flat-cache/-/flat-cache-4.0.1.tgz 0ms (cache hit)
+npm http cache find-up@https://registry.npmjs.org/find-up/-/find-up-5.0.0.tgz 0ms (cache hit)
+npm http cache file-entry-cache@https://registry.npmjs.org/file-entry-cache/-/file-entry-cache-8.0.0.tgz 0ms (cache hit)
+npm http cache fastq@https://registry.npmjs.org/fastq/-/fastq-1.20.1.tgz 0ms (cache hit)
+npm http cache fill-range@https://registry.npmjs.org/fill-range/-/fill-range-7.1.1.tgz 0ms (cache hit)
+npm http cache fast-levenshtein@https://registry.npmjs.org/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz 0ms (cache hit)
+npm http cache fast-json-stable-stringify@https://registry.npmjs.org/fast-json-stable-stringify/-/fast-json-stable-stringify-2.1.0.tgz 0ms (cache hit)
+npm http cache fast-glob@https://registry.npmjs.org/fast-glob/-/fast-glob-3.3.1.tgz 0ms (cache hit)
+npm http cache expect-type@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/expect-type/-/expect-type-1.3.0.tgz 0ms (cache hit)
+npm http cache fast-deep-equal@https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz 0ms (cache hit)
+npm http cache estree-walker@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/estree-walker/-/estree-walker-3.0.3.tgz 0ms (cache hit)
+npm http cache esutils@https://registry.npmjs.org/esutils/-/esutils-2.0.3.tgz 0ms (cache hit)
+npm http cache esrecurse@https://registry.npmjs.org/esrecurse/-/esrecurse-4.3.0.tgz 0ms (cache hit)
+npm http cache estraverse@https://registry.npmjs.org/estraverse/-/estraverse-5.3.0.tgz 0ms (cache hit)
+npm http cache esquery@https://registry.npmjs.org/esquery/-/esquery-1.7.0.tgz 0ms (cache hit)
+npm http cache espree@https://registry.npmjs.org/espree/-/espree-10.4.0.tgz 0ms (cache hit)
+npm http cache eslint-visitor-keys@https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-4.2.1.tgz 0ms (cache hit)
+npm http cache eslint-scope@https://registry.npmjs.org/eslint-scope/-/eslint-scope-8.4.0.tgz 0ms (cache hit)
+npm http cache eslint-plugin-react-hooks@https://registry.npmjs.org/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-7.0.1.tgz 0ms (cache hit)
+npm http cache eslint-plugin-react@https://registry.npmjs.org/eslint-plugin-react/-/eslint-plugin-react-7.37.5.tgz 0ms (cache hit)
+npm http cache eslint-plugin-jsx-a11y@https://registry.npmjs.org/eslint-plugin-jsx-a11y/-/eslint-plugin-jsx-a11y-6.10.2.tgz 0ms (cache hit)
+npm http cache eslint-plugin-import@https://registry.npmjs.org/eslint-plugin-import/-/eslint-plugin-import-2.32.0.tgz 0ms (cache hit)
+npm http cache eslint-module-utils@https://registry.npmjs.org/eslint-module-utils/-/eslint-module-utils-2.12.1.tgz 0ms (cache hit)
+npm http cache eslint-import-resolver-typescript@https://registry.npmjs.org/eslint-import-resolver-typescript/-/eslint-import-resolver-typescript-3.10.1.tgz 0ms (cache hit)
+npm http cache eslint-config-next@https://registry.npmjs.org/eslint-config-next/-/eslint-config-next-16.2.1.tgz 0ms (cache hit)
+npm http cache eslint-import-resolver-node@https://registry.npmjs.org/eslint-import-resolver-node/-/eslint-import-resolver-node-0.3.9.tgz 0ms (cache hit)
+npm http cache eslint@https://registry.npmjs.org/eslint/-/eslint-9.39.4.tgz 0ms (cache hit)
+npm http cache escape-string-regexp@https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz 0ms (cache hit)
+npm http cache escalade@https://registry.npmjs.org/escalade/-/escalade-3.2.0.tgz 0ms (cache hit)
+npm http cache es-shim-unscopables@https://registry.npmjs.org/es-shim-unscopables/-/es-shim-unscopables-1.1.0.tgz 0ms (cache hit)
+npm http cache es-to-primitive@https://registry.npmjs.org/es-to-primitive/-/es-to-primitive-1.3.0.tgz 0ms (cache hit)
+npm http cache es-set-tostringtag@https://registry.npmjs.org/es-set-tostringtag/-/es-set-tostringtag-2.1.0.tgz 0ms (cache hit)
+npm http cache es-object-atoms@https://registry.npmjs.org/es-object-atoms/-/es-object-atoms-1.1.1.tgz 0ms (cache hit)
+npm http cache es-iterator-helpers@https://registry.npmjs.org/es-iterator-helpers/-/es-iterator-helpers-1.3.1.tgz 0ms (cache hit)
+npm http cache es-module-lexer@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/es-module-lexer/-/es-module-lexer-2.0.0.tgz 0ms (cache hit)
+npm http cache es-errors@https://registry.npmjs.org/es-errors/-/es-errors-1.3.0.tgz 0ms (cache hit)
+npm http cache es-define-property@https://registry.npmjs.org/es-define-property/-/es-define-property-1.0.1.tgz 0ms (cache hit)
+npm http cache es-abstract@https://registry.npmjs.org/es-abstract/-/es-abstract-1.24.1.tgz 0ms (cache hit)
+npm http cache enhanced-resolve@https://registry.npmjs.org/enhanced-resolve/-/enhanced-resolve-5.20.1.tgz 0ms (cache hit)
+npm http cache emoji-regex@https://registry.npmjs.org/emoji-regex/-/emoji-regex-9.2.2.tgz 0ms (cache hit)
+npm http cache electron-to-chromium@https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.328.tgz 0ms (cache hit)
+npm http cache dunder-proto@https://registry.npmjs.org/dunder-proto/-/dunder-proto-1.0.1.tgz 0ms (cache hit)
+npm http cache doctrine@https://registry.npmjs.org/doctrine/-/doctrine-2.1.0.tgz 0ms (cache hit)
+npm http cache detect-libc@https://registry.npmjs.org/detect-libc/-/detect-libc-2.1.2.tgz 0ms (cache hit)
+npm http cache define-properties@https://registry.npmjs.org/define-properties/-/define-properties-1.2.1.tgz 0ms (cache hit)
+npm http cache define-data-property@https://registry.npmjs.org/define-data-property/-/define-data-property-1.1.4.tgz 0ms (cache hit)
+npm http cache deep-is@https://registry.npmjs.org/deep-is/-/deep-is-0.1.4.tgz 0ms (cache hit)
+npm http cache debug@https://registry.npmjs.org/debug/-/debug-4.4.3.tgz 0ms (cache hit)
+npm http cache data-view-byte-offset@https://registry.npmjs.org/data-view-byte-offset/-/data-view-byte-offset-1.0.1.tgz 0ms (cache hit)
+npm http cache data-view-buffer@https://registry.npmjs.org/data-view-buffer/-/data-view-buffer-1.0.2.tgz 0ms (cache hit)
+npm http cache csstype@https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz 0ms (cache hit)
+npm http cache damerau-levenshtein@https://registry.npmjs.org/damerau-levenshtein/-/damerau-levenshtein-1.0.8.tgz 0ms (cache hit)
+npm http cache data-view-byte-length@https://registry.npmjs.org/data-view-byte-length/-/data-view-byte-length-1.0.2.tgz 0ms (cache hit)
+npm http cache cross-spawn@https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.6.tgz 0ms (cache hit)
+npm http cache convert-source-map@https://registry.npmjs.org/convert-source-map/-/convert-source-map-2.0.0.tgz 0ms (cache hit)
+npm http cache concat-map@https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz 0ms (cache hit)
+npm http cache color-convert@https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz 0ms (cache hit)
+npm http cache color-name@https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz 0ms (cache hit)
+npm http cache chalk@https://registry.npmjs.org/chalk/-/chalk-4.1.2.tgz 0ms (cache hit)
+npm http cache caniuse-lite@https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001782.tgz 0ms (cache hit)
+npm http cache client-only@https://registry.npmjs.org/client-only/-/client-only-0.0.1.tgz 0ms (cache hit)
+npm http cache callsites@https://registry.npmjs.org/callsites/-/callsites-3.1.0.tgz 0ms (cache hit)
+npm http cache call-bind-apply-helpers@https://registry.npmjs.org/call-bind-apply-helpers/-/call-bind-apply-helpers-1.0.2.tgz 0ms (cache hit)
+npm http cache chai@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/chai/-/chai-6.2.2.tgz 0ms (cache hit)
+npm http cache call-bound@https://registry.npmjs.org/call-bound/-/call-bound-1.0.4.tgz 0ms (cache hit)
+npm http cache call-bind@https://registry.npmjs.org/call-bind/-/call-bind-1.0.8.tgz 0ms (cache hit)
+npm http cache browserslist@https://registry.npmjs.org/browserslist/-/browserslist-4.28.1.tgz 0ms (cache hit)
+npm http cache brace-expansion@https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.13.tgz 0ms (cache hit)
+npm http cache braces@https://registry.npmjs.org/braces/-/braces-3.0.3.tgz 0ms (cache hit)
+npm http cache balanced-match@https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz 0ms (cache hit)
+npm http cache baseline-browser-mapping@https://registry.npmjs.org/baseline-browser-mapping/-/baseline-browser-mapping-2.10.12.tgz 0ms (cache hit)
+npm http cache axobject-query@https://registry.npmjs.org/axobject-query/-/axobject-query-4.1.0.tgz 0ms (cache hit)
+npm http cache axe-core@https://registry.npmjs.org/axe-core/-/axe-core-4.11.1.tgz 0ms (cache hit)
+npm http cache available-typed-arrays@https://registry.npmjs.org/available-typed-arrays/-/available-typed-arrays-1.0.7.tgz 0ms (cache hit)
+npm http cache async-function@https://registry.npmjs.org/async-function/-/async-function-1.0.0.tgz 0ms (cache hit)
+npm http cache ast-types-flow@https://registry.npmjs.org/ast-types-flow/-/ast-types-flow-0.0.8.tgz 0ms (cache hit)
+npm http cache assertion-error@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/assertion-error/-/assertion-error-2.0.1.tgz 0ms (cache hit)
+npm http cache arraybuffer.prototype.slice@https://registry.npmjs.org/arraybuffer.prototype.slice/-/arraybuffer.prototype.slice-1.0.4.tgz 0ms (cache hit)
+npm http cache array.prototype.flatmap@https://registry.npmjs.org/array.prototype.flatmap/-/array.prototype.flatmap-1.3.3.tgz 0ms (cache hit)
+npm http cache array.prototype.tosorted@https://registry.npmjs.org/array.prototype.tosorted/-/array.prototype.tosorted-1.1.4.tgz 0ms (cache hit)
+npm http cache array.prototype.findlastindex@https://registry.npmjs.org/array.prototype.findlastindex/-/array.prototype.findlastindex-1.2.6.tgz 0ms (cache hit)
+npm http cache array.prototype.flat@https://registry.npmjs.org/array.prototype.flat/-/array.prototype.flat-1.3.3.tgz 0ms (cache hit)
+npm http cache array.prototype.findlast@https://registry.npmjs.org/array.prototype.findlast/-/array.prototype.findlast-1.2.5.tgz 0ms (cache hit)
+npm http cache array-includes@https://registry.npmjs.org/array-includes/-/array-includes-3.1.9.tgz 0ms (cache hit)
+npm http cache array-buffer-byte-length@https://registry.npmjs.org/array-buffer-byte-length/-/array-buffer-byte-length-1.0.2.tgz 0ms (cache hit)
+npm http cache aria-query@https://registry.npmjs.org/aria-query/-/aria-query-5.3.2.tgz 0ms (cache hit)
+npm http cache acorn-jsx@https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-5.3.2.tgz 0ms (cache hit)
+npm http cache ajv@https://registry.npmjs.org/ajv/-/ajv-6.14.0.tgz 0ms (cache hit)
+npm http cache argparse@https://registry.npmjs.org/argparse/-/argparse-2.0.1.tgz 0ms (cache hit)
+npm http cache ansi-styles@https://registry.npmjs.org/ansi-styles/-/ansi-styles-4.3.0.tgz 0ms (cache hit)
+npm http cache @vitest/utils@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/utils/-/utils-4.1.4.tgz 0ms (cache hit)
+npm http cache acorn@https://registry.npmjs.org/acorn/-/acorn-8.16.0.tgz 0ms (cache hit)
+npm http cache @vitest/spy@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/spy/-/spy-4.1.4.tgz 0ms (cache hit)
+npm http cache @vitest/runner@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/runner/-/runner-4.1.4.tgz 0ms (cache hit)
+npm http cache @vitest/pretty-format@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/pretty-format/-/pretty-format-4.1.4.tgz 0ms (cache hit)
+npm http cache @vitest/snapshot@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/snapshot/-/snapshot-4.1.4.tgz 0ms (cache hit)
+npm http cache @vitest/mocker@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/mocker/-/mocker-4.1.4.tgz 0ms (cache hit)
+npm http cache @unrs/resolver-binding-win32-x64-msvc@https://registry.npmjs.org/@unrs/resolver-binding-win32-x64-msvc/-/resolver-binding-win32-x64-msvc-1.11.1.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/visitor-keys@https://registry.npmjs.org/@typescript-eslint/visitor-keys/-/visitor-keys-8.57.2.tgz 0ms (cache hit)
+npm http cache @vitest/expect@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/expect/-/expect-4.1.4.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/utils@https://registry.npmjs.org/@typescript-eslint/utils/-/utils-8.57.2.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/types@https://registry.npmjs.org/@typescript-eslint/types/-/types-8.57.2.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/type-utils@https://registry.npmjs.org/@typescript-eslint/type-utils/-/type-utils-8.57.2.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/tsconfig-utils@https://registry.npmjs.org/@typescript-eslint/tsconfig-utils/-/tsconfig-utils-8.57.2.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/project-service@https://registry.npmjs.org/@typescript-eslint/project-service/-/project-service-8.57.2.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/typescript-estree@https://registry.npmjs.org/@typescript-eslint/typescript-estree/-/typescript-estree-8.57.2.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/scope-manager@https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-8.57.2.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/parser@https://registry.npmjs.org/@typescript-eslint/parser/-/parser-8.57.2.tgz 0ms (cache hit)
+npm http cache @typescript-eslint/eslint-plugin@https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.57.2.tgz 0ms (cache hit)
+npm http cache @types/react@https://registry.npmjs.org/@types/react/-/react-19.2.14.tgz 0ms (cache hit)
+npm http cache @types/ws@https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz 0ms (cache hit)
+npm http cache @types/react-dom@https://registry.npmjs.org/@types/react-dom/-/react-dom-19.2.3.tgz 0ms (cache hit)
+npm http cache @types/node@https://registry.npmjs.org/@types/node/-/node-20.19.37.tgz 0ms (cache hit)
+npm http cache @types/json5@https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz 0ms (cache hit)
+npm http cache @types/leaflet@https://registry.npmjs.org/@types/leaflet/-/leaflet-1.9.21.tgz 0ms (cache hit)
+npm http cache @types/geojson@https://registry.npmjs.org/@types/geojson/-/geojson-7946.0.16.tgz 0ms (cache hit)
+npm http cache @types/json-schema@https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.15.tgz 0ms (cache hit)
+npm http cache @types/deep-eql@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@types/deep-eql/-/deep-eql-4.0.2.tgz 0ms (cache hit)
+npm http cache @tybys/wasm-util@https://registry.npmjs.org/@tybys/wasm-util/-/wasm-util-0.10.1.tgz 0ms (cache hit)
+npm http cache @types/estree@https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz 0ms (cache hit)
+npm http cache @tailwindcss/postcss@https://registry.npmjs.org/@tailwindcss/postcss/-/postcss-4.2.2.tgz 0ms (cache hit)
+npm http cache @types/chai@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@types/chai/-/chai-5.2.3.tgz 0ms (cache hit)
+npm http cache @tailwindcss/oxide-win32-x64-msvc@https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.2.2.tgz 0ms (cache hit)
+npm http cache @tailwindcss/oxide@https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.2.2.tgz 0ms (cache hit)
+npm http cache @tailwindcss/node@https://registry.npmjs.org/@tailwindcss/node/-/node-4.2.2.tgz 0ms (cache hit)
+npm http cache @supabase/realtime-js@https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.100.1.tgz 0ms (cache hit)
+npm http cache @swc/helpers@https://registry.npmjs.org/@swc/helpers/-/helpers-0.5.15.tgz 0ms (cache hit)
+npm http cache @supabase/storage-js@https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.100.1.tgz 0ms (cache hit)
+npm http cache @supabase/supabase-js@https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.100.1.tgz 0ms (cache hit)
+npm http cache @supabase/postgrest-js@https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.100.1.tgz 0ms (cache hit)
+npm http cache @supabase/functions-js@https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.100.1.tgz 0ms (cache hit)
+npm http cache @rtsao/scc@https://registry.npmjs.org/@rtsao/scc/-/scc-1.1.0.tgz 0ms (cache hit)
+npm http cache @supabase/auth-js@https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.100.1.tgz 0ms (cache hit)
+npm http cache @supabase/phoenix@https://registry.npmjs.org/@supabase/phoenix/-/phoenix-0.4.0.tgz 0ms (cache hit)
+npm http cache @standard-schema/spec@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@standard-schema/spec/-/spec-1.1.0.tgz 0ms (cache hit)
+npm http cache @rolldown/binding-win32-x64-msvc@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@rolldown/binding-win32-x64-msvc/-/binding-win32-x64-msvc-1.0.0-rc.15.tgz 0ms (cache hit)
+npm http cache @react-leaflet/core@https://registry.npmjs.org/@react-leaflet/core/-/core-3.0.0.tgz 0ms (cache hit)
+npm http cache @rolldown/pluginutils@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@rolldown/pluginutils/-/pluginutils-1.0.0-rc.15.tgz 0ms (cache hit)
+npm http cache @oxc-project/types@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@oxc-project/types/-/types-0.124.0.tgz 0ms (cache hit)
+npm http cache @nolyfill/is-core-module@https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz 0ms (cache hit)
+npm http cache @nodelib/fs.walk@https://registry.npmjs.org/@nodelib/fs.walk/-/fs.walk-1.2.8.tgz 0ms (cache hit)
+npm http cache @next/swc-win32-x64-msvc@https://registry.npmjs.org/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-16.2.1.tgz 0ms (cache hit)
+npm http cache @nodelib/fs.scandir@https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz 0ms (cache hit)
+npm http cache @next/eslint-plugin-next@https://registry.npmjs.org/@next/eslint-plugin-next/-/eslint-plugin-next-16.2.1.tgz 0ms (cache hit)
+npm http cache @next/env@https://registry.npmjs.org/@next/env/-/env-16.2.1.tgz 0ms (cache hit)
+npm http cache @napi-rs/wasm-runtime@https://registry.npmjs.org/@napi-rs/wasm-runtime/-/wasm-runtime-0.2.12.tgz 0ms (cache hit)
+npm http cache @nodelib/fs.stat@https://registry.npmjs.org/@nodelib/fs.stat/-/fs.stat-2.0.5.tgz 0ms (cache hit)
+npm http cache @jridgewell/trace-mapping@https://registry.npmjs.org/@jridgewell/trace-mapping/-/trace-mapping-0.3.31.tgz 0ms (cache hit)
+npm http cache @jridgewell/sourcemap-codec@https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.5.tgz 0ms (cache hit)
+npm http cache @jridgewell/resolve-uri@https://registry.npmjs.org/@jridgewell/resolve-uri/-/resolve-uri-3.1.2.tgz 0ms (cache hit)
+npm http cache @jridgewell/gen-mapping@https://registry.npmjs.org/@jridgewell/gen-mapping/-/gen-mapping-0.3.13.tgz 0ms (cache hit)
+npm http cache @img/colour@https://registry.npmjs.org/@img/colour/-/colour-1.1.0.tgz 0ms (cache hit)
+npm http cache @jridgewell/remapping@https://registry.npmjs.org/@jridgewell/remapping/-/remapping-2.3.5.tgz 0ms (cache hit)
+npm http cache @img/sharp-win32-x64@https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.34.5.tgz 0ms (cache hit)
+npm http cache @humanwhocodes/retry@https://registry.npmjs.org/@humanwhocodes/retry/-/retry-0.4.3.tgz 0ms (cache hit)
+npm http cache @humanwhocodes/module-importer@https://registry.npmjs.org/@humanwhocodes/module-importer/-/module-importer-1.0.1.tgz 0ms (cache hit)
+npm http cache @eslint/plugin-kit@https://registry.npmjs.org/@eslint/plugin-kit/-/plugin-kit-0.4.1.tgz 0ms (cache hit)
+npm http cache @humanfs/node@https://registry.npmjs.org/@humanfs/node/-/node-0.16.7.tgz 0ms (cache hit)
+npm http cache @eslint/object-schema@https://registry.npmjs.org/@eslint/object-schema/-/object-schema-2.1.7.tgz 0ms (cache hit)
+npm http cache @humanfs/core@https://registry.npmjs.org/@humanfs/core/-/core-0.19.1.tgz 0ms (cache hit)
+npm http cache @eslint/core@https://registry.npmjs.org/@eslint/core/-/core-0.17.0.tgz 0ms (cache hit)
+npm http cache @eslint/eslintrc@https://registry.npmjs.org/@eslint/eslintrc/-/eslintrc-3.3.5.tgz 0ms (cache hit)
+npm http cache @eslint/js@https://registry.npmjs.org/@eslint/js/-/js-9.39.4.tgz 0ms (cache hit)
+npm http cache @eslint/config-helpers@https://registry.npmjs.org/@eslint/config-helpers/-/config-helpers-0.4.2.tgz 0ms (cache hit)
+npm http cache @eslint/config-array@https://registry.npmjs.org/@eslint/config-array/-/config-array-0.21.2.tgz 0ms (cache hit)
+npm http cache @eslint-community/eslint-utils@https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.9.1.tgz 0ms (cache hit)
+npm http cache @eslint-community/regexpp@https://registry.npmjs.org/@eslint-community/regexpp/-/regexpp-4.12.2.tgz 0ms (cache hit)
+npm http cache @emnapi/wasi-threads@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz 0ms (cache hit)
+npm http cache @emnapi/runtime@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@emnapi/runtime/-/runtime-1.9.2.tgz 0ms (cache hit)
+npm http cache @babel/traverse@https://registry.npmjs.org/@babel/traverse/-/traverse-7.29.0.tgz 0ms (cache hit)
+npm http cache @babel/parser@https://registry.npmjs.org/@babel/parser/-/parser-7.29.2.tgz 0ms (cache hit)
+npm http cache @emnapi/core@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@emnapi/core/-/core-1.9.2.tgz 0ms (cache hit)
+npm http cache @babel/helpers@https://registry.npmjs.org/@babel/helpers/-/helpers-7.29.2.tgz 0ms (cache hit)
+npm http cache @babel/types@https://registry.npmjs.org/@babel/types/-/types-7.29.0.tgz 0ms (cache hit)
+npm http cache @babel/template@https://registry.npmjs.org/@babel/template/-/template-7.28.6.tgz 0ms (cache hit)
+npm http cache @babel/helper-validator-option@https://registry.npmjs.org/@babel/helper-validator-option/-/helper-validator-option-7.27.1.tgz 0ms (cache hit)
+npm http cache @babel/helper-validator-identifier@https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.28.5.tgz 0ms (cache hit)
+npm http cache @babel/helper-module-transforms@https://registry.npmjs.org/@babel/helper-module-transforms/-/helper-module-transforms-7.28.6.tgz 0ms (cache hit)
+npm http cache @babel/helper-string-parser@https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.27.1.tgz 0ms (cache hit)
+npm http cache @babel/helper-module-imports@https://registry.npmjs.org/@babel/helper-module-imports/-/helper-module-imports-7.28.6.tgz 0ms (cache hit)
+npm http cache @babel/helper-globals@https://registry.npmjs.org/@babel/helper-globals/-/helper-globals-7.28.0.tgz 0ms (cache hit)
+npm http cache @babel/generator@https://registry.npmjs.org/@babel/generator/-/generator-7.29.1.tgz 0ms (cache hit)
+npm http cache @babel/helper-compilation-targets@https://registry.npmjs.org/@babel/helper-compilation-targets/-/helper-compilation-targets-7.28.6.tgz 0ms (cache hit)
+npm http cache @babel/core@https://registry.npmjs.org/@babel/core/-/core-7.29.0.tgz 0ms (cache hit)
+npm http cache @alloc/quick-lru@https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.2.0.tgz 0ms (cache hit)
+npm http cache @babel/compat-data@https://registry.npmjs.org/@babel/compat-data/-/compat-data-7.29.0.tgz 0ms (cache hit)
+npm http cache @babel/code-frame@https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.29.0.tgz 0ms (cache hit)
+npm http cache picomatch@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/picomatch/-/picomatch-4.0.4.tgz 0ms (cache hit)
+npm http cache picomatch@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/picomatch/-/picomatch-4.0.4.tgz 0ms (cache hit)
+npm http cache picomatch@https://registry.npmjs.org/picomatch/-/picomatch-4.0.4.tgz 0ms (cache hit)
+npm http cache json5@https://registry.npmjs.org/json5/-/json5-1.0.2.tgz 0ms (cache hit)
+npm http cache semver@https://registry.npmjs.org/semver/-/semver-7.7.4.tgz 0ms (cache hit)
+npm http cache postcss@https://registry.npmjs.org/postcss/-/postcss-8.4.31.tgz 0ms (cache hit)
+npm http cache fdir@https://registry.npmjs.org/fdir/-/fdir-6.5.0.tgz 0ms (cache hit)
+npm http cache semver@https://registry.npmjs.org/semver/-/semver-7.7.4.tgz 0ms (cache hit)
+npm http cache glob-parent@https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz 0ms (cache hit)
+npm http cache resolve@https://registry.npmjs.org/resolve/-/resolve-2.0.0-next.6.tgz 0ms (cache hit)
+npm http cache debug@https://registry.npmjs.org/debug/-/debug-3.2.7.tgz 0ms (cache hit)
+npm http cache debug@https://registry.npmjs.org/debug/-/debug-3.2.7.tgz 0ms (cache hit)
+npm http cache debug@https://registry.npmjs.org/debug/-/debug-3.2.7.tgz 0ms (cache hit)
+npm http cache globals@https://registry.npmjs.org/globals/-/globals-16.4.0.tgz 0ms (cache hit)
+npm http cache semver@https://registry.npmjs.org/semver/-/semver-7.7.4.tgz 0ms (cache hit)
+npm http cache eslint-visitor-keys@https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-5.0.1.tgz 0ms (cache hit)
+npm http cache minimatch@https://registry.npmjs.org/minimatch/-/minimatch-10.2.4.tgz 0ms (cache hit)
+npm http cache brace-expansion@https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.5.tgz 0ms (cache hit)
+npm http cache balanced-match@https://registry.npmjs.org/balanced-match/-/balanced-match-4.0.4.tgz 0ms (cache hit)
+npm http cache ignore@https://registry.npmjs.org/ignore/-/ignore-7.0.5.tgz 0ms (cache hit)
+npm http cache eslint-visitor-keys@https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-3.4.3.tgz 0ms (cache hit)
+npm http cache @napi-rs/wasm-runtime@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@napi-rs/wasm-runtime/-/wasm-runtime-1.1.3.tgz 0ms (cache hit)
+npm silly tarball no local data for why-is-node-running@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/why-is-node-running/-/why-is-node-running-2.3.0.tgz. Extracting by manifest.
+npm silly tarball no local data for vitest@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vitest/-/vitest-4.1.4.tgz. Extracting by manifest.
+npm silly tarball no local data for vite@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vite/-/vite-8.0.8.tgz. Extracting by manifest.
+npm silly tarball no local data for tinyrainbow@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyrainbow/-/tinyrainbow-3.1.0.tgz. Extracting by manifest.
+npm silly tarball no local data for tinyexec@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyexec/-/tinyexec-1.1.1.tgz. Extracting by manifest.
+npm silly tarball no local data for tinybench@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinybench/-/tinybench-2.9.0.tgz. Extracting by manifest.
+npm silly tarball no local data for std-env@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/std-env/-/std-env-4.0.0.tgz. Extracting by manifest.
+npm silly tarball no local data for stackback@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/stackback/-/stackback-0.0.2.tgz. Extracting by manifest.
+npm silly tarball no local data for siginfo@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/siginfo/-/siginfo-2.0.0.tgz. Extracting by manifest.
+npm silly tarball no local data for rolldown@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/rolldown/-/rolldown-1.0.0-rc.15.tgz. Extracting by manifest.
+npm silly tarball no local data for pathe@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/pathe/-/pathe-2.0.3.tgz. Extracting by manifest.
+npm silly tarball no local data for obug@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/obug/-/obug-2.1.1.tgz. Extracting by manifest.
+npm silly tarball no local data for expect-type@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/expect-type/-/expect-type-1.3.0.tgz. Extracting by manifest.
+npm silly tarball no local data for estree-walker@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/estree-walker/-/estree-walker-3.0.3.tgz. Extracting by manifest.
+npm silly tarball no local data for es-module-lexer@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/es-module-lexer/-/es-module-lexer-2.0.0.tgz. Extracting by manifest.
+npm silly tarball no local data for chai@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/chai/-/chai-6.2.2.tgz. Extracting by manifest.
+npm silly tarball no local data for assertion-error@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/assertion-error/-/assertion-error-2.0.1.tgz. Extracting by manifest.
+npm silly tarball no local data for @vitest/utils@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/utils/-/utils-4.1.4.tgz. Extracting by manifest.
+npm silly tarball no local data for @vitest/spy@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/spy/-/spy-4.1.4.tgz. Extracting by manifest.
+npm silly tarball no local data for @vitest/runner@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/runner/-/runner-4.1.4.tgz. Extracting by manifest.
+npm silly tarball no local data for @vitest/pretty-format@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/pretty-format/-/pretty-format-4.1.4.tgz. Extracting by manifest.
+npm silly tarball no local data for @vitest/snapshot@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/snapshot/-/snapshot-4.1.4.tgz. Extracting by manifest.
+npm silly tarball no local data for @vitest/mocker@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/mocker/-/mocker-4.1.4.tgz. Extracting by manifest.
+npm silly tarball no local data for @vitest/expect@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@vitest/expect/-/expect-4.1.4.tgz. Extracting by manifest.
+npm silly tarball no local data for @types/deep-eql@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@types/deep-eql/-/deep-eql-4.0.2.tgz. Extracting by manifest.
+npm silly tarball no local data for @types/chai@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@types/chai/-/chai-5.2.3.tgz. Extracting by manifest.
+npm silly tarball no local data for @standard-schema/spec@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@standard-schema/spec/-/spec-1.1.0.tgz. Extracting by manifest.
+npm silly tarball no local data for @rolldown/binding-win32-x64-msvc@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@rolldown/binding-win32-x64-msvc/-/binding-win32-x64-msvc-1.0.0-rc.15.tgz. Extracting by manifest.
+npm silly tarball no local data for @rolldown/pluginutils@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@rolldown/pluginutils/-/pluginutils-1.0.0-rc.15.tgz. Extracting by manifest.
+npm silly tarball no local data for @oxc-project/types@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@oxc-project/types/-/types-0.124.0.tgz. Extracting by manifest.
+npm silly tarball no local data for @emnapi/wasi-threads@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz. Extracting by manifest.
+npm silly tarball no local data for @emnapi/runtime@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@emnapi/runtime/-/runtime-1.9.2.tgz. Extracting by manifest.
+npm silly tarball no local data for @emnapi/core@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@emnapi/core/-/core-1.9.2.tgz. Extracting by manifest.
+npm silly tarball no local data for @napi-rs/wasm-runtime@https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@napi-rs/wasm-runtime/-/wasm-runtime-1.1.3.tgz. Extracting by manifest.
+npm timing reifyNode:node_modules/client-only Completed in 2302ms
+npm timing reifyNode:node_modules/natural-compare Completed in 2316ms
+npm timing reifyNode:node_modules/strip-bom Completed in 2413ms
+npm timing reifyNode:node_modules/shebang-command Completed in 2414ms
+npm timing reifyNode:node_modules/resolve-from Completed in 2414ms
+npm timing reifyNode:node_modules/run-parallel Completed in 2415ms
+npm timing reifyNode:node_modules/path-parse Completed in 2415ms
+npm timing reifyNode:node_modules/parent-module Completed in 2415ms
+npm timing reifyNode:node_modules/object-assign Completed in 2416ms
+npm timing reifyNode:node_modules/ms Completed in 2415ms
+npm timing reifyNode:node_modules/merge2 Completed in 2416ms
+npm timing reifyNode:node_modules/isarray Completed in 2417ms
+npm timing reifyNode:node_modules/is-number Completed in 2418ms
+npm timing reifyNode:node_modules/is-extglob Completed in 2418ms
+npm timing reifyNode:node_modules/imurmurhash Completed in 2419ms
+npm timing reifyNode:node_modules/glob-parent Completed in 2419ms
+npm timing reifyNode:node_modules/fast-levenshtein Completed in 2420ms
+npm timing reifyNode:node_modules/eslint-import-resolver-node Completed in 2420ms
+npm timing reifyNode:node_modules/color-name Completed in 2421ms
+npm timing reifyNode:node_modules/brace-expansion Completed in 2422ms
+npm timing reifyNode:node_modules/@types/json5 Completed in 2423ms
+npm timing reifyNode:node_modules/@types/geojson Completed in 2423ms
+npm timing reifyNode:node_modules/@nolyfill/is-core-module Completed in 2424ms
+npm timing reifyNode:node_modules/to-regex-range Completed in 2431ms
+npm timing reifyNode:node_modules/lru-cache Completed in 2434ms
+npm timing reifyNode:node_modules/is-glob Completed in 2436ms
+npm timing reifyNode:node_modules/file-entry-cache Completed in 2438ms
+npm timing reifyNode:node_modules/fill-range Completed in 2439ms
+npm timing reifyNode:node_modules/convert-source-map Completed in 2441ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide Completed in 2445ms
+npm timing reifyNode:node_modules/minimatch Completed in 2463ms
+npm timing reifyNode:node_modules/@types/json-schema Completed in 2471ms
+npm timing reifyNode:node_modules/micromatch Completed in 2489ms
+npm timing reifyNode:node_modules/lodash.merge Completed in 2491ms
+npm timing reifyNode:node_modules/@next/env Completed in 2507ms
+npm timing reifyNode:node_modules/yocto-queue Completed in 2512ms
+npm timing reifyNode:node_modules/word-wrap Completed in 2514ms
+npm timing reifyNode:node_modules/supports-color Completed in 2514ms
+npm timing reifyNode:node_modules/strip-json-comments Completed in 2514ms
+npm timing reifyNode:node_modules/shebang-regex Completed in 2515ms
+npm timing reifyNode:node_modules/queue-microtask Completed in 2516ms
+npm timing reifyNode:node_modules/p-locate Completed in 2517ms
+npm timing reifyNode:node_modules/path-exists Completed in 2517ms
+npm timing reifyNode:node_modules/path-key Completed in 2517ms
+npm timing reifyNode:node_modules/p-limit Completed in 2519ms
+npm timing reifyNode:node_modules/locate-path Completed in 2518ms
+npm timing reifyNode:node_modules/keyv Completed in 2520ms
+npm timing reifyNode:node_modules/import-fresh Completed in 2521ms
+npm timing reifyNode:node_modules/has-flag Completed in 2521ms
+npm timing reifyNode:node_modules/find-up Completed in 2522ms
+npm timing reifyNode:node_modules/escape-string-regexp Completed in 2523ms
+npm timing reifyNode:node_modules/callsites Completed in 2524ms
+npm timing reifyNode:node_modules/yallist Completed in 2538ms
+npm timing reifyNode:node_modules/fast-glob/node_modules/glob-parent Completed in 2537ms
+npm timing reifyNode:node_modules/js-tokens Completed in 2542ms
+npm timing reifyNode:node_modules/esrecurse Completed in 2547ms
+npm timing reifyNode:node_modules/balanced-match Completed in 2549ms
+npm timing reifyNode:node_modules/ansi-styles Completed in 2550ms
+npm timing reifyNode:node_modules/@types/estree Completed in 2551ms
+npm timing reifyNode:node_modules/@alloc/quick-lru Completed in 2553ms
+npm timing reifyNode:node_modules/punycode Completed in 2560ms
+npm timing reifyNode:node_modules/@types/ws Completed in 2569ms
+npm timing reifyNode:node_modules/unrs-resolver Completed in 2577ms
+npm timing reifyNode:node_modules/@types/leaflet Completed in 2596ms
+npm timing reifyNode:node_modules/ast-types-flow Completed in 2622ms
+npm timing reifyNode:node_modules/@rtsao/scc Completed in 2623ms
+npm timing reifyNode:node_modules/which Completed in 2632ms
+npm timing reifyNode:node_modules/stable-hash Completed in 2633ms
+npm timing reifyNode:node_modules/json-buffer Completed in 2633ms
+npm timing reifyNode:node_modules/acorn-jsx Completed in 2640ms
+npm timing reifyNode:node_modules/@babel/helper-string-parser Completed in 2643ms
+npm timing reifyNode:node_modules/@babel/code-frame Completed in 2644ms
+npm timing reifyNode:node_modules/estraverse Completed in 2655ms
+npm timing reifyNode:node_modules/node-releases Completed in 2674ms
+npm timing reifyNode:node_modules/language-tags Completed in 2674ms
+npm timing reifyNode:node_modules/ignore Completed in 2677ms
+npm timing reifyNode:node_modules/@img/colour Completed in 2684ms
+npm timing reifyNode:node_modules/@typescript-eslint/eslint-plugin/node_modules/ignore Completed in 2691ms
+npm timing reifyNode:node_modules/picocolors Completed in 2693ms
+npm timing reifyNode:node_modules/graceful-fs Completed in 2700ms
+npm timing reifyNode:node_modules/jsesc Completed in 2701ms
+npm timing reifyNode:node_modules/semver Completed in 2716ms
+npm timing reifyNode:node_modules/color-convert Completed in 2720ms
+npm timing reifyNode:node_modules/type-check Completed in 2730ms
+npm timing reifyNode:node_modules/levn Completed in 2732ms
+npm timing reifyNode:node_modules/concat-map Completed in 2735ms
+npm timing reifyNode:node_modules/damerau-levenshtein Completed in 2736ms
+npm timing reifyNode:node_modules/@babel/helper-globals Completed in 2741ms
+npm timing reifyNode:node_modules/@eslint/core Completed in 2741ms
+npm timing reifyNode:node_modules/globals Completed in 2755ms
+npm timing reifyNode:node_modules/loose-envify Completed in 2771ms
+npm timing reifyNode:node_modules/update-browserslist-db Completed in 2788ms
+npm timing reifyNode:node_modules/gensync Completed in 2798ms
+npm timing reifyNode:node_modules/isexe Completed in 2809ms
+npm timing reifyNode:node_modules/flat-cache Completed in 2810ms
+npm timing reifyNode:node_modules/resolve-pkg-maps Completed in 2848ms
+npm timing reifyNode:node_modules/iterator.prototype Completed in 2851ms
+npm timing reifyNode:node_modules/chalk Completed in 2855ms
+npm timing reifyNode:node_modules/optionator Completed in 2873ms
+npm timing reifyNode:node_modules/debug Completed in 2882ms
+npm timing reifyNode:node_modules/eslint-config-next/node_modules/globals Completed in 2889ms
+npm timing reifyNode:node_modules/tinyglobby Completed in 2891ms
+npm timing reifyNode:node_modules/set-function-name Completed in 2910ms
+npm timing reifyNode:node_modules/react-leaflet-cluster Completed in 2911ms
+npm timing reifyNode:node_modules/esutils Completed in 2914ms
+npm timing reifyNode:node_modules/define-properties Completed in 2914ms
+npm timing reifyNode:node_modules/@eslint/js Completed in 2916ms
+npm timing reifyNode:node_modules/tinyglobby/node_modules/fdir Completed in 2922ms
+npm timing reifyNode:node_modules/normalize-wheel Completed in 2928ms
+npm timing reifyNode:node_modules/is-core-module Completed in 2928ms
+npm timing reifyNode:node_modules/has-property-descriptors Completed in 2928ms
+npm timing reifyNode:node_modules/detect-libc Completed in 2951ms
+npm timing reifyNode:node_modules/@tailwindcss/postcss Completed in 2953ms
+npm timing reifyNode:node_modules/argparse Completed in 2955ms
+npm timing reifyNode:node_modules/hasown Completed in 2966ms
+npm timing reifyNode:node_modules/get-intrinsic Completed in 2967ms
+npm timing reifyNode:node_modules/supports-preserve-symlinks-flag Completed in 2978ms
+npm timing reifyNode:node_modules/react-is Completed in 2979ms
+npm timing reifyNode:node_modules/possible-typed-array-names Completed in 2979ms
+npm timing reifyNode:node_modules/is-bun-module Completed in 2980ms
+npm timing reifyNode:node_modules/es-set-tostringtag Completed in 2980ms
+npm timing reifyNode:node_modules/deep-is Completed in 2980ms
+npm timing reifyNode:node_modules/which-builtin-type Completed in 2990ms
+npm timing reifyNode:node_modules/json-schema-traverse Completed in 2996ms
+npm timing reifyNode:node_modules/functions-have-names Completed in 2998ms
+npm timing reifyNode:node_modules/@jridgewell/resolve-uri Completed in 3003ms
+npm timing reifyNode:node_modules/@humanfs/node Completed in 3004ms
+npm timing reifyNode:node_modules/is-callable Completed in 3014ms
+npm timing reifyNode:node_modules/get-tsconfig Completed in 3015ms
+npm timing reifyNode:node_modules/eslint-import-resolver-typescript Completed in 3032ms
+npm timing reifyNode:node_modules/@typescript-eslint/parser Completed in 3034ms
+npm timing reifyNode:node_modules/eslint-module-utils/node_modules/debug Completed in 3036ms
+npm timing reifyNode:node_modules/eslint-import-resolver-node/node_modules/debug Completed in 3036ms
+npm timing reifyNode:node_modules/eslint-plugin-import/node_modules/debug Completed in 3036ms
+npm timing reifyNode:node_modules/typed-array-length Completed in 3038ms
+npm timing reifyNode:node_modules/typed-array-byte-length Completed in 3039ms
+npm timing reifyNode:node_modules/typed-array-buffer Completed in 3039ms
+npm timing reifyNode:node_modules/safe-regex-test Completed in 3039ms
+npm timing reifyNode:node_modules/stop-iteration-iterator Completed in 3039ms
+npm timing reifyNode:node_modules/safe-push-apply Completed in 3040ms
+npm timing reifyNode:node_modules/is-regex Completed in 3041ms
+npm timing reifyNode:node_modules/call-bound Completed in 3045ms
+npm timing reifyNode:node_modules/which-collection Completed in 3055ms
+npm timing reifyNode:node_modules/typed-array-byte-offset Completed in 3055ms
+npm timing reifyNode:node_modules/safe-array-concat Completed in 3055ms
+npm timing reifyNode:node_modules/own-keys Completed in 3056ms
+npm timing reifyNode:node_modules/object-keys Completed in 3056ms
+npm timing reifyNode:node_modules/is-weakref Completed in 3055ms
+npm timing reifyNode:node_modules/is-shared-array-buffer Completed in 3056ms
+npm timing reifyNode:node_modules/is-finalizationregistry Completed in 3057ms
+npm timing reifyNode:node_modules/is-array-buffer Completed in 3057ms
+npm timing reifyNode:node_modules/is-bigint Completed in 3057ms
+npm timing reifyNode:node_modules/has-bigints Completed in 3058ms
+npm timing reifyNode:node_modules/es-define-property Completed in 3060ms
+npm timing reifyNode:node_modules/data-view-byte-length Completed in 3059ms
+npm timing reifyNode:node_modules/data-view-buffer Completed in 3059ms
+npm timing reifyNode:node_modules/doctrine Completed in 3059ms
+npm timing reifyNode:node_modules/data-view-byte-offset Completed in 3060ms
+npm timing reifyNode:node_modules/available-typed-arrays Completed in 3060ms
+npm timing reifyNode:node_modules/browserslist Completed in 3061ms
+npm timing reifyNode:node_modules/array-buffer-byte-length Completed in 3061ms
+npm timing reifyNode:node_modules/is-string Completed in 3071ms
+npm timing reifyNode:node_modules/is-async-function Completed in 3073ms
+npm timing reifyNode:node_modules/define-data-property Completed in 3074ms
+npm timing reifyNode:node_modules/eslint-visitor-keys Completed in 3076ms
+npm timing reifyNode:node_modules/@babel/helper-validator-option Completed in 3076ms
+npm timing reifyNode:node_modules/@typescript-eslint/visitor-keys/node_modules/eslint-visitor-keys Completed in 3080ms
+npm timing reifyNode:node_modules/@eslint-community/eslint-utils/node_modules/eslint-visitor-keys Completed in 3080ms
+npm timing reifyNode:node_modules/@babel/helper-validator-identifier Completed in 3089ms
+npm timing reifyNode:node_modules/side-channel-weakmap Completed in 3095ms
+npm timing reifyNode:node_modules/set-function-length Completed in 3095ms
+npm timing reifyNode:node_modules/is-typed-array Completed in 3096ms
+npm timing reifyNode:node_modules/is-negative-zero Completed in 3096ms
+npm timing reifyNode:node_modules/picomatch Completed in 3099ms
+npm timing reifyNode:node_modules/cross-spawn Completed in 3099ms
+npm timing reifyNode:node_modules/which-boxed-primitive Completed in 3105ms
+npm timing reifyNode:node_modules/unbox-primitive Completed in 3106ms
+npm timing reifyNode:node_modules/side-channel Completed in 3106ms
+npm timing reifyNode:node_modules/side-channel-map Completed in 3106ms
+npm timing reifyNode:node_modules/is-symbol Completed in 3107ms
+npm timing reifyNode:node_modules/is-weakmap Completed in 3108ms
+npm timing reifyNode:node_modules/is-date-object Completed in 3108ms
+npm timing reifyNode:node_modules/is-number-object Completed in 3108ms
+npm timing reifyNode:node_modules/is-data-view Completed in 3108ms
+npm timing reifyNode:node_modules/gopd Completed in 3109ms
+npm timing reifyNode:node_modules/@humanwhocodes/module-importer Completed in 3112ms
+npm timing reifyNode:node_modules/@humanwhocodes/retry Completed in 3113ms
+npm timing reifyNode:node_modules/is-boolean-object Completed in 3120ms
+npm timing reifyNode:node_modules/fast-deep-equal Completed in 3122ms
+npm timing reifyNode:node_modules/eslint-config-next Completed in 3124ms
+npm timing reifyNode:node_modules/baseline-browser-mapping Completed in 3127ms
+npm timing reifyNode:node_modules/which-typed-array Completed in 3131ms
+npm timing reifyNode:node_modules/prelude-ls Completed in 3133ms
+npm timing reifyNode:node_modules/es-shim-unscopables Completed in 3136ms
+npm timing reifyNode:node_modules/call-bind Completed in 3136ms
+npm timing reifyNode:node_modules/side-channel-list Completed in 3142ms
+npm timing reifyNode:node_modules/escalade Completed in 3147ms
+npm timing reifyNode:node_modules/braces Completed in 3147ms
+npm timing reifyNode:node_modules/vitest/node_modules/picomatch Completed in 3152ms
+npm timing reifyNode:node_modules/vite/node_modules/picomatch Completed in 3153ms
+npm timing reifyNode:node_modules/tinyglobby/node_modules/picomatch Completed in 3153ms
+npm timing reifyNode:node_modules/is-weakset Completed in 3154ms
+npm timing reifyNode:node_modules/is-set Completed in 3155ms
+npm timing reifyNode:node_modules/is-map Completed in 3155ms
+npm timing reifyNode:node_modules/get-symbol-description Completed in 3155ms
+npm timing reifyNode:node_modules/internal-slot Completed in 3155ms
+npm timing reifyNode:node_modules/espree Completed in 3157ms
+npm timing reifyNode:node_modules/ts-api-utils Completed in 3164ms
+npm timing reifyNode:node_modules/function-bind Completed in 3165ms
+npm timing reifyNode:node_modules/@typescript-eslint/tsconfig-utils Completed in 3166ms
+npm timing reifyNode:node_modules/@typescript-eslint/visitor-keys Completed in 3166ms
+npm timing reifyNode:node_modules/@typescript-eslint/project-service Completed in 3167ms
+npm timing reifyNode:node_modules/prop-types Completed in 3173ms
+npm timing reifyNode:node_modules/iceberg-js Completed in 3176ms
+npm timing reifyNode:node_modules/is-generator-function Completed in 3184ms
+npm timing reifyNode:node_modules/for-each Completed in 3185ms
+npm timing reifyNode:node_modules/electron-to-chromium Completed in 3186ms
+npm timing reifyNode:node_modules/@eslint-community/regexpp Completed in 3207ms
+npm timing reifyNode:node_modules/string.prototype.repeat Completed in 3219ms
+npm timing reifyNode:node_modules/async-function Completed in 3222ms
+npm timing reifyNode:node_modules/set-proto Completed in 3229ms
+npm timing reifyNode:node_modules/get-proto Completed in 3230ms
+npm timing reifyNode:node_modules/generator-function Completed in 3230ms
+npm timing reifyNode:node_modules/@babel/helper-module-imports Completed in 3231ms
+npm timing reifyNode:node_modules/tslib Completed in 3247ms
+npm timing reifyNode:node_modules/reusify Completed in 3255ms
+npm timing reifyNode:node_modules/es-object-atoms Completed in 3256ms
+npm timing reifyNode:node_modules/fastq Completed in 3257ms
+npm timing reifyNode:node_modules/dunder-proto Completed in 3256ms
+npm timing reifyNode:node_modules/@eslint-community/eslint-utils Completed in 3263ms
+npm timing reifyNode:node_modules/@tailwindcss/node Completed in 3267ms
+npm timing reifyNode:node_modules/@eslint/config-helpers Completed in 3266ms
+npm timing reifyNode:node_modules/tsconfig-paths/node_modules/json5 Completed in 3272ms
+npm timing reifyNode:node_modules/reflect.getprototypeof Completed in 3272ms
+npm timing reifyNode:node_modules/@eslint/object-schema Completed in 3275ms
+npm timing reifyNode:node_modules/@humanfs/core Completed in 3284ms
+npm timing reifyNode:node_modules/has-proto Completed in 3290ms
+npm timing reifyNode:node_modules/@types/react-dom Completed in 3292ms
+npm timing reifyNode:node_modules/string.prototype.trimstart Completed in 3296ms
+npm timing reifyNode:node_modules/typescript-eslint Completed in 3297ms
+npm timing reifyNode:node_modules/object.fromentries Completed in 3297ms
+npm timing reifyNode:node_modules/@eslint/plugin-kit Completed in 3299ms
+npm timing reifyNode:node_modules/string.prototype.trimend Completed in 3303ms
+npm timing reifyNode:node_modules/arraybuffer.prototype.slice Completed in 3307ms
+npm timing reifyNode:node_modules/string.prototype.trim Completed in 3313ms
+npm timing reifyNode:node_modules/object.groupby Completed in 3313ms
+npm timing reifyNode:node_modules/flatted Completed in 3316ms
+npm timing reifyNode:node_modules/array.prototype.findlastindex Completed in 3315ms
+npm timing reifyNode:node_modules/array.prototype.tosorted Completed in 3315ms
+npm timing reifyNode:node_modules/@babel/compat-data Completed in 3324ms
+npm timing reifyNode:node_modules/has-tostringtag Completed in 3328ms
+npm timing reifyNode:node_modules/has-symbols Completed in 3336ms
+npm timing reifyNode:node_modules/emoji-regex Completed in 3339ms
+npm timing reifyNode:node_modules/array.prototype.flat Completed in 3344ms
+npm timing reifyNode:node_modules/array-includes Completed in 3345ms
+npm timing reifyNode:node_modules/object.values Completed in 3351ms
+npm timing reifyNode:node_modules/globalthis Completed in 3351ms
+npm timing reifyNode:node_modules/array.prototype.findlast Completed in 3350ms
+npm timing reifyNode:node_modules/array.prototype.flatmap Completed in 3351ms
+npm timing reifyNode:node_modules/string.prototype.matchall Completed in 3356ms
+npm timing reifyNode:node_modules/regexp.prototype.flags Completed in 3362ms
+npm timing reifyNode:node_modules/scheduler Completed in 3363ms
+npm timing reifyNode:node_modules/json-stable-stringify-without-jsonify Completed in 3381ms
+npm timing reifyNode:node_modules/acorn Completed in 3393ms
+npm timing reifyNode:node_modules/object.entries Completed in 3396ms
+npm timing reifyNode:node_modules/eslint-scope Completed in 3403ms
+npm timing reifyNode:node_modules/magic-string Completed in 3409ms
+npm timing reifyNode:node_modules/call-bind-apply-helpers Completed in 3409ms
+npm timing reifyNode:node_modules/@typescript-eslint/types Completed in 3415ms
+npm timing reifyNode:node_modules/function.prototype.name Completed in 3421ms
+npm timing reifyNode:node_modules/fast-json-stable-stringify Completed in 3425ms
+npm timing reifyNode:node_modules/@typescript-eslint/typescript-estree/node_modules/balanced-match Completed in 3429ms
+npm timing reifyNode:node_modules/es-errors Completed in 3433ms
+npm timing reifyNode:node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion Completed in 3441ms
+npm timing reifyNode:node_modules/csstype Completed in 3455ms
+npm timing reifyNode:node_modules/@nodelib/fs.stat Completed in 3466ms
+npm timing reifyNode:node_modules/zod-validation-error Completed in 3470ms
+npm timing reifyNode:node_modules/@babel/helper-compilation-targets Completed in 3472ms
+npm timing reifyNode:node_modules/@types/react Completed in 3485ms
+npm timing reifyNode:node_modules/object.assign Completed in 3489ms
+npm timing reifyNode:node_modules/hermes-estree Completed in 3501ms
+npm timing reifyNode:node_modules/es-to-primitive Completed in 3504ms
+npm timing reifyNode:node_modules/source-map-js Completed in 3510ms
+npm timing reifyNode:node_modules/@babel/helper-module-transforms Completed in 3512ms
+npm timing reifyNode:node_modules/lightningcss Completed in 3521ms
+npm timing reifyNode:node_modules/ws Completed in 3525ms
+npm timing reifyNode:node_modules/string.prototype.includes Completed in 3544ms
+npm timing reifyNode:node_modules/@babel/template Completed in 3544ms
+npm timing reifyNode:node_modules/tapable Completed in 3548ms
+npm timing reifyNode:node_modules/@eslint/config-array Completed in 3591ms
+npm timing reifyNode:node_modules/@unrs/resolver-binding-win32-x64-msvc Completed in 3603ms
+npm timing reifyNode:node_modules/json5 Completed in 3605ms
+npm timing reifyNode:node_modules/react-easy-crop Completed in 3615ms
+npm timing reifyNode:node_modules/nanoid Completed in 3617ms
+npm timing reifyNode:node_modules/minimist Completed in 3629ms
+npm timing reifyNode:node_modules/esquery Completed in 3649ms
+npm timing reifyNode:node_modules/eslint-module-utils Completed in 3656ms
+npm timing reifyNode:node_modules/napi-postinstall Completed in 3670ms
+npm timing reifyNode:node_modules/styled-jsx Completed in 3723ms
+npm timing reifyNode:node_modules/react Completed in 3723ms
+npm timing reifyNode:node_modules/@nodelib/fs.scandir Completed in 3737ms
+npm timing reifyNode:node_modules/@babel/parser Completed in 3744ms
+npm timing reifyNode:node_modules/@jridgewell/sourcemap-codec Completed in 3748ms
+npm timing reifyNode:node_modules/node-exports-info Completed in 3886ms
+npm timing reifyNode:node_modules/math-intrinsics Completed in 3898ms
+npm timing reifyNode:node_modules/undici-types Completed in 3908ms
+npm timing reifyNode:node_modules/@nodelib/fs.walk Completed in 3950ms
+npm timing reifyNode:node_modules/jiti Completed in 3969ms
+npm timing reifyNode:node_modules/@jridgewell/remapping Completed in 3980ms
+npm timing reifyNode:node_modules/object-inspect Completed in 3983ms
+npm timing reifyNode:node_modules/@jridgewell/gen-mapping Completed in 3989ms
+npm timing reifyNode:node_modules/@react-leaflet/core Completed in 4046ms
+npm timing reifyNode:node_modules/@tailwindcss/oxide-win32-x64-msvc Completed in 4055ms
+npm timing reifyNode:node_modules/language-subtag-registry Completed in 4063ms
+npm timing reifyNode:node_modules/sharp Completed in 4100ms
+npm timing reifyNode:node_modules/@supabase/supabase-js Completed in 4122ms
+npm timing reifyNode:node_modules/tailwindcss Completed in 4150ms
+npm timing reifyNode:node_modules/js-yaml Completed in 4150ms
+npm timing reifyNode:node_modules/@eslint/eslintrc Completed in 4176ms
+npm timing reifyNode:node_modules/@supabase/postgrest-js Completed in 4199ms
+npm timing reifyNode:node_modules/@supabase/storage-js Completed in 4224ms
+npm timing reifyNode:node_modules/eslint-plugin-react-hooks Completed in 4308ms
+npm timing reifyNode:node_modules/sharp/node_modules/semver Completed in 4331ms
+npm timing reifyNode:node_modules/is-bun-module/node_modules/semver Completed in 4330ms
+npm timing reifyNode:node_modules/@typescript-eslint/typescript-estree/node_modules/semver Completed in 4330ms
+npm timing reifyNode:node_modules/react-leaflet Completed in 4336ms
+npm timing reifyNode:node_modules/@typescript-eslint/type-utils Completed in 4347ms
+npm timing reifyNode:node_modules/@jridgewell/trace-mapping Completed in 4361ms
+npm timing reifyNode:node_modules/axe-core Completed in 4422ms
+npm timing reifyNode:node_modules/next/node_modules/postcss Completed in 4425ms
+npm timing reifyNode:node_modules/postcss Completed in 4431ms
+npm timing reifyNode:node_modules/enhanced-resolve Completed in 4454ms
+npm timing reifyNode:node_modules/@babel/generator Completed in 4472ms
+npm timing reifyNode:node_modules/@tybys/wasm-util Completed in 4502ms
+npm timing reifyNode:node_modules/@supabase/functions-js Completed in 4540ms
+npm timing reifyNode:node_modules/hermes-parser Completed in 4574ms
+npm timing reifyNode:node_modules/uri-js Completed in 4598ms
+npm timing reifyNode:node_modules/@next/eslint-plugin-next Completed in 4609ms
+npm timing reifyNode:node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch Completed in 4648ms
+npm timing reifyNode:node_modules/fast-glob Completed in 4650ms
+npm timing reifyNode:node_modules/@types/node Completed in 4661ms
+npm timing reifyNode:node_modules/@supabase/phoenix Completed in 4708ms
+npm timing reifyNode:node_modules/@napi-rs/wasm-runtime Completed in 4731ms
+npm timing reifyNode:node_modules/tsconfig-paths Completed in 4823ms
+npm timing reifyNode:node_modules/@babel/traverse Completed in 4829ms
+npm timing reifyNode:node_modules/lightningcss-win32-x64-msvc Completed in 4865ms
+npm timing reifyNode:node_modules/@typescript-eslint/typescript-estree Completed in 4987ms
+npm timing reifyNode:node_modules/@typescript-eslint/utils Completed in 5022ms
+npm timing reifyNode:node_modules/react-dom Completed in 5024ms
+npm timing reifyNode:node_modules/ajv Completed in 5115ms
+npm timing reifyNode:node_modules/resolve Completed in 5197ms
+npm timing reifyNode:node_modules/es-iterator-helpers Completed in 5216ms
+npm timing reifyNode:node_modules/jsx-ast-utils Completed in 5259ms
+npm timing reifyNode:node_modules/eslint-plugin-react/node_modules/resolve Completed in 5291ms
+npm timing reifyNode:node_modules/leaflet.markercluster Completed in 5353ms
+npm timing reifyNode:node_modules/@babel/core Completed in 5482ms
+npm timing reifyNode:node_modules/eslint-plugin-import Completed in 5542ms
+npm timing reifyNode:node_modules/leaflet Completed in 5562ms
+npm timing reifyNode:node_modules/@supabase/realtime-js Completed in 5582ms
+npm timing reifyNode:node_modules/@img/sharp-win32-x64 Completed in 5622ms
+npm timing reifyNode:node_modules/axobject-query Completed in 5733ms
+npm timing reifyNode:node_modules/@babel/types Completed in 6015ms
+npm timing reifyNode:node_modules/aria-query Completed in 6161ms
+npm timing reifyNode:node_modules/@supabase/auth-js Completed in 6291ms
+npm timing reifyNode:node_modules/eslint-plugin-jsx-a11y Completed in 6335ms
+npm timing reifyNode:node_modules/@babel/helpers Completed in 6333ms
+npm timing reifyNode:node_modules/typescript Completed in 6442ms
+npm timing reifyNode:node_modules/@swc/helpers Completed in 6655ms
+npm timing reifyNode:node_modules/@typescript-eslint/scope-manager Completed in 6658ms
+npm timing reifyNode:node_modules/eslint-plugin-react Completed in 6873ms
+npm timing reifyNode:node_modules/eslint Completed in 7071ms
+npm timing reifyNode:node_modules/@typescript-eslint/eslint-plugin Completed in 7134ms
+npm timing reifyNode:node_modules/@next/swc-win32-x64-msvc Completed in 7510ms
+npm timing reifyNode:node_modules/zod Completed in 7798ms
+npm timing reifyNode:node_modules/caniuse-lite Completed in 7936ms
+npm timing reifyNode:node_modules/es-abstract Completed in 9914ms
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/expect-type/-/expect-type-1.3.0.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/why-is-node-running/-/why-is-node-running-2.3.0.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vite/-/vite-8.0.8.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/estree-walker/-/estree-walker-3.0.3.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinybench/-/tinybench-2.9.0.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/es-module-lexer/-/es-module-lexer-2.0.0.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vitest/-/vitest-4.1.4.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/stackback/-/stackback-0.0.2.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/siginfo/-/siginfo-2.0.0.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyexec/-/tinyexec-1.1.1.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/rolldown/-/rolldown-1.0.0-rc.15.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/obug/-/obug-2.1.1.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/pathe/-/pathe-2.0.3.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyrainbow/-/tinyrainbow-3.1.0.tgz attempt 1 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/std-env/-/std-env-4.0.0.tgz attempt 1 failed with ETIMEDOUT
+npm timing reifyNode:node_modules/next Completed in 26173ms
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/rolldown/-/rolldown-1.0.0-rc.15.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vitest/-/vitest-4.1.4.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/siginfo/-/siginfo-2.0.0.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyexec/-/tinyexec-1.1.1.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinybench/-/tinybench-2.9.0.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/why-is-node-running/-/why-is-node-running-2.3.0.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/estree-walker/-/estree-walker-3.0.3.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vite/-/vite-8.0.8.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/stackback/-/stackback-0.0.2.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/expect-type/-/expect-type-1.3.0.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/pathe/-/pathe-2.0.3.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyrainbow/-/tinyrainbow-3.1.0.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/es-module-lexer/-/es-module-lexer-2.0.0.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/std-env/-/std-env-4.0.0.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/obug/-/obug-2.1.1.tgz attempt 2 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/why-is-node-running/-/why-is-node-running-2.3.0.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vitest/-/vitest-4.1.4.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/siginfo/-/siginfo-2.0.0.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/expect-type/-/expect-type-1.3.0.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/pathe/-/pathe-2.0.3.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyexec/-/tinyexec-1.1.1.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinyrainbow/-/tinyrainbow-3.1.0.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/vite/-/vite-8.0.8.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/std-env/-/std-env-4.0.0.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/estree-walker/-/estree-walker-3.0.3.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/es-module-lexer/-/es-module-lexer-2.0.0.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/rolldown/-/rolldown-1.0.0-rc.15.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tinybench/-/tinybench-2.9.0.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/stackback/-/stackback-0.0.2.tgz attempt 3 failed with ETIMEDOUT
+npm http fetch GET https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/obug/-/obug-2.1.1.tgz attempt 3 failed with ETIMEDOUT
+npm verbose cwd C:\Users\46730\ghtrollers
+npm verbose os Windows_NT 10.0.26200
+npm verbose node v22.22.2
+npm verbose npm  v10.9.7
+npm error Exit handler never called!
+npm error This is an error with npm itself. Please report this error at:
+npm error   <https://github.com/npm/cli/issues>
+npm verbose exit 1
+npm verbose code 1
+npm error A complete log of this run can be found in: C:\Users\46730\AppData\Local\npm-cache\_logs\2026-04-14T11_34_13_345Z-debug-0.log

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type LocationMethodModalProps = {
   open: boolean;
@@ -23,15 +23,6 @@ export default function LocationMethodModal({
 }: LocationMethodModalProps) {
   const [selectedMethod, setSelectedMethod] = useState<"manual" | null>(null);
   const [manualLocation, setManualLocation] = useState(initialLocationName);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    setSelectedMethod(null);
-    setManualLocation(initialLocationName);
-  }, [initialLocationName, open]);
 
   if (!open) {
     return null;
