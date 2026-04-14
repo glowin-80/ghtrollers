@@ -97,15 +97,21 @@ describe("reported catch achievements", () => {
 
     expect(resolved).toHaveLength(reportedCatchAchievements.length);
 
-    const unlockedTitles = resolved.filter((achievement) => achievement.unlocked).map((achievement) => achievement.title);
+    const unlockedTitles = resolved
+      .filter((achievement) => achievement.unlocked)
+      .map((achievement) => achievement.title);
     expect(unlockedTitles).toEqual(["Fiskesugen", "Fiskarn", "Storfiskarn"]);
 
-    const currentTitles = resolved.filter((achievement) => achievement.current).map((achievement) => achievement.title);
+    const currentTitles = resolved
+      .filter((achievement) => achievement.current)
+      .map((achievement) => achievement.title);
     expect(currentTitles).toEqual(["Storfiskarn"]);
   });
 
   it("returns unlocked achievements in ascending progression order", () => {
-    const unlocked = getUnlockedAchievementsByValue(200, "reported_catches").map((achievement) => achievement.title);
+    const unlocked = getUnlockedAchievementsByValue(200, "reported_catches").map(
+      (achievement) => achievement.title
+    );
 
     expect(unlocked).toEqual([
       "Fiskesugen",
