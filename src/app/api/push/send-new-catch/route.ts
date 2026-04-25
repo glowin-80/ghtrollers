@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import webPush from "web-push";
 import {
+  createPushServiceRoleSupabaseClient,
   getAuthenticatedPushMemberContext,
   getRequiredVapidEnv,
   type PushSubscriptionRow,
@@ -61,7 +62,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
 
-  if (!context.member?.is_active || (!context.member.is_admin && !context.member.is_super_admin)) {
+  if (
+    !context.member?.is_active ||
+    (!context.member.is_admin && !context.member.is_super_admin)
+  ) {
     return NextResponse.json(
       { error: "Only active admins can send push notifications." },
       { status: 403 }
@@ -84,19 +88,26 @@ export async function POST(request: Request) {
     );
   }
 
-  webPush.setVapidDetails(
-    vapid.subject,
-    vapid.publicKey,
-    vapid.privateKey
-  );
+  const serviceSupabase = createPushServiceRoleSupabaseClient();
 
-  const { data: catchData, error: catchError } = await context.supabase
+  if (!serviceSupabase) {
+    return NextResponse.json(
+      { error: "Push notifications are not configured with service role key." },
+      { status: 500 }
+    );
+  }
+
+  webPush.setVapidDetails(vapid.subject, vapid.publicKey, vapid.privateKey);
+
+  const { data: catchData, error: catchError } = await serviceSupabase
     .from("catches")
     .select("id, caught_for, fish_type, fine_fish_type, weight_g, status")
     .eq("id", catchId)
     .maybeSingle();
 
   if (catchError) {
+    console.error("Could not read approved catch for push notification.", catchError);
+
     return NextResponse.json(
       { error: "Could not read approved catch." },
       { status: 500 }
@@ -116,13 +127,16 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: subscriptionsData, error: subscriptionsError } = await context.supabase
-    .from("push_subscriptions")
-    .select("id, endpoint, p256dh_key, auth_key")
-    .eq("is_active", true)
-    .eq("notify_new_catch", true);
+  const { data: subscriptionsData, error: subscriptionsError } =
+    await serviceSupabase
+      .from("push_subscriptions")
+      .select("id, endpoint, p256dh_key, auth_key")
+      .eq("is_active", true)
+      .eq("notify_new_catch", true);
 
   if (subscriptionsError) {
+    console.error("Could not read push subscriptions.", subscriptionsError);
+
     return NextResponse.json(
       { error: "Could not read push subscriptions." },
       { status: 500 }
@@ -162,13 +176,16 @@ export async function POST(request: Request) {
   );
 
   if (inactiveSubscriptionIds.length > 0) {
-    const { error: deactivateError } = await context.supabase
+    const { error: deactivateError } = await serviceSupabase
       .from("push_subscriptions")
       .update({ is_active: false, updated_at: new Date().toISOString() })
       .in("id", inactiveSubscriptionIds);
 
     if (deactivateError) {
-      console.error("Could not deactivate stale push subscriptions.", deactivateError);
+      console.error(
+        "Could not deactivate stale push subscriptions.",
+        deactivateError
+      );
     }
   }
 
