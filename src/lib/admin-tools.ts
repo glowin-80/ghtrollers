@@ -116,17 +116,17 @@ export async function deletePendingMember(memberId: string) {
   if (error) throw error;
 }
 
-async function sendPushNotificationRequest(
+async function sendPushNotificationRequest<TResponse = unknown>(
   path: string,
   catchId: string,
   warningMessage: string
-) {
+): Promise<TResponse | null> {
   const { data } = await supabase.auth.getSession();
   const accessToken = data.session?.access_token;
 
   if (!accessToken) {
     console.warn(`${warningMessage} Auth session is missing.`);
-    return;
+    return null;
   }
 
   const response = await fetch(path, {
@@ -141,7 +141,10 @@ async function sendPushNotificationRequest(
   if (!response.ok) {
     const details = await response.text().catch(() => "");
     console.warn(warningMessage, details);
+    return null;
   }
+
+  return (await response.json().catch(() => null)) as TResponse | null;
 }
 
 async function sendNewApprovedCatchPushNotification(catchId: string) {
@@ -149,6 +152,20 @@ async function sendNewApprovedCatchPushNotification(catchId: string) {
     "/api/push/send-new-catch",
     catchId,
     "Could not send new catch push notification."
+  );
+}
+
+type AllTimeHighPushResponse = {
+  ok?: boolean;
+  skipped?: boolean;
+  allTimeHighDetected?: boolean;
+};
+
+async function sendAllTimeHighPushNotification(catchId: string) {
+  return await sendPushNotificationRequest<AllTimeHighPushResponse>(
+    "/api/push/send-all-time-high",
+    catchId,
+    "Could not send all-time-high push notification."
   );
 }
 
@@ -168,10 +185,21 @@ export async function approvePendingCatch(catchId: string) {
 
   if (error) throw error;
 
+  let allTimeHighDetected = false;
+
   try {
-    await sendNewApprovedCatchPushNotification(catchId);
+    const allTimeHighResult = await sendAllTimeHighPushNotification(catchId);
+    allTimeHighDetected = Boolean(allTimeHighResult?.allTimeHighDetected);
   } catch (pushError) {
-    console.warn("The catch was approved, but the new catch push notification could not be sent.", pushError);
+    console.warn("The catch was approved, but the all-time-high push notification could not be sent.", pushError);
+  }
+
+  if (!allTimeHighDetected) {
+    try {
+      await sendNewApprovedCatchPushNotification(catchId);
+    } catch (pushError) {
+      console.warn("The catch was approved, but the new catch push notification could not be sent.", pushError);
+    }
   }
 
   try {
