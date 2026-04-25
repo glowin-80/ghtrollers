@@ -7,6 +7,7 @@ import StatsGrid from "@/components/member/StatsGrid";
 import MyCatchesSection from "@/components/member/MyCatchesSection";
 import AdminToolsCard from "@/components/member/AdminToolsCard";
 import PendingApprovalCard from "@/components/member/PendingApprovalCard";
+import PushNotificationSettings from "@/components/member/PushNotificationSettings";
 import MemberCatchSpotlightModal from "@/components/member/MemberCatchSpotlightModal";
 import { useMemberPageData } from "@/hooks/useMemberPageData";
 import { signOutMember } from "@/lib/member-service";
@@ -125,6 +126,8 @@ export default function MinSidaPage() {
             onLogout={handleLogout}
             onProfileImageUploaded={handleProfileImageUploaded}
           />
+
+          <PushNotificationSettings member={member} />
 
           {member.is_admin || member.is_super_admin ? <AdminToolsCard /> : null}
 
