@@ -106,7 +106,7 @@ type PushSupabaseDatabase = {
   };
 };
 
-type PushSupabaseClient = SupabaseClient<PushSupabaseDatabase>;
+export type PushSupabaseClient = SupabaseClient<PushSupabaseDatabase>;
 
 export type PushMemberContext = {
   userId: string;
@@ -129,6 +129,36 @@ function getRequiredSupabaseEnv() {
   }
 
   return { supabaseUrl, supabaseAnonKey };
+}
+
+function getRequiredServiceRoleEnv() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    return null;
+  }
+
+  return { supabaseUrl, serviceRoleKey };
+}
+
+export function createPushServiceRoleSupabaseClient(): PushSupabaseClient | null {
+  const env = getRequiredServiceRoleEnv();
+
+  if (!env) {
+    return null;
+  }
+
+  return createClient<PushSupabaseDatabase>(
+    env.supabaseUrl,
+    env.serviceRoleKey,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
 }
 
 export function getRequiredVapidEnv() {
