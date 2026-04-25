@@ -8,6 +8,7 @@ import {
   formatAchievementRange,
   getAchievementCategory,
   getAllUnlockedAchievements,
+  getCurrentAchievementByValue,
   getRemainingToNextAchievement,
   getResolvedAchievementsByValue,
 } from "@/lib/achievements";
@@ -118,9 +119,10 @@ export default function AchievementsPage() {
     [catchCount, selectedCategoryId]
   );
 
-  const currentAchievement =
-    resolvedAchievements.find((achievement) => achievement.current) ??
-    resolvedAchievements[0];
+  const currentAchievement = useMemo(
+    () => getCurrentAchievementByValue(catchCount, selectedCategoryId),
+    [catchCount, selectedCategoryId]
+  );
 
   return (
     <main className="px-4 pb-8 pt-4">
@@ -164,30 +166,37 @@ export default function AchievementsPage() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {myUnlockedAchievements.map((achievement) => (
-              <div
-                key={achievement.id}
-                className="flex items-center gap-4 rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-4 py-4"
-              >
-                <img
-                  src={achievement.imageSrc}
-                  alt={achievement.title}
-                  className="h-16 w-16 shrink-0 object-contain"
-                  loading="lazy"
-                />
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
-                    {getAchievementCategory(achievement.categoryId)?.label ??
-                      "Achievement"}
-                  </div>
-                  <div className="mt-1 text-lg font-bold leading-tight text-[#1f2937]">
-                    {achievement.title}
+          {myUnlockedAchievements.length > 0 ? (
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {myUnlockedAchievements.map((achievement) => (
+                <div
+                  key={achievement.id}
+                  className="flex items-center gap-4 rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-4 py-4"
+                >
+                  <img
+                    src={achievement.imageSrc}
+                    alt={achievement.title}
+                    className="h-16 w-16 shrink-0 object-contain"
+                    loading="lazy"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
+                      {getAchievementCategory(achievement.categoryId)?.label ??
+                        "Achievement"}
+                    </div>
+                    <div className="mt-1 text-lg font-bold leading-tight text-[#1f2937]">
+                      {achievement.title}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-5 rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-5 py-5 text-sm leading-7 text-[#6b7280]">
+              Du har inga upplåsta märken ännu. Första märket låses upp när din
+              första fångst blir godkänd.
+            </div>
+          )}
         </section>
 
         <section className="rounded-[30px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-6">
