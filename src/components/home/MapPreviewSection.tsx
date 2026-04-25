@@ -112,50 +112,46 @@ function MapPreviewSectionComponent({
             <h2 className="text-2xl font-bold text-[#1f2937]">
               🗺️ Fångstkarta och Fiskeplatser
             </h2>
+
             <p className="mt-2 text-sm text-[#6b7280]">
               Växla mellan godkända fångster, godkända fiskeplatser eller visa båda samtidigt.
+              {isSuperAdmin ? (
+                <>
+                  {" "}
+                  <button
+                    type="button"
+                    aria-pressed={showPrivateRegistrations}
+                    onClick={() => setShowPrivateRegistrations((current) => !current)}
+                    className="inline border-0 bg-transparent p-0 text-inherit outline-none underline-offset-2 hover:underline focus-visible:underline"
+                    title="Växla visning av privata kartmarkeringar"
+                  >
+                    Privata {showPrivateRegistrations ? "på" : "av"}.
+                  </button>
+                </>
+              ) : null}
             </p>
           </div>
 
-          <div className="flex flex-col items-start gap-2 md:items-end">
-            <div className="flex flex-wrap gap-2">
-              {toggleOptions.map((option) => {
-                const isActive = filter === option.value;
+          <div className="flex flex-wrap gap-2">
+            {toggleOptions.map((option) => {
+              const isActive = filter === option.value;
 
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setFilter(option.value)}
-                    className={[
-                      "rounded-full px-4 py-2 text-sm font-semibold transition",
-                      isActive
-                        ? "bg-[#324b2f] text-white"
-                        : "border border-[#d8d2c7] bg-white text-[#374151] hover:bg-[#f9f7f3]",
-                    ].join(" ")}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {isSuperAdmin ? (
-              <button
-                type="button"
-                aria-pressed={showPrivateRegistrations}
-                onClick={() => setShowPrivateRegistrations((current) => !current)}
-                className={[
-                  "rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] transition",
-                  showPrivateRegistrations
-                    ? "border border-[#324b2f] bg-[#324b2f] text-white shadow-[0_4px_10px_rgba(50,75,47,0.16)]"
-                    : "border border-[#d8d2c7]/70 bg-white/60 text-[#8a8173] hover:bg-[#f9f7f3] hover:text-[#5f584d]",
-                ].join(" ")}
-                title="Växla visning av privata kartmarkeringar"
-              >
-                Admin · privata {showPrivateRegistrations ? "på" : "av"}
-              </button>
-            ) : null}
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setFilter(option.value)}
+                  className={[
+                    "rounded-full px-4 py-2 text-sm font-semibold transition",
+                    isActive
+                      ? "bg-[#324b2f] text-white"
+                      : "border border-[#d8d2c7] bg-white text-[#374151] hover:bg-[#f9f7f3]",
+                  ].join(" ")}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
