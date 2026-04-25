@@ -66,7 +66,7 @@ export const reportedCatchBaselineAchievement: AchievementDefinition = {
     "Du har inte rapporterat någon fångst ännu, men blicken är redan riktad mot vattnet.",
   minValue: 0,
   maxValue: 0,
-  imageSrc: "",
+  imageSrc: "/Achievments/catch/catchBadge_0.svg",
   sortOrder: 0,
 };
 
@@ -215,7 +215,10 @@ export function getNewlyUnlockedAchievementByValue(
   return newlyUnlockedAchievements.at(-1) ?? null;
 }
 
-export function getResolvedAchievementsByValue(value: number, categoryId = "reported_catches"): ResolvedAchievement[] {
+export function getResolvedAchievementsByValue(
+  value: number,
+  categoryId = "reported_catches"
+): ResolvedAchievement[] {
   const current = getCurrentAchievementByValue(value, categoryId);
 
   return getAchievementsForCategory(categoryId).map((achievement) => ({
