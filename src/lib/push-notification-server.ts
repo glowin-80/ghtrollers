@@ -15,6 +15,13 @@ export const defaultPushNotificationPreferences: PushNotificationPreferences = {
   notify_new_all_time_high: true,
 };
 
+export type PushSubscriptionRow = {
+  id: string;
+  endpoint: string;
+  p256dh_key: string;
+  auth_key: string;
+};
+
 type PushSupabaseDatabase = {
   public: {
     Tables: {
@@ -25,6 +32,19 @@ type PushSupabaseDatabase = {
           is_active: boolean | null;
           is_admin: boolean | null;
           is_super_admin: boolean | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      catches: {
+        Row: {
+          id: string;
+          caught_for: string | null;
+          fish_type: string | null;
+          fine_fish_type: string | null;
+          weight_g: number | null;
+          status: string | null;
         };
         Insert: never;
         Update: never;
@@ -109,6 +129,22 @@ function getRequiredSupabaseEnv() {
   }
 
   return { supabaseUrl, supabaseAnonKey };
+}
+
+export function getRequiredVapidEnv() {
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY;
+  const subject = process.env.VAPID_SUBJECT;
+
+  if (!publicKey || !privateKey || !subject) {
+    return null;
+  }
+
+  return {
+    publicKey,
+    privateKey,
+    subject,
+  };
 }
 
 function getBearerToken(request: Request) {
