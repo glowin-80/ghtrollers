@@ -12,6 +12,46 @@ import {
   getResolvedAchievementsByValue,
 } from "@/lib/achievements";
 
+function LockedAchievementBadge() {
+  return (
+    <div
+      aria-label="Låst achievement"
+      className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#c7b584] bg-[radial-gradient(circle_at_35%_28%,#f8f2df_0%,#d8c38a_24%,#786b52_48%,#202833_100%)] shadow-[0_6px_14px_rgba(18,35,28,0.14),inset_0_1px_0_rgba(255,255,255,0.42)]"
+    >
+      <div className="absolute inset-[6px] rounded-full border border-white/25 bg-black/35" />
+      <div className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[#d8c38a]/75 bg-[#202833]/90 text-[18px] font-black text-[#f5e6b8] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
+        ?
+      </div>
+      <div className="absolute bottom-[5px] rounded-full bg-black/45 px-2 py-[1px] text-[8px] font-black uppercase tracking-[0.12em] text-[#f5e6b8]">
+        Låst
+      </div>
+    </div>
+  );
+}
+
+function AchievementBadgeImage({
+  imageSrc,
+  title,
+  unlocked,
+}: {
+  imageSrc: string;
+  title: string;
+  unlocked: boolean;
+}) {
+  if (!unlocked) {
+    return <LockedAchievementBadge />;
+  }
+
+  return (
+    <img
+      src={imageSrc}
+      alt={title}
+      className="h-16 w-16 shrink-0 object-contain"
+      loading="lazy"
+    />
+  );
+}
+
 export default function AchievementsPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState("reported_catches");
   const [memberName, setMemberName] = useState<string | null>(null);
@@ -238,11 +278,10 @@ export default function AchievementsPage() {
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-4">
-                    <img
-                      src={achievement.imageSrc}
-                      alt={achievement.title}
-                      className="h-16 w-16 shrink-0 object-contain"
-                      loading="lazy"
+                    <AchievementBadgeImage
+                      imageSrc={achievement.imageSrc}
+                      title={achievement.title}
+                      unlocked={achievement.unlocked}
                     />
                     <div className="min-w-0">
                       <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">

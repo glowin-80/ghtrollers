@@ -254,6 +254,7 @@ export default function Home() {
             <MapPreviewSection
               isLoggedIn={isLoggedIn}
               hasActiveMembership={hasActiveMembership}
+              isSuperAdmin={Boolean(member?.is_super_admin)}
               catches={approvedCatches}
               fishingSpots={approvedFishingSpots}
             />
