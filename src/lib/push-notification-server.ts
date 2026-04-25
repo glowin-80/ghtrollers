@@ -1,4 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+import {
+  createClient,
+  type SupabaseClient,
+} from "@supabase/supabase-js";
 
 export type PushNotificationPreferences = {
   notify_new_catch: boolean;
@@ -12,6 +15,79 @@ export const defaultPushNotificationPreferences: PushNotificationPreferences = {
   notify_new_all_time_high: true,
 };
 
+type PushSupabaseDatabase = {
+  public: {
+    Tables: {
+      members: {
+        Row: {
+          id: string;
+          name: string | null;
+          is_active: boolean | null;
+          is_admin: boolean | null;
+          is_super_admin: boolean | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: {
+          id: string;
+          member_id: string;
+          endpoint: string;
+          p256dh_key: string;
+          auth_key: string;
+          user_agent: string | null;
+          notify_new_catch: boolean;
+          notify_new_achievement: boolean;
+          notify_new_all_time_high: boolean;
+          is_active: boolean;
+          last_seen_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          member_id: string;
+          endpoint: string;
+          p256dh_key: string;
+          auth_key: string;
+          user_agent?: string | null;
+          notify_new_catch?: boolean;
+          notify_new_achievement?: boolean;
+          notify_new_all_time_high?: boolean;
+          is_active?: boolean;
+          last_seen_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          member_id?: string;
+          endpoint?: string;
+          p256dh_key?: string;
+          auth_key?: string;
+          user_agent?: string | null;
+          notify_new_catch?: boolean;
+          notify_new_achievement?: boolean;
+          notify_new_all_time_high?: boolean;
+          is_active?: boolean;
+          last_seen_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
+  };
+};
+
+type PushSupabaseClient = SupabaseClient<PushSupabaseDatabase>;
+
 export type PushMemberContext = {
   userId: string;
   member: {
@@ -21,7 +97,7 @@ export type PushMemberContext = {
     is_admin: boolean | null;
     is_super_admin: boolean | null;
   } | null;
-  supabase: ReturnType<typeof createClient>;
+  supabase: PushSupabaseClient;
 };
 
 function getRequiredSupabaseEnv() {
@@ -44,6 +120,22 @@ function getBearerToken(request: Request) {
   }
 
   return token.trim();
+}
+
+function createPushSupabaseClient(token: string): PushSupabaseClient {
+  const { supabaseUrl, supabaseAnonKey } = getRequiredSupabaseEnv();
+
+  return createClient<PushSupabaseDatabase>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  });
 }
 
 export function normalizePushPreferences(
@@ -74,19 +166,7 @@ export async function getAuthenticatedPushMemberContext(
     return null;
   }
 
-  const { supabaseUrl, supabaseAnonKey } = getRequiredSupabaseEnv();
-
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-    global: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  });
+  const supabase = createPushSupabaseClient(token);
 
   const {
     data: { user },
