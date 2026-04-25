@@ -52,18 +52,6 @@ function MapPreviewSectionComponent({
     return fishingSpots.filter((spot) => !spot.is_private);
   }, [fishingSpots, isSuperAdmin, showPrivateRegistrations]);
 
-  const privateCatchCount = useMemo(
-    () => catches.filter((catchItem) => catchItem.is_location_private).length,
-    [catches]
-  );
-
-  const privateFishingSpotCount = useMemo(
-    () => fishingSpots.filter((spot) => spot.is_private).length,
-    [fishingSpots]
-  );
-
-  const privateRegistrationCount = privateCatchCount + privateFishingSpotCount;
-
   useEffect(() => {
     if (shouldRenderMap) {
       return;
@@ -121,60 +109,63 @@ function MapPreviewSectionComponent({
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-[#1f2937]">🗺️ Fångstkarta och Fiskeplatser</h2>
+            <h2 className="text-2xl font-bold text-[#1f2937]">
+              🗺️ Fångstkarta och Fiskeplatser
+            </h2>
             <p className="mt-2 text-sm text-[#6b7280]">
               Växla mellan godkända fångster, godkända fiskeplatser eller visa båda samtidigt.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {toggleOptions.map((option) => {
-              const isActive = filter === option.value;
+          <div className="flex flex-col items-start gap-2 md:items-end">
+            <div className="flex flex-wrap gap-2">
+              {toggleOptions.map((option) => {
+                const isActive = filter === option.value;
 
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setFilter(option.value)}
-                  className={[
-                    "rounded-full px-4 py-2 text-sm font-semibold transition",
-                    isActive
-                      ? "bg-[#324b2f] text-white"
-                      : "border border-[#d8d2c7] bg-white text-[#374151] hover:bg-[#f9f7f3]",
-                  ].join(" ")}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setFilter(option.value)}
+                    className={[
+                      "rounded-full px-4 py-2 text-sm font-semibold transition",
+                      isActive
+                        ? "bg-[#324b2f] text-white"
+                        : "border border-[#d8d2c7] bg-white text-[#374151] hover:bg-[#f9f7f3]",
+                    ].join(" ")}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {isSuperAdmin ? (
+              <button
+                type="button"
+                aria-pressed={showPrivateRegistrations}
+                onClick={() => setShowPrivateRegistrations((current) => !current)}
+                className={[
+                  "rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] transition",
+                  showPrivateRegistrations
+                    ? "border border-[#324b2f] bg-[#324b2f] text-white shadow-[0_4px_10px_rgba(50,75,47,0.16)]"
+                    : "border border-[#d8d2c7]/70 bg-white/60 text-[#8a8173] hover:bg-[#f9f7f3] hover:text-[#5f584d]",
+                ].join(" ")}
+                title="Växla visning av privata kartmarkeringar"
+              >
+                Admin · privata {showPrivateRegistrations ? "på" : "av"}
+              </button>
+            ) : null}
           </div>
         </div>
 
-        {isSuperAdmin ? (
-          <div className="mt-4 rounded-[20px] border border-[#d8d2c7] bg-[#fcfbf8] px-4 py-3">
-            <label className="flex cursor-pointer items-start gap-3">
-              <input
-                type="checkbox"
-                checked={showPrivateRegistrations}
-                onChange={(event) => setShowPrivateRegistrations(event.target.checked)}
-                className="mt-1 h-4 w-4 accent-[#324b2f]"
-              />
-              <span className="text-sm leading-6 text-[#374151]">
-                <span className="font-semibold text-[#1f2937]">Visa privata</span>
-                <span className="block text-[#6b7280]">
-                  Endast synligt för super admin. När valet är av döljs privata fångstplatser och privata fiskeplatser i kartan
-                  {privateRegistrationCount > 0
-                    ? ` (${privateRegistrationCount} privata registreringar finns i det laddade underlaget).`
-                    : "."}
-                </span>
-              </span>
-            </label>
-          </div>
-        ) : null}
-
         <div className="mt-4 overflow-hidden rounded-2xl border border-[#d8d2c7]">
           {shouldRenderMap ? (
-            <CatchesMap catches={visibleCatches} fishingSpots={visibleFishingSpots} filter={filter} />
+            <CatchesMap
+              catches={visibleCatches}
+              fishingSpots={visibleFishingSpots}
+              filter={filter}
+            />
           ) : (
             <div className="flex h-[420px] w-full items-center justify-center bg-white text-[#6b7280]">
               Laddar karta...
