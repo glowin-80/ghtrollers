@@ -6,7 +6,6 @@ import {
   getRequiredVapidEnv,
   type PushSubscriptionRow,
 } from "@/lib/push-notification-server";
-import { formatWeightFromGrams, getFishLabel } from "@/lib/catch-display";
 
 export const runtime = "nodejs";
 
@@ -37,18 +36,52 @@ function isInactiveSubscriptionError(error: unknown) {
   return statusCode === 404 || statusCode === 410;
 }
 
+function getFirstName(name: string | null) {
+  const trimmedName = name?.trim();
+
+  if (!trimmedName) {
+    return "En medlem";
+  }
+
+  return trimmedName.split(/\s+/)[0] || "En medlem";
+}
+
+function getPushFishSpecies(catchItem: ApprovedCatchNotificationSource) {
+  const fishType = catchItem.fish_type?.trim() || "fisk";
+
+  if (fishType === "Fina fisken") {
+    return catchItem.fine_fish_type?.trim() || "fisk";
+  }
+
+  return fishType;
+}
+
+function formatPushWeight(weightG: number | null) {
+  if (!weightG || weightG <= 0) {
+    return "okänd vikt";
+  }
+
+  if (weightG < 1000) {
+    return `${weightG}g`;
+  }
+
+  const weightKg = weightG / 1000;
+  const formattedKg = new Intl.NumberFormat("sv-SE", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(weightKg);
+
+  return `${formattedKg} kg`;
+}
+
 function buildNotificationPayload(catchItem: ApprovedCatchNotificationSource) {
-  const caughtFor = catchItem.caught_for?.trim() || "En medlem";
-  const fishLabel = getFishLabel({
-    fish_type: catchItem.fish_type || "Fångst",
-    fine_fish_type: catchItem.fine_fish_type,
-    weight_g: catchItem.weight_g || 0,
-  });
-  const weightLabel = formatWeightFromGrams(catchItem.weight_g);
+  const firstName = getFirstName(catchItem.caught_for);
+  const fishSpecies = getPushFishSpecies(catchItem);
+  const weightLabel = formatPushWeight(catchItem.weight_g);
 
   return {
     title: "Ny godkänd fångst 🎣",
-    body: `${caughtFor} har fått ${fishLabel} på ${weightLabel}.`,
+    body: `${firstName} har dragit upp en ${fishSpecies} på ${weightLabel}.`,
     url: `/fangst/${catchItem.id}`,
     icon: "/header.png",
     badge: "/header.png",
