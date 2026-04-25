@@ -1,0 +1,42 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(44 34) rotate(51) scale(84)">
+      <stop offset="0" stop-color="#F8F2DF"></stop>
+      <stop offset="0.28" stop-color="#D8C38A"></stop>
+      <stop offset="0.58" stop-color="#786B52"></stop>
+      <stop offset="1" stop-color="#202833"></stop>
+    </radialGradient>
+
+    <linearGradient id="ring" x1="18" y1="18" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F6E8BE"></stop>
+      <stop offset="0.45" stop-color="#C7A95D"></stop>
+      <stop offset="1" stop-color="#8A6A2F"></stop>
+    </linearGradient>
+
+    <linearGradient id="ribbon" x1="64" y1="82" x2="64" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8B7449"></stop>
+      <stop offset="1" stop-color="#5F4D2E"></stop>
+    </linearGradient>
+
+    <filter id="shadow" x="6" y="8" width="116" height="116" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#12231C" flood-opacity="0.18"></feDropShadow>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <circle cx="64" cy="56" r="46" fill="url(#bg)" stroke="url(#ring)" stroke-width="4"></circle>
+    <circle cx="64" cy="56" r="36" fill="#1F2B36" fill-opacity="0.28" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"></circle>
+    <circle cx="64" cy="56" r="24" fill="#202833" stroke="#D8C38A" stroke-width="2"></circle>
+
+    <path d="M63.9999 43C56.9999 43 51.9999 47.6 51.9999 54.2C51.9999 55.6 53.1999 56.7 54.5999 56.7C55.9999 56.7 57.1999 55.6 57.1999 54.2C57.1999 50.7 59.8999 48.5 63.6999 48.5C67.3999 48.5 70.0999 50.6 70.0999 53.8C70.0999 56.2 68.8999 57.5 66.0999 59.4C62.6999 61.7 60.7999 63.9 60.7999 68V69.2C60.7999 70.7 61.9999 71.9 63.4999 71.9H63.9999C65.4999 71.9 66.6999 70.7 66.6999 69.2V68.5C66.6999 66.4 67.3999 65.5 69.9999 63.7C73.6999 61.2 75.4999 58.4 75.4999 53.8C75.4999 47.2 70.4999 43 63.9999 43Z" fill="#F6E8BE"></path>
+    <circle cx="64" cy="77.5" r="4.5" fill="#F6E8BE"></circle>
+
+    <path d="M44 91L53 84L58 108L44 101V91Z" fill="url(#ribbon)"></path>
+    <path d="M84 91L75 84L70 108L84 101V91Z" fill="url(#ribbon)"></path>
+
+    <rect x="24" y="94" width="80" height="18" rx="9" fill="#000000" fill-opacity="0.42" stroke="rgba(255,255,255,0.16)" stroke-width="1"></rect>
+    <text x="64" y="106" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4" fill="#F5E6B8">
+      NYFIKEN
+    </text>
+  </g>
+</svg>
