@@ -116,6 +116,30 @@ export async function deletePendingMember(memberId: string) {
   if (error) throw error;
 }
 
+async function sendNewApprovedCatchPushNotification(catchId: string) {
+  const { data } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+
+  if (!accessToken) {
+    console.warn("Could not send new catch push notification because auth session is missing.");
+    return;
+  }
+
+  const response = await fetch("/api/push/send-new-catch", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ catchId }),
+  });
+
+  if (!response.ok) {
+    const details = await response.text().catch(() => "");
+    console.warn("Could not send new catch push notification.", details);
+  }
+}
+
 export async function approvePendingCatch(catchId: string) {
   const { error } = await supabase
     .from("catches")
@@ -123,6 +147,12 @@ export async function approvePendingCatch(catchId: string) {
     .eq("id", catchId);
 
   if (error) throw error;
+
+  try {
+    await sendNewApprovedCatchPushNotification(catchId);
+  } catch (pushError) {
+    console.warn("The catch was approved, but the push notification could not be sent.", pushError);
+  }
 }
 
 export async function deletePendingCatch(catchId: string) {
