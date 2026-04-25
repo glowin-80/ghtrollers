@@ -58,6 +58,18 @@ export const achievementCategories: AchievementCategory[] = [
   },
 ];
 
+export const reportedCatchBaselineAchievement: AchievementDefinition = {
+  id: "catch_00",
+  categoryId: "reported_catches",
+  title: "Nyfiken",
+  description:
+    "Du har inte rapporterat någon fångst ännu, men blicken är redan riktad mot vattnet.",
+  minValue: 0,
+  maxValue: 0,
+  imageSrc: "",
+  sortOrder: 0,
+};
+
 export const reportedCatchAchievements: AchievementDefinition[] = [
   {
     id: "catch_01",
@@ -65,7 +77,7 @@ export const reportedCatchAchievements: AchievementDefinition[] = [
     title: "Fiskesugen",
     description:
       "Du är igång. Kaffet är varmt, draglådan halvöppen och jakten har börjat.",
-    minValue: 0,
+    minValue: 1,
     maxValue: 19,
     imageSrc: "/Achievments/catch/catchBadge_1.png",
     sortOrder: 1,
@@ -163,6 +175,10 @@ export function getAchievementsForCategory(categoryId: string) {
 }
 
 export function getCurrentAchievementByValue(value: number, categoryId = "reported_catches") {
+  if (categoryId === "reported_catches" && value <= 0) {
+    return reportedCatchBaselineAchievement;
+  }
+
   const achievements = getAchievementsForCategory(categoryId);
 
   return (
@@ -181,6 +197,22 @@ export function getNextAchievementByValue(value: number, categoryId = "reported_
 
 export function getUnlockedAchievementsByValue(value: number, categoryId = "reported_catches") {
   return getAchievementsForCategory(categoryId).filter((achievement) => value >= achievement.minValue);
+}
+
+export function getNewlyUnlockedAchievementByValue(
+  beforeValue: number,
+  afterValue: number,
+  categoryId = "reported_catches"
+) {
+  if (afterValue <= beforeValue) {
+    return null;
+  }
+
+  const newlyUnlockedAchievements = getAchievementsForCategory(categoryId).filter(
+    (achievement) => achievement.minValue > beforeValue && achievement.minValue <= afterValue
+  );
+
+  return newlyUnlockedAchievements.at(-1) ?? null;
 }
 
 export function getResolvedAchievementsByValue(value: number, categoryId = "reported_catches"): ResolvedAchievement[] {

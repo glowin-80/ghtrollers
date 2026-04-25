@@ -41,6 +41,7 @@ type PushSupabaseDatabase = {
         Row: {
           id: string;
           caught_for: string | null;
+          caught_for_member_id: string | null;
           fish_type: string | null;
           fine_fish_type: string | null;
           weight_g: number | null;

@@ -116,16 +116,20 @@ export async function deletePendingMember(memberId: string) {
   if (error) throw error;
 }
 
-async function sendNewApprovedCatchPushNotification(catchId: string) {
+async function sendPushNotificationRequest(
+  path: string,
+  catchId: string,
+  warningMessage: string
+) {
   const { data } = await supabase.auth.getSession();
   const accessToken = data.session?.access_token;
 
   if (!accessToken) {
-    console.warn("Could not send new catch push notification because auth session is missing.");
+    console.warn(`${warningMessage} Auth session is missing.`);
     return;
   }
 
-  const response = await fetch("/api/push/send-new-catch", {
+  const response = await fetch(path, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -136,8 +140,24 @@ async function sendNewApprovedCatchPushNotification(catchId: string) {
 
   if (!response.ok) {
     const details = await response.text().catch(() => "");
-    console.warn("Could not send new catch push notification.", details);
+    console.warn(warningMessage, details);
   }
+}
+
+async function sendNewApprovedCatchPushNotification(catchId: string) {
+  await sendPushNotificationRequest(
+    "/api/push/send-new-catch",
+    catchId,
+    "Could not send new catch push notification."
+  );
+}
+
+async function sendAchievementPushNotification(catchId: string) {
+  await sendPushNotificationRequest(
+    "/api/push/send-achievement",
+    catchId,
+    "Could not send achievement push notification."
+  );
 }
 
 export async function approvePendingCatch(catchId: string) {
@@ -151,7 +171,13 @@ export async function approvePendingCatch(catchId: string) {
   try {
     await sendNewApprovedCatchPushNotification(catchId);
   } catch (pushError) {
-    console.warn("The catch was approved, but the push notification could not be sent.", pushError);
+    console.warn("The catch was approved, but the new catch push notification could not be sent.", pushError);
+  }
+
+  try {
+    await sendAchievementPushNotification(catchId);
+  } catch (pushError) {
+    console.warn("The catch was approved, but the achievement push notification could not be sent.", pushError);
   }
 }
 
