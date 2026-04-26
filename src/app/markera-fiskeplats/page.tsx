@@ -6,7 +6,8 @@ import FishingSpotForm from "@/components/fishing-spots/FishingSpotForm";
 import MyFishingSpotsSection from "@/components/fishing-spots/MyFishingSpotsSection";
 import { useAuthMember } from "@/hooks/useAuthMember";
 import {
-  createPendingFishingSpot,
+  createFishingSpot,
+  updateOwnPrivateFishingSpot,
   fetchOwnFishingSpots,
   submitFishingSpotEdit,
 } from "@/lib/fishing-spots";
@@ -177,7 +178,7 @@ export default function MarkeraFiskeplatsPage() {
         setSubmitLoading(true);
         setFormMessage(null);
 
-        const createdSpot = await createPendingFishingSpot({
+        const createdSpot = await createFishingSpot({
           createdByMemberId: member.id,
           createdByName: member.name || member.email || "Medlem",
           latitude,
@@ -196,7 +197,9 @@ export default function MarkeraFiskeplatsPage() {
         setMapOpen(false);
         setFormMessage({
           variant: "success",
-          text: "Fiskeplatsen sparades och väntar nu på admin-godkännande.",
+          text: isPrivate
+            ? "Den privata fiskeplatsen sparades direkt och visas nu på din egen karta."
+            : "Fiskeplatsen sparades och väntar nu på admin-godkännande.",
         });
       } catch (error) {
         console.error(error);
@@ -319,15 +322,47 @@ export default function MarkeraFiskeplatsPage() {
         return;
       }
 
+      const nextTitle = editDraft.title.trim() ? editDraft.title.trim() : null;
+      const nextNotes = editDraft.notes.trim() ? editDraft.notes.trim() : null;
+      const canUpdatePrivateDirectly =
+        targetSpot.status === "approved" &&
+        targetSpot.is_private === true &&
+        editDraft.isPrivate === true;
+
       try {
         setEditDraft((prev) => ({ ...prev, submitLoading: true, formMessage: null }));
+
+        if (canUpdatePrivateDirectly) {
+          const updatedSpot = await updateOwnPrivateFishingSpot({
+            spotId: editSpotId,
+            createdByMemberId: member.id,
+            latitude: editDraft.latitude,
+            longitude: editDraft.longitude,
+            title: nextTitle,
+            notes: nextNotes,
+          });
+
+          setSpots((prev) =>
+            prev.map((spot) => (spot.id === editSpotId ? updatedSpot : spot))
+          );
+          setEditDraft((prev) => ({
+            ...prev,
+            submitLoading: false,
+            mapOpen: false,
+            formMessage: {
+              variant: "success",
+              text: "Den privata fiskeplatsen uppdaterades direkt och visas nu på din egen karta.",
+            },
+          }));
+          return;
+        }
 
         await submitFishingSpotEdit({
           spotId: editSpotId,
           latitude: editDraft.latitude,
           longitude: editDraft.longitude,
-          title: editDraft.title.trim() ? editDraft.title.trim() : null,
-          notes: editDraft.notes.trim() ? editDraft.notes.trim() : null,
+          title: nextTitle,
+          notes: nextNotes,
           isPrivate: editDraft.isPrivate,
         });
 
@@ -335,9 +370,6 @@ export default function MarkeraFiskeplatsPage() {
           if (spot.id !== editSpotId) {
             return spot;
           }
-
-          const nextTitle = editDraft.title.trim() ? editDraft.title.trim() : null;
-          const nextNotes = editDraft.notes.trim() ? editDraft.notes.trim() : null;
 
           if (spot.status === "pending") {
             return {
@@ -390,7 +422,6 @@ export default function MarkeraFiskeplatsPage() {
     },
     [editDraft, editSpotId, hasActiveMembership, isLoggedIn, member?.id, spots]
   );
-
   return (
     <main className="px-4 pb-10 pt-4">
       <div className="mx-auto max-w-5xl space-y-4">
@@ -415,6 +446,8 @@ export default function MarkeraFiskeplatsPage() {
           onCloseMap={() => setMapOpen(false)}
           onMapSelect={handleMapSelect}
           onSubmit={handleSubmit}
+          statusLabel={isPrivate ? "Sparas direkt" : "Väntar på admin"}
+          helperText={isPrivate ? "Privata fiskeplatser visas direkt på din egen karta." : "Officiella fiskeplatser skickas till admin för godkännande."}
         />
 
         {!isLoggedIn ? (

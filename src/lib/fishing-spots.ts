@@ -42,6 +42,42 @@ export async function fetchOwnFishingSpots(memberId: string): Promise<FishingSpo
   return data || [];
 }
 
+export async function createFishingSpot(input: {
+  createdByMemberId: string;
+  createdByName: string;
+  latitude: number;
+  longitude: number;
+  title: string | null;
+  notes: string | null;
+  isPrivate: boolean;
+}) {
+  const now = new Date().toISOString();
+  const payload = {
+    created_by_member_id: input.createdByMemberId,
+    created_by_name: input.createdByName,
+    latitude: input.latitude,
+    longitude: input.longitude,
+    title: input.title,
+    notes: input.notes,
+    is_private: input.isPrivate,
+    status: input.isPrivate ? "approved" : "pending",
+    approved_at: input.isPrivate ? now : null,
+    approved_by_member_id: input.isPrivate ? input.createdByMemberId : null,
+  };
+
+  const { data, error } = await supabase
+    .from("fishing_spots")
+    .insert(payload)
+    .select(FISHING_SPOT_SELECT)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
 export async function createPendingFishingSpot(input: {
   createdByMemberId: string;
   createdByName: string;
@@ -51,20 +87,41 @@ export async function createPendingFishingSpot(input: {
   notes: string | null;
   isPrivate: boolean;
 }) {
-  const payload = {
-    created_by_member_id: input.createdByMemberId,
-    created_by_name: input.createdByName,
-    latitude: input.latitude,
-    longitude: input.longitude,
-    title: input.title,
-    notes: input.notes,
-    is_private: input.isPrivate,
-    status: "pending",
-  };
+  return createFishingSpot({
+    ...input,
+    isPrivate: false,
+  });
+}
 
+export async function updateOwnPrivateFishingSpot(input: {
+  spotId: string;
+  createdByMemberId: string;
+  latitude: number;
+  longitude: number;
+  title: string | null;
+  notes: string | null;
+}) {
   const { data, error } = await supabase
     .from("fishing_spots")
-    .insert(payload)
+    .update({
+      latitude: input.latitude,
+      longitude: input.longitude,
+      title: input.title,
+      notes: input.notes,
+      is_private: true,
+      status: "approved",
+      pending_latitude: null,
+      pending_longitude: null,
+      pending_title: null,
+      pending_notes: null,
+      pending_is_private: null,
+      has_pending_edit: false,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", input.spotId)
+    .eq("created_by_member_id", input.createdByMemberId)
+    .eq("status", "approved")
+    .eq("is_private", true)
     .select(FISHING_SPOT_SELECT)
     .single();
 
@@ -103,24 +160,37 @@ export type PendingFishingSpot = FishingSpot & {
   review_type: FishingSpotReviewType;
 };
 
+function shouldShowPendingFishingSpotForAdmin(spot: FishingSpot) {
+  if (spot.status === "pending") {
+    return spot.is_private !== true;
+  }
+
+  if (spot.has_pending_edit) {
+    const currentIsPrivate = spot.is_private === true;
+    const pendingIsPrivate = spot.pending_is_private === true;
+
+    return !(currentIsPrivate && pendingIsPrivate);
+  }
+
+  return false;
+}
+
 export async function fetchPendingFishingSpots(viewer?: { isSuperAdmin?: boolean }): Promise<PendingFishingSpot[]> {
-  let query = supabase
+  const { data, error } = await supabase
     .from("fishing_spots")
     .select(FISHING_SPOT_SELECT)
     .or("status.eq.pending,has_pending_edit.eq.true")
     .order("created_at", { ascending: true });
 
-  if (!viewer?.isSuperAdmin) {
-    query = query.not("is_private", "is", true).not("pending_is_private", "is", true);
-  }
-
-  const { data, error } = await query;
-
   if (error) {
     throw error;
   }
 
-  return (data || []).map((spot) => ({
+  const visibleSpots = viewer?.isSuperAdmin
+    ? data || []
+    : (data || []).filter(shouldShowPendingFishingSpotForAdmin);
+
+  return visibleSpots.map((spot) => ({
     ...spot,
     review_type: spot.status === "pending" ? "new" : "edit",
   }));

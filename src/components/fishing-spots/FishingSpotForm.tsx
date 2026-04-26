@@ -36,6 +36,7 @@ type FishingSpotFormProps = {
   submitLabel?: string;
   submitLoadingLabel?: string;
   helperText?: string;
+  privacyHelperText?: string;
 };
 
 export default function FishingSpotForm({
@@ -67,6 +68,7 @@ export default function FishingSpotForm({
   submitLabel,
   submitLoadingLabel,
   helperText,
+  privacyHelperText,
 }: FishingSpotFormProps) {
   const isLocked = !isLoggedIn || !hasActiveMembership;
   const resolvedHeading =
@@ -89,6 +91,13 @@ export default function FishingSpotForm({
     (mode === "edit"
       ? "Du kan justera koordinater, rubrik och anteckningar när du har mer tid."
       : "Det räcker att spara endast position om du har bråttom.");
+  const resolvedPrivacyHelperText =
+    privacyHelperText ??
+    (mode === "edit"
+      ? "Ändringar mellan privat och officiell skickas till admin för godkännande."
+      : isPrivate
+        ? "Denna kan bara du se. Privata fiskeplatser går inte genom adminflödet och visas direkt på din egen karta."
+        : "Officiella fiskeplatser skickas till admin för godkännande innan andra medlemmar kan se dem.");
 
   return (
     <section className="rounded-[28px] border border-[#d8d2c7] bg-white/95 p-6 shadow-[0_8px_24px_rgba(18,35,28,0.06)]">
@@ -230,7 +239,7 @@ export default function FishingSpotForm({
           />
           <span>
             <span className="block font-semibold text-[#1f2937]">Gör platsen privat</span>
-            <span className="mt-1 block text-xs leading-5 text-[#6b7280]">Denna kan bara du se.</span>
+            <span className="mt-1 block text-xs leading-5 text-[#6b7280]">{resolvedPrivacyHelperText}</span>
           </span>
         </label>
 
