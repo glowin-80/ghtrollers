@@ -207,9 +207,16 @@ export default function UploadCatchForm({
             required
           >
             <option value="">Välj fiskemetod</option>
-            <option value="Trolling">Trolling</option>
             <option value="Spinnfiske">Spinnfiske</option>
-            <option value="Metspö">Metspö</option>
+            <option value="Trolling">Trolling</option>
+            <option value="Mete">Mete</option>
+            <option value="Vertikalfiske">Vertikalfiske</option>
+            <option value="Flugfiske">Flugfiske</option>
+            <option value="Pimpel">Pimpel</option>
+            <option value="Ismete">Ismete</option>
+            <option value="Havsfiske">Havsfiske</option>
+            <option value="Kastmete">Kastmete</option>
+            <option value="Annat">Annat</option>
           </select>
         </label>
 
