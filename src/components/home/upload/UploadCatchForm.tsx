@@ -50,6 +50,23 @@ type UploadCatchFormProps = {
   onFormMessageAction: () => void;
 };
 
+const FISHING_METHOD_TIPS: Record<string, string> = {
+  Spinnfiske:
+    "Tips: Spinnfiske omfattar kastfiske med drag, wobbler, jigg, jerkbait, gummibete eller liknande.",
+  Trolling: "Tips: Med Trolling menas att betet dras efter båten.",
+  Mete: "Tips: Mete innebär att agn eller bete presenteras mer passivt eller halvpassivt.",
+  Vertikalfiske:
+    "Tips: Vertikalfiske innebär att man fiskar mer lodrätt under båten, ofta med ekolod.",
+  Flugfiske: "Tips: Flugfiske innebär fiske med flugspö, fluglina och fluga.",
+  Pimpel: "Tips: Pimpel är isfiske där betet fiskas aktivt genom ett hål i isen.",
+  Ismete: "Tips: Ismete är isfiske där agn eller bete presenteras mer stilla genom ett hål i isen.",
+  Havsfiske:
+    "Tips: Havsfiske används för fångster i havsmiljö, saltvatten eller tydligt havsinriktat fiske.",
+  Kastmete:
+    "Tips: Kastmete innebär att agn eller bete kastas ut och presenteras mer passivt eller halvpassivt.",
+  Annat: "Tips: Välj Annat om metoden inte passar in i något av alternativen ovan.",
+};
+
 export default function UploadCatchForm({
   members,
   caughtForMemberId,
@@ -96,6 +113,7 @@ export default function UploadCatchForm({
     ? "text-[#374151]"
     : "text-[#9ca3af]";
   const selectedFileName = previewUrl ? "Bild vald" : "Ingen bild vald";
+  const fishingMethodTip = fishingMethod ? FISHING_METHOD_TIPS[fishingMethod] : null;
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-4">
@@ -219,6 +237,12 @@ export default function UploadCatchForm({
             <option value="Annat">Annat</option>
           </select>
         </label>
+
+        {fishingMethodTip ? (
+          <p className="mt-2 rounded-2xl bg-[#f8f5ef] px-3 py-2 text-xs leading-5 text-[#6b7280]">
+            {fishingMethodTip}
+          </p>
+        ) : null}
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="flex items-start gap-3 rounded-2xl border border-[#e5ddd0] bg-white px-4 py-3">
