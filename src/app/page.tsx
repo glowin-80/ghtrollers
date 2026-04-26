@@ -12,14 +12,12 @@ import { useCatchUpload } from "@/hooks/useCatchUpload";
 import LeaderboardSection from "@/components/home/LeaderboardSection";
 import UploadCatchSection from "@/components/home/UploadCatchSection";
 import RecentApprovedSection from "@/components/home/RecentApprovedSection";
-import MapPreviewSection from "@/components/home/MapPreviewSection";
 import HashSectionScroller from "@/components/shared/HashSectionScroller";
 
 export default function Home() {
   const {
     members,
     approvedCatches,
-    approvedFishingSpots,
     isLoggedIn,
     hasActiveMembership,
     member,
@@ -154,7 +152,6 @@ export default function Home() {
         watchValues={[
           members.length,
           approvedCatches.length,
-          approvedFishingSpots.length,
           isLoggedIn,
           hasActiveMembership,
         ]}
@@ -245,18 +242,6 @@ export default function Home() {
               isLoggedIn={isLoggedIn}
               members={members}
               onImageClick={handleImageClick}
-            />
-          </div>
-
-          <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-black/15 to-transparent" />
-
-          <div id="map-section" className="scroll-mt-[360px]">
-            <MapPreviewSection
-              isLoggedIn={isLoggedIn}
-              hasActiveMembership={hasActiveMembership}
-              isSuperAdmin={Boolean(member?.is_super_admin)}
-              catches={approvedCatches}
-              fishingSpots={approvedFishingSpots}
             />
           </div>
 

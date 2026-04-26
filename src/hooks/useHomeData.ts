@@ -5,7 +5,7 @@ import type { Catch, FishingSpot, Member } from "@/types/home";
 
 export { type MembershipStatus } from "@/lib/auth-member";
 
-export function useHomeData() {
+export function useHomeData(options?: { includeFishingSpots?: boolean }) {
   const [members, setMembers] = useState<Member[]>([]);
   const [approvedCatches, setApprovedCatches] = useState<Catch[]>([]);
   const [approvedFishingSpots, setApprovedFishingSpots] = useState<FishingSpot[]>([]);
@@ -16,7 +16,7 @@ export function useHomeData() {
       void (async () => {
         try {
           const data = await fetchHomePageData({
-            includeFishingSpots: hasActiveMembership,
+            includeFishingSpots: Boolean(options?.includeFishingSpots && hasActiveMembership),
             viewer: {
               isLoggedIn,
               memberId: member?.id ?? null,
@@ -34,7 +34,7 @@ export function useHomeData() {
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
-  }, [hasActiveMembership, isLoggedIn, isSuperAdmin, member?.id, member?.name]);
+  }, [hasActiveMembership, isLoggedIn, isSuperAdmin, member?.id, member?.name, options?.includeFishingSpots]);
 
   return {
     members,
