@@ -4,7 +4,10 @@ import type { FishingSpot, FishingSpotReviewType } from "@/types/fishing-spots";
 const FISHING_SPOT_SELECT =
   "id, created_at, updated_at, created_by_member_id, created_by_name, latitude, longitude, title, notes, is_private, status, pending_latitude, pending_longitude, pending_title, pending_notes, pending_is_private, has_pending_edit, approved_at, approved_by_member_id";
 
-export async function fetchApprovedFishingSpots(viewer?: { memberId?: string | null; isSuperAdmin?: boolean; }): Promise<FishingSpot[]> {
+export async function fetchApprovedFishingSpots(viewer?: {
+  memberId?: string | null;
+  isSuperAdmin?: boolean;
+}): Promise<FishingSpot[]> {
   let query = supabase
     .from("fishing_spots")
     .select(FISHING_SPOT_SELECT)
@@ -13,7 +16,9 @@ export async function fetchApprovedFishingSpots(viewer?: { memberId?: string | n
 
   if (!viewer?.isSuperAdmin) {
     if (viewer?.memberId) {
-      query = query.or(`is_private.is.false,and(is_private.is.true,created_by_member_id.eq.${viewer.memberId})`);
+      query = query.or(
+        `is_private.is.false,and(is_private.is.true,created_by_member_id.eq.${viewer.memberId})`
+      );
     } else {
       query = query.or("is_private.is.false,is_private.is.null");
     }
@@ -28,7 +33,9 @@ export async function fetchApprovedFishingSpots(viewer?: { memberId?: string | n
   return data || [];
 }
 
-export async function fetchOwnFishingSpots(memberId: string): Promise<FishingSpot[]> {
+export async function fetchOwnFishingSpots(
+  memberId: string
+): Promise<FishingSpot[]> {
   const { data, error } = await supabase
     .from("fishing_spots")
     .select(FISHING_SPOT_SELECT)
@@ -42,6 +49,46 @@ export async function fetchOwnFishingSpots(memberId: string): Promise<FishingSpo
   return data || [];
 }
 
+async function createPrivateFishingSpotDirect(input: {
+  latitude: number;
+  longitude: number;
+  title: string | null;
+  notes: string | null;
+}): Promise<FishingSpot> {
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError || !session?.access_token) {
+    throw new Error("Du behöver vara inloggad för att spara en privat fiskeplats.");
+  }
+
+  const response = await fetch("/api/fishing-spots/create-private", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({
+      latitude: input.latitude,
+      longitude: input.longitude,
+      title: input.title,
+      notes: input.notes,
+    }),
+  });
+
+  const payload = (await response.json().catch(() => null)) as
+    | { spot?: FishingSpot; error?: string }
+    | null;
+
+  if (!response.ok || !payload?.spot) {
+    throw new Error(payload?.error || "Kunde inte spara privat fiskeplats.");
+  }
+
+  return payload.spot;
+}
+
 export async function createFishingSpot(input: {
   createdByMemberId: string;
   createdByName: string;
@@ -51,7 +98,15 @@ export async function createFishingSpot(input: {
   notes: string | null;
   isPrivate: boolean;
 }) {
-  const now = new Date().toISOString();
+  if (input.isPrivate) {
+    return createPrivateFishingSpotDirect({
+      latitude: input.latitude,
+      longitude: input.longitude,
+      title: input.title,
+      notes: input.notes,
+    });
+  }
+
   const payload = {
     created_by_member_id: input.createdByMemberId,
     created_by_name: input.createdByName,
@@ -59,10 +114,8 @@ export async function createFishingSpot(input: {
     longitude: input.longitude,
     title: input.title,
     notes: input.notes,
-    is_private: input.isPrivate,
-    status: input.isPrivate ? "approved" : "pending",
-    approved_at: input.isPrivate ? now : null,
-    approved_by_member_id: input.isPrivate ? input.createdByMemberId : null,
+    is_private: false,
+    status: "pending",
   };
 
   const { data, error } = await supabase
@@ -175,7 +228,9 @@ function shouldShowPendingFishingSpotForAdmin(spot: FishingSpot) {
   return false;
 }
 
-export async function fetchPendingFishingSpots(viewer?: { isSuperAdmin?: boolean }): Promise<PendingFishingSpot[]> {
+export async function fetchPendingFishingSpots(viewer?: {
+  isSuperAdmin?: boolean;
+}): Promise<PendingFishingSpot[]> {
   const { data, error } = await supabase
     .from("fishing_spots")
     .select(FISHING_SPOT_SELECT)
@@ -196,7 +251,10 @@ export async function fetchPendingFishingSpots(viewer?: { isSuperAdmin?: boolean
   }));
 }
 
-export async function approvePendingFishingSpot(spotId: string, approverMemberId: string) {
+export async function approvePendingFishingSpot(
+  spotId: string,
+  approverMemberId: string
+) {
   const { error } = await supabase
     .from("fishing_spots")
     .update({
