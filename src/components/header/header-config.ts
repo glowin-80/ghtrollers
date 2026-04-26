@@ -39,9 +39,9 @@ export const desktopGraphicItems: NavItem[] = [
   {
     id: "map",
     label: "Karta",
-    section: "map-section",
+    href: "/karta",
     alt: "Karta",
-    type: "section",
+    type: "route",
   },
   {
     id: "markera-fiskeplats",
@@ -98,9 +98,9 @@ export const mobileMenuItems: NavItem[] = [
   {
     id: "map",
     label: "Karta",
-    section: "map-section",
+    href: "/karta",
     alt: "Karta",
-    type: "section",
+    type: "route",
   },
   {
     id: "markera-fiskeplats",
