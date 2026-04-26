@@ -140,11 +140,11 @@ export default function Header() {
   return (
     <>
       <header className="w-full">
-        <div className="relative h-[140px] w-full overflow-hidden sm:h-[190px] lg:h-[220px] xl:h-[240px]">
+        <div className="relative h-[140px] w-full overflow-hidden sm:h-[190px] lg:h-[260px] xl:h-[300px] 2xl:h-[330px]">
           <img
             src="/header.png"
             alt="Gäddhäng Trollers"
-            className="h-full w-full object-cover object-[center_38%]"
+            className="h-full w-full object-cover object-[center_38%] lg:object-center"
             draggable={false}
           />
         </div>
