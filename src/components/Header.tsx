@@ -139,7 +139,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="w-full">
+      <header className="relative w-full bg-black">
         <div className="relative h-[140px] w-full overflow-hidden sm:h-[190px] lg:h-[230px] xl:h-[250px] 2xl:h-[280px]">
           <img
             src="/header.png"
@@ -147,12 +147,16 @@ export default function Header() {
             className="h-full w-full object-cover object-center"
             draggable={false}
           />
+
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent via-black/55 to-black" />
+          <div className="pointer-events-none absolute bottom-0 left-0 h-24 w-24 bg-gradient-to-br from-black via-black/70 to-transparent sm:h-28 sm:w-28" />
+          <div className="pointer-events-none absolute bottom-0 right-0 h-24 w-24 bg-gradient-to-bl from-black via-black/70 to-transparent sm:h-28 sm:w-28" />
         </div>
       </header>
 
       <div
         id="site-nav"
-        className="sticky top-0 z-50 border-b border-black/10 bg-[#e5dccd]/95 backdrop-blur-md"
+        className="sticky top-0 z-50 -mt-5 rounded-t-[30px] border-b border-black/10 bg-[#e5dccd]/95 backdrop-blur-md sm:-mt-6 sm:rounded-t-[36px]"
       >
         <div className="mx-auto max-w-2xl px-3 py-3 sm:px-4">
           <div ref={menuRef} className="relative">
