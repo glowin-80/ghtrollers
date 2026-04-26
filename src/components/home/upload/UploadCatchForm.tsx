@@ -117,19 +117,28 @@ export default function UploadCatchForm({
         </div>
       ) : null}
 
-      <select
-        value={caughtForMemberId}
-        onChange={(e) => onCaughtForChange(e.target.value)}
-        className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
-        required
-      >
-        <option value="">Välj vem som fångade fisken</option>
-        {members.map((member) => (
-          <option key={member.id} value={member.id}>
-            {member.name}
-          </option>
-        ))}
-      </select>
+      <div className="space-y-2">
+        <div className="px-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#6b7280]">
+          Fångad av
+        </div>
+        <select
+          value={caughtForMemberId}
+          onChange={(e) => onCaughtForChange(e.target.value)}
+          className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+          required
+        >
+          <option value="">Välj vem som fångade fisken</option>
+          {members.map((member) => (
+            <option key={member.id} value={member.id}>
+              {member.name}
+            </option>
+          ))}
+        </select>
+        <p className="px-1 text-xs leading-5 text-[#6b7280]">
+          Den inloggade medlemmen är förvald, men du kan ändra om du
+          registrerar fångsten åt någon annan.
+        </p>
+      </div>
 
       <div className="w-full rounded-2xl border border-[#d8d2c7] bg-[#f8f5ef] px-4 py-3 text-[#1f2937]">
         <div className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#6b7280]">
@@ -180,21 +189,31 @@ export default function UploadCatchForm({
 
       <div className="rounded-2xl border border-[#d8d2c7] bg-[#fffdfb] px-4 py-4 text-sm text-[#374151]">
         <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6b7280]">
-          Fiskemetoder
+          Fiskemetod
         </div>
-        <select
-          value={fishingMethod}
-          onChange={(e) => onFishingMethodChange(e.target.value)}
-          className="mt-3 w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
-          required
-        >
-          <option value="">Välj fiskemetod</option>
-          <option value="Trolling">Trolling</option>
-          <option value="Spinnfiske">Spinnfiske</option>
-          <option value="Metspö">Metspö</option>
-        </select>
+        <p className="mt-2 text-xs leading-5 text-[#6b7280]">
+          Välj hur fisken fångades. Live-scope och Utomlands är separata
+          tillval som gör att fångsten inte räknas i tävlingen.
+        </p>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label className="mt-3 block">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-[#6b7280]">
+            Välj fiskemetod
+          </span>
+          <select
+            value={fishingMethod}
+            onChange={(e) => onFishingMethodChange(e.target.value)}
+            className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-[#1f2937] outline-none transition focus:border-[#8b7b68] focus:ring-2 focus:ring-[#d9cfbf]"
+            required
+          >
+            <option value="">Välj fiskemetod</option>
+            <option value="Trolling">Trolling</option>
+            <option value="Spinnfiske">Spinnfiske</option>
+            <option value="Metspö">Metspö</option>
+          </select>
+        </label>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="flex items-start gap-3 rounded-2xl border border-[#e5ddd0] bg-white px-4 py-3">
             <input
               type="checkbox"

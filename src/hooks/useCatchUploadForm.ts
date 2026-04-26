@@ -6,11 +6,24 @@ type UseCatchUploadFormOptions = {
   registeredByMemberIdDefault?: string | null;
 };
 
+function getTodayDateValue() {
+  const formatter = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Stockholm",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  return formatter.format(new Date());
+}
+
 export function useCatchUploadForm({
   registeredByDefault,
   registeredByMemberIdDefault = null,
 }: UseCatchUploadFormOptions) {
-  const [caughtForMemberId, setCaughtForMemberId] = useState("");
+  const [caughtForMemberId, setCaughtForMemberId] = useState(
+    registeredByMemberIdDefault ?? ""
+  );
   const [registeredBy, setRegisteredBy] = useState(registeredByDefault);
   const [registeredByMemberId, setRegisteredByMemberId] = useState<string | null>(
     registeredByMemberIdDefault
@@ -18,7 +31,7 @@ export function useCatchUploadForm({
   const [fishType, setFishType] = useState("");
   const [fineFishType, setFineFishType] = useState("");
   const [weight, setWeight] = useState("");
-  const [catchDate, setCatchDate] = useState("");
+  const [catchDate, setCatchDate] = useState(getTodayDateValue);
   const [fishingMethod, setFishingMethod] = useState("");
   const [liveScope, setLiveScope] = useState(false);
   const [caughtAbroad, setCaughtAbroad] = useState(false);
@@ -44,14 +57,20 @@ export function useCatchUploadForm({
     setRegisteredByMemberId(registeredByMemberIdDefault);
   }, [registeredByMemberIdDefault]);
 
+  useEffect(() => {
+    if (!registeredByMemberIdDefault) return;
+
+    setCaughtForMemberId((currentValue) => currentValue || registeredByMemberIdDefault);
+  }, [registeredByMemberIdDefault]);
+
   const resetForm = useCallback(() => {
-    setCaughtForMemberId("");
+    setCaughtForMemberId(registeredByMemberIdDefault ?? "");
     setRegisteredBy(registeredByDefault);
     setRegisteredByMemberId(registeredByMemberIdDefault);
     setFishType("");
     setFineFishType("");
     setWeight("");
-    setCatchDate("");
+    setCatchDate(getTodayDateValue());
     setFishingMethod("");
     setLiveScope(false);
     setCaughtAbroad(false);
