@@ -148,9 +148,7 @@ export default function Header() {
             draggable={false}
           />
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent via-black/55 to-black" />
-          <div className="pointer-events-none absolute bottom-0 left-0 h-24 w-24 bg-gradient-to-br from-black via-black/70 to-transparent sm:h-28 sm:w-28" />
-          <div className="pointer-events-none absolute bottom-0 right-0 h-24 w-24 bg-gradient-to-bl from-black via-black/70 to-transparent sm:h-28 sm:w-28" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent via-black/45 to-black" />
         </div>
       </header>
 
