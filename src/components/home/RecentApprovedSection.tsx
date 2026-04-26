@@ -10,6 +10,7 @@ import {
   getCatchCategoryLabel,
 } from "@/lib/catch-sharing";
 import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
+import { getCatchMethodSummary } from "@/lib/catch-display";
 import type { Catch, Member } from "@/types/home";
 
 type RecentApprovedSectionProps = {
@@ -63,6 +64,7 @@ function RecentApprovedSectionComponent({
           {catches.map((item) => {
             const shareDetails = buildCatchShareDetails(item, allApprovedCatches, members);
             const ownerName = getCatchOwnerDisplayName(item, members);
+            const methodSummary = getCatchMethodSummary(item);
 
             return (
               <li
@@ -101,6 +103,12 @@ function RecentApprovedSectionComponent({
                       <div className="mt-1 line-clamp-2 text-[0.9rem] leading-snug text-[#2f3f49]">
                         {getCatchCategoryLabel(item)} · {formatCatchWeightForDisplay(item.weight_g)}
                       </div>
+
+                      {methodSummary ? (
+                        <div className="mt-1.5 text-[0.78rem] font-semibold leading-snug text-[#4f614f]">
+                          {methodSummary}
+                        </div>
+                      ) : null}
 
                       <div className="mt-1.5 text-[0.78rem] leading-snug text-[#687780]">
                         {getLocationLine(item, isLoggedIn)}

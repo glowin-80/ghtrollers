@@ -66,3 +66,31 @@ export function getInitials(name: string): string {
     .slice(0, 2)
     .toUpperCase();
 }
+
+export function getCatchMethodDetails(
+  catchItem: Pick<Catch, "fishing_method" | "live_scope" | "caught_abroad">
+): string[] {
+  const details: string[] = [];
+  const method = catchItem.fishing_method?.trim();
+
+  if (method) {
+    details.push(method);
+  }
+
+  if (catchItem.live_scope) {
+    details.push("Live-scope");
+  }
+
+  if (catchItem.caught_abroad) {
+    details.push("Utomlands");
+  }
+
+  return details;
+}
+
+export function getCatchMethodSummary(
+  catchItem: Pick<Catch, "fishing_method" | "live_scope" | "caught_abroad">
+): string | null {
+  const details = getCatchMethodDetails(catchItem);
+  return details.length ? details.join(" · ") : null;
+}
