@@ -139,6 +139,9 @@ export default function Header() {
 
   return (
     <>
+      <div className="pointer-events-none fixed inset-y-0 left-0 z-[9998] w-[3px] bg-black" />
+      <div className="pointer-events-none fixed inset-y-0 right-0 z-[9998] w-[3px] bg-black" />
+
       <header className="relative w-full bg-black">
         <div className="relative h-[140px] w-full overflow-hidden sm:h-[190px] lg:h-[230px] xl:h-[250px] 2xl:h-[280px]">
           <img
