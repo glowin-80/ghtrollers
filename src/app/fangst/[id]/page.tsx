@@ -122,7 +122,7 @@ export default async function CatchPage({ params }: CatchPageProps) {
   const catchBadgeLabel = isGuestAnglerRole(owner?.member_role)
     ? "Privat fångst"
     : isCompetitionEligibleCatch(catchItem, shareDetails.members)
-      ? "Tävlings fångst"
+      ? "Tävlingsfångst"
       : "Privat fångst";
 
   const yearlyRankLabel = shareDetails.yearlyRank
