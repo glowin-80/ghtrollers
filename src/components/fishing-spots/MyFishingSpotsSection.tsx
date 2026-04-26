@@ -42,6 +42,32 @@ type MyFishingSpotsSectionProps = {
   onEditSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 };
 
+function getEditPrivacyHelperText(spot: FishingSpot, nextIsPrivate: boolean) {
+  const currentIsPrivate = spot.is_private === true;
+
+  if (currentIsPrivate && nextIsPrivate) {
+    return "Denna kan bara du se. Ändringen sparas direkt och går inte genom adminflödet.";
+  }
+
+  if (currentIsPrivate && !nextIsPrivate) {
+    return "Platsen skickas till admin för godkännande innan andra medlemmar kan se den.";
+  }
+
+  if (!currentIsPrivate && nextIsPrivate) {
+    return "Ändringen skickas till admin för godkännande innan platsen tas bort från den gemensamma kartan.";
+  }
+
+  return "Ändringen skickas till admin för godkännande innan den syns på kartan.";
+}
+
+function getEditStatusLabel(spot: FishingSpot, nextIsPrivate: boolean) {
+  if (spot.is_private === true && nextIsPrivate) {
+    return "Sparas direkt";
+  }
+
+  return "Ändring väntar på admin";
+}
+
 function getStatusMeta(spot: FishingSpot) {
   if (spot.status === "pending") {
     return {
@@ -121,7 +147,9 @@ export default function MyFishingSpotsSection({
               <div className="mt-1 text-sm text-[#6b7280]">
                 {activeEditSpot.status === "pending"
                   ? "Eftersom platsen ännu inte är publicerad uppdateras väntande versionen direkt."
-                  : "Den publika versionen ligger kvar tills admin har godkänt din nya ändring."}
+                  : activeEditSpot.is_private === true && editDraft.isPrivate
+                    ? "Privata ändringar sparas direkt eftersom bara du kan se platsen."
+                    : "Ändringar mellan privat och officiell skickas till admin för godkännande."}
               </div>
             </div>
 
@@ -151,11 +179,12 @@ export default function MyFishingSpotsSection({
             onSubmit={onEditSubmit}
             mode="edit"
             heading="✏️ Editera vald fiskeplats"
-            description="Justera koordinater, rubrik eller anteckning. Godkända platser skickar in en väntande ändring till admin, medan ännu ej godkända platser uppdateras direkt i sin väntande version."
-            statusLabel={activeEditSpot.status === "pending" ? "Fortfarande väntar på admin" : "Ändring väntar på admin"}
-            submitLabel={activeEditSpot.status === "pending" ? "Uppdatera väntande plats" : "Skicka ändring"}
+            description="Justera koordinater, rubrik eller anteckning. Privata platser som fortsätter vara privata sparas direkt. Ändringar mellan privat och officiell skickas till admin för godkännande."
+            statusLabel={activeEditSpot.status === "pending" ? "Fortfarande väntar på admin" : getEditStatusLabel(activeEditSpot, editDraft.isPrivate)}
+            submitLabel={activeEditSpot.status === "pending" ? "Uppdatera väntande plats" : activeEditSpot.is_private === true && editDraft.isPrivate ? "Spara privat ändring" : "Skicka ändring"}
             submitLoadingLabel="Sparar ändring..."
-            helperText="Har du bråttom kan du bara justera koordinaten nu och fylla på text senare."
+            helperText={activeEditSpot.is_private === true && editDraft.isPrivate ? "Privat ändring sparas direkt." : "Ändringen skickas till admin för godkännande."}
+            privacyHelperText={getEditPrivacyHelperText(activeEditSpot, editDraft.isPrivate)}
           />
         </div>
       ) : null}

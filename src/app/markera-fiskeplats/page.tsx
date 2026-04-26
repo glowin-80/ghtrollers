@@ -6,7 +6,8 @@ import FishingSpotForm from "@/components/fishing-spots/FishingSpotForm";
 import MyFishingSpotsSection from "@/components/fishing-spots/MyFishingSpotsSection";
 import { useAuthMember } from "@/hooks/useAuthMember";
 import {
-  createPendingFishingSpot,
+  createFishingSpot,
+  updateOwnPrivateFishingSpot,
   fetchOwnFishingSpots,
   submitFishingSpotEdit,
 } from "@/lib/fishing-spots";
@@ -15,6 +16,11 @@ import type { FishingSpot } from "@/types/fishing-spots";
 
 type FeedbackMessage = {
   variant: "success" | "error";
+  text: string;
+};
+
+type ConfirmationDialog = {
+  title: string;
   text: string;
 };
 
@@ -44,7 +50,9 @@ const DEFAULT_EDIT_DRAFT: EditDraftState = {
   isPrivate: false,
 };
 
-function getInitialEditValues(spot: FishingSpot): Pick<EditDraftState, "title" | "notes" | "latitude" | "longitude" | "isPrivate"> {
+function getInitialEditValues(
+  spot: FishingSpot
+): Pick<EditDraftState, "title" | "notes" | "latitude" | "longitude" | "isPrivate"> {
   if (
     spot.has_pending_edit &&
     spot.pending_latitude !== null &&
@@ -83,6 +91,7 @@ export default function MarkeraFiskeplatsPage() {
   const [mapOpen, setMapOpen] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [formMessage, setFormMessage] = useState<FeedbackMessage | null>(null);
+  const [confirmationDialog, setConfirmationDialog] = useState<ConfirmationDialog | null>(null);
   const [spotsLoading, setSpotsLoading] = useState(false);
   const [spotsError, setSpotsError] = useState<string | null>(null);
   const [spots, setSpots] = useState<FishingSpot[]>([]);
@@ -177,7 +186,7 @@ export default function MarkeraFiskeplatsPage() {
         setSubmitLoading(true);
         setFormMessage(null);
 
-        const createdSpot = await createPendingFishingSpot({
+        const createdSpot = await createFishingSpot({
           createdByMemberId: member.id,
           createdByName: member.name || member.email || "Medlem",
           latitude,
@@ -196,8 +205,21 @@ export default function MarkeraFiskeplatsPage() {
         setMapOpen(false);
         setFormMessage({
           variant: "success",
-          text: "Fiskeplatsen sparades och väntar nu på admin-godkännande.",
+          text: isPrivate
+            ? "Den privata fiskeplatsen sparades direkt och visas nu på din egen karta."
+            : "Fiskeplatsen sparades och väntar nu på admin-godkännande.",
         });
+        setConfirmationDialog(
+          isPrivate
+            ? {
+                title: "Platsen sparades privat",
+                text: "Fiskeplatsen sparades direkt och visas nu på din egen karta. Den syns inte för andra medlemmar.",
+              }
+            : {
+                title: "Platsen skickades för godkännande",
+                text: "Fiskeplatsen är sparad och väntar nu på att admin ska godkänna den innan andra medlemmar kan se den.",
+              }
+        );
       } catch (error) {
         console.error(error);
         setFormMessage({
@@ -319,15 +341,51 @@ export default function MarkeraFiskeplatsPage() {
         return;
       }
 
+      const nextTitle = editDraft.title.trim() ? editDraft.title.trim() : null;
+      const nextNotes = editDraft.notes.trim() ? editDraft.notes.trim() : null;
+      const canUpdatePrivateDirectly =
+        targetSpot.status === "approved" &&
+        targetSpot.is_private === true &&
+        editDraft.isPrivate === true;
+
       try {
         setEditDraft((prev) => ({ ...prev, submitLoading: true, formMessage: null }));
+
+        if (canUpdatePrivateDirectly) {
+          const updatedSpot = await updateOwnPrivateFishingSpot({
+            spotId: editSpotId,
+            createdByMemberId: member.id,
+            latitude: editDraft.latitude,
+            longitude: editDraft.longitude,
+            title: nextTitle,
+            notes: nextNotes,
+          });
+
+          setSpots((prev) =>
+            prev.map((spot) => (spot.id === editSpotId ? updatedSpot : spot))
+          );
+          setEditDraft((prev) => ({
+            ...prev,
+            submitLoading: false,
+            mapOpen: false,
+            formMessage: {
+              variant: "success",
+              text: "Den privata fiskeplatsen uppdaterades direkt och visas nu på din egen karta.",
+            },
+          }));
+          setConfirmationDialog({
+            title: "Den privata platsen uppdaterades",
+            text: "Ändringen sparades direkt eftersom platsen fortfarande är privat och bara syns för dig.",
+          });
+          return;
+        }
 
         await submitFishingSpotEdit({
           spotId: editSpotId,
           latitude: editDraft.latitude,
           longitude: editDraft.longitude,
-          title: editDraft.title.trim() ? editDraft.title.trim() : null,
-          notes: editDraft.notes.trim() ? editDraft.notes.trim() : null,
+          title: nextTitle,
+          notes: nextNotes,
           isPrivate: editDraft.isPrivate,
         });
 
@@ -335,9 +393,6 @@ export default function MarkeraFiskeplatsPage() {
           if (spot.id !== editSpotId) {
             return spot;
           }
-
-          const nextTitle = editDraft.title.trim() ? editDraft.title.trim() : null;
-          const nextNotes = editDraft.notes.trim() ? editDraft.notes.trim() : null;
 
           if (spot.status === "pending") {
             return {
@@ -376,6 +431,17 @@ export default function MarkeraFiskeplatsPage() {
                 : "Ändringen sparades och väntar nu på admin-godkännande innan den syns på kartan.",
           },
         }));
+        setConfirmationDialog(
+          targetSpot.status === "pending"
+            ? {
+                title: "Väntande plats uppdaterades",
+                text: "Fiskeplatsen är uppdaterad men väntar fortfarande på admin-godkännande.",
+              }
+            : {
+                title: "Ändringen skickades för godkännande",
+                text: "Ändringen väntar nu på admin-godkännande innan den slår igenom på kartan.",
+              }
+        );
       } catch (error) {
         console.error(error);
         setEditDraft((prev) => ({
@@ -415,6 +481,12 @@ export default function MarkeraFiskeplatsPage() {
           onCloseMap={() => setMapOpen(false)}
           onMapSelect={handleMapSelect}
           onSubmit={handleSubmit}
+          statusLabel={isPrivate ? "Sparas direkt" : "Väntar på admin"}
+          helperText={
+            isPrivate
+              ? "Privata fiskeplatser visas direkt på din egen karta."
+              : "Officiella fiskeplatser skickas till admin för godkännande."
+          }
         />
 
         {!isLoggedIn ? (
@@ -481,6 +553,40 @@ export default function MarkeraFiskeplatsPage() {
           />
         ) : null}
       </div>
+
+      {confirmationDialog ? (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/45 px-4 py-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="fishing-spot-confirmation-title"
+        >
+          <div className="w-full max-w-sm rounded-[28px] border border-[#d8d2c7] bg-white p-6 text-center shadow-[0_20px_60px_rgba(0,0,0,0.25)]">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-2xl">
+              ✅
+            </div>
+
+            <h2
+              id="fishing-spot-confirmation-title"
+              className="mt-4 text-xl font-bold text-[#1f2937]"
+            >
+              {confirmationDialog.title}
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-[#4b5563]">
+              {confirmationDialog.text}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setConfirmationDialog(null)}
+              className="mt-6 w-full rounded-full bg-[#324b2f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3e5d3b]"
+            >
+              Ok
+            </button>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

@@ -117,19 +117,91 @@ describe('all-time-high push detection', () => {
 
   it('detects Big Five all-time-high when the catch improves the annual total without setting a species record', () => {
     const bertBigFive = [
-      makeCatch({ id: 'bert-a', caught_for: 'Bert Fiskare', caught_for_member_id: 'm-bert', fish_type: 'Gädda', weight_g: 3000, catch_date: '2025-06-01' }),
-      makeCatch({ id: 'bert-b', caught_for: 'Bert Fiskare', caught_for_member_id: 'm-bert', fish_type: 'Gädda', weight_g: 2500, catch_date: '2025-06-02' }),
-      makeCatch({ id: 'bert-c', caught_for: 'Bert Fiskare', caught_for_member_id: 'm-bert', fish_type: 'Gädda', weight_g: 2000, catch_date: '2025-06-03' }),
-      makeCatch({ id: 'bert-d', caught_for: 'Bert Fiskare', caught_for_member_id: 'm-bert', fish_type: 'Gädda', weight_g: 1500, catch_date: '2025-06-04' }),
-      makeCatch({ id: 'bert-e', caught_for: 'Bert Fiskare', caught_for_member_id: 'm-bert', fish_type: 'Gädda', weight_g: 1000, catch_date: '2025-06-05' }),
-      makeCatch({ id: 'bert-pike-record', caught_for: 'Bert Fiskare', caught_for_member_id: 'm-bert', fish_type: 'Gädda', weight_g: 12000, catch_date: '2024-06-01' }),
+      makeCatch({
+        id: 'bert-a',
+        caught_for: 'Bert Fiskare',
+        caught_for_member_id: 'm-bert',
+        fish_type: 'Gädda',
+        weight_g: 3000,
+        catch_date: '2025-06-01',
+      }),
+      makeCatch({
+        id: 'bert-b',
+        caught_for: 'Bert Fiskare',
+        caught_for_member_id: 'm-bert',
+        fish_type: 'Gädda',
+        weight_g: 2500,
+        catch_date: '2025-06-02',
+      }),
+      makeCatch({
+        id: 'bert-c',
+        caught_for: 'Bert Fiskare',
+        caught_for_member_id: 'm-bert',
+        fish_type: 'Gädda',
+        weight_g: 2000,
+        catch_date: '2025-06-03',
+      }),
+      makeCatch({
+        id: 'bert-d',
+        caught_for: 'Bert Fiskare',
+        caught_for_member_id: 'm-bert',
+        fish_type: 'Gädda',
+        weight_g: 1500,
+        catch_date: '2025-06-04',
+      }),
+      makeCatch({
+        id: 'bert-e',
+        caught_for: 'Bert Fiskare',
+        caught_for_member_id: 'm-bert',
+        fish_type: 'Gädda',
+        weight_g: 1000,
+        catch_date: '2025-06-05',
+      }),
+      makeCatch({
+        id: 'bert-pike-record',
+        caught_for: 'Bert Fiskare',
+        caught_for_member_id: 'm-bert',
+        fish_type: 'Gädda',
+        weight_g: 11900,
+        catch_date: '2024-06-01',
+      }),
     ];
+
     const tommyBefore = [
-      makeCatch({ id: 'tommy-a', caught_for: 'Tommy Holmberg', caught_for_member_id: 'm-tommy', fish_type: 'Gädda', weight_g: 2600, catch_date: '2026-06-01' }),
-      makeCatch({ id: 'tommy-b', caught_for: 'Tommy Holmberg', caught_for_member_id: 'm-tommy', fish_type: 'Gädda', weight_g: 2500, catch_date: '2026-06-02' }),
-      makeCatch({ id: 'tommy-c', caught_for: 'Tommy Holmberg', caught_for_member_id: 'm-tommy', fish_type: 'Gädda', weight_g: 2400, catch_date: '2026-06-03' }),
-      makeCatch({ id: 'tommy-d', caught_for: 'Tommy Holmberg', caught_for_member_id: 'm-tommy', fish_type: 'Gädda', weight_g: 2300, catch_date: '2026-06-04' }),
+      makeCatch({
+        id: 'tommy-a',
+        caught_for: 'Tommy Holmberg',
+        caught_for_member_id: 'm-tommy',
+        fish_type: 'Gädda',
+        weight_g: 2600,
+        catch_date: '2026-06-01',
+      }),
+      makeCatch({
+        id: 'tommy-b',
+        caught_for: 'Tommy Holmberg',
+        caught_for_member_id: 'm-tommy',
+        fish_type: 'Gädda',
+        weight_g: 2500,
+        catch_date: '2026-06-02',
+      }),
+      makeCatch({
+        id: 'tommy-c',
+        caught_for: 'Tommy Holmberg',
+        caught_for_member_id: 'm-tommy',
+        fish_type: 'Gädda',
+        weight_g: 2400,
+        catch_date: '2026-06-03',
+      }),
+      makeCatch({
+        id: 'tommy-d',
+        caught_for: 'Tommy Holmberg',
+        caught_for_member_id: 'm-tommy',
+        fish_type: 'Gädda',
+        weight_g: 2300,
+        catch_date: '2026-06-04',
+      }),
     ];
+
     const approvedCatch = makeCatch({
       id: 'tommy-big-five-record',
       caught_for: 'Tommy Holmberg',
@@ -138,6 +210,7 @@ describe('all-time-high push detection', () => {
       weight_g: 2200,
       catch_date: '2026-06-05',
     });
+
     const beforeCatches = [...bertBigFive, ...tommyBefore];
 
     const event = detectAllTimeHighPushEvent({
