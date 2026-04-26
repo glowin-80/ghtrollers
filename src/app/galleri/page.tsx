@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useHomeData } from "@/hooks/useHomeData";
 import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
+import { getCatchMethodSummary } from "@/lib/catch-display";
 import type { Catch } from "@/types/home";
 
 function getCatchLabel(item: Catch) {
@@ -135,52 +136,59 @@ export default function GalleriPage() {
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {filteredCatches.map((item) => {
                 const ownerName = getCatchOwnerDisplayName(item, members);
+                const methodSummary = getCatchMethodSummary(item);
 
                 return (
-                <article
-                  key={item.id}
-                  className="overflow-hidden rounded-[22px] border border-[#d8d2c7] bg-[#fffdf9] shadow-sm"
-                >
-                  <button
-                    type="button"
-                    onClick={() => item.image_url && setSelectedImage(item.image_url)}
-                    className="block w-full bg-[#ebe7de] text-left"
-                    aria-label={`Öppna bild för ${ownerName}`}
+                  <article
+                    key={item.id}
+                    className="overflow-hidden rounded-[22px] border border-[#d8d2c7] bg-[#fffdf9] shadow-sm"
                   >
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={`${ownerName} fångst`}
-                        className="h-40 w-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <div className="flex h-40 w-full items-center justify-center text-sm font-semibold text-[#6b7280]">
-                        Ingen bild
-                      </div>
-                    )}
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => item.image_url && setSelectedImage(item.image_url)}
+                      className="block w-full bg-[#ebe7de] text-left"
+                      aria-label={`Öppna bild för ${ownerName}`}
+                    >
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={`${ownerName} fångst`}
+                          className="h-40 w-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <div className="flex h-40 w-full items-center justify-center text-sm font-semibold text-[#6b7280]">
+                          Ingen bild
+                        </div>
+                      )}
+                    </button>
 
-                  <div className="space-y-1 px-3 py-3">
-                    <div className="truncate text-sm font-bold text-[#1f2937]">
-                      {ownerName}
+                    <div className="space-y-1 px-3 py-3">
+                      <div className="truncate text-sm font-bold text-[#1f2937]">
+                        {ownerName}
+                      </div>
+                      <div className="text-[0.82rem] leading-snug text-[#374151]">
+                        {getCatchLabel(item)}
+                      </div>
+                      <div className="text-[0.8rem] font-semibold text-[#31414b]">
+                        {formatWeight(item.weight_g)}
+                      </div>
+                      {methodSummary ? (
+                        <div className="line-clamp-1 text-[0.76rem] font-semibold text-[#4f614f]">
+                          {methodSummary}
+                        </div>
+                      ) : null}
+                      <div className="line-clamp-1 text-[0.76rem] text-[#6b7280]">
+                        {getLocationLabel(item, isLoggedIn)}
+                      </div>
+                      <div className="text-[0.76rem] text-[#6b7280]">
+                        {formatDate(item.catch_date)}
+                      </div>
                     </div>
-                    <div className="text-[0.82rem] leading-snug text-[#374151]">
-                      {getCatchLabel(item)}
-                    </div>
-                    <div className="text-[0.8rem] font-semibold text-[#31414b]">
-                      {formatWeight(item.weight_g)}
-                    </div>
-                    <div className="line-clamp-1 text-[0.76rem] text-[#6b7280]">
-                      {getLocationLabel(item, isLoggedIn)}
-                    </div>
-                    <div className="text-[0.76rem] text-[#6b7280]">
-                      {formatDate(item.catch_date)}
-                    </div>
-                  </div>
-                </article>
-              )})}
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
