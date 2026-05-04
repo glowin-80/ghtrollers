@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { Analytics } from "@vercel/analytics/react";
 import Header from "@/components/Header";
 import AppProviders from "@/components/providers/AppProviders";
 
@@ -53,8 +54,12 @@ export default function RootAppShell({ children }: RootAppShellProps) {
       )}
 
       <div className="relative z-10">
-        <AppProviders>{renderSfvofShell ? children : <><Header />{children}</>}</AppProviders>
+        <AppProviders>
+          {renderSfvofShell ? children : <><Header />{children}</>}
+        </AppProviders>
       </div>
+
+      {!renderSfvofShell ? <Analytics /> : null}
     </div>
   );
 }
