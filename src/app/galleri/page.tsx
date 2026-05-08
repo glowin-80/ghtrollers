@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import ShareCatchButton from "@/components/shared/ShareCatchButton";
 import { useHomeData } from "@/hooks/useHomeData";
 import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
 import { getCatchMethodSummary } from "@/lib/catch-display";
+import { buildCatchShareDetails } from "@/lib/catch-sharing";
 import type { Catch } from "@/types/home";
 
 function getCatchLabel(item: Catch) {
@@ -151,6 +153,7 @@ export default function GalleriPage() {
               {filteredCatches.map((item) => {
                 const ownerName = getCatchOwnerDisplayName(item, members);
                 const methodSummary = getCatchMethodSummary(item);
+                const shareDetails = buildCatchShareDetails(item, approvedCatches, members);
 
                 return (
                   <article
@@ -198,6 +201,14 @@ export default function GalleriPage() {
                       </div>
                       <div className="text-[0.76rem] text-[#6b7280]">
                         {formatDate(item.catch_date)}
+                      </div>
+                      <div className="pt-2">
+                        <ShareCatchButton
+                          catchId={item.id}
+                          shareTitle={shareDetails.shareTitle}
+                          shareText={shareDetails.shareText}
+                          compact
+                        />
                       </div>
                     </div>
                   </article>
