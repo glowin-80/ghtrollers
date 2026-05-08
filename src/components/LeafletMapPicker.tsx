@@ -28,11 +28,21 @@ function getWaterStatusText(
   }
 
   if (water.found && water.name) {
-    return `Identifierat vatten: ${water.name}`;
+    if (water.achievementEligible) {
+      return `Vatten: ${water.name}`;
+    }
+
+    if (typeof water.distanceM === "number") {
+      return `Närmaste vatten: ${water.name} (${Math.round(
+        water.distanceM
+      )} m bort, räknas inte för achievement)`;
+    }
+
+    return `Närmaste vatten: ${water.name} (räknas inte för achievement)`;
   }
 
   if (water.setupRequired) {
-    return "Vattenidentifiering är inte färdigkopplad i databasen ännu.";
+    return "Vattenidentifiering kunde inte köras just nu.";
   }
 
   return "Inget vatten identifierat på denna punkt.";
@@ -72,6 +82,9 @@ function ClickHandler({
             name: null,
             waterKey: null,
             source: null,
+            distanceM: null,
+            achievementEligible: false,
+            matchType: null,
             message: "Kunde inte identifiera vatten just nu.",
           });
         })
@@ -100,9 +113,12 @@ export default function LeafletMapPicker({
   onSelect,
   selectedPosition = null,
 }: LeafletMapPickerProps) {
-  const [clickedPosition, setClickedPosition] = useState<[number, number] | null>(null);
+  const [clickedPosition, setClickedPosition] = useState<[number, number] | null>(
+    null
+  );
   const [water, setWater] = useState<WaterIdentificationResult | null>(null);
   const [waterLoading, setWaterLoading] = useState(false);
+
   const position = clickedPosition ?? selectedPosition;
   const center = position ?? defaultCenter;
 
