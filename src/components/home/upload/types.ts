@@ -40,6 +40,7 @@ export type UploadCatchSectionProps = {
   isLocationPrivate: boolean;
   isGuestAngler?: boolean;
   locationName: string;
+  selectedWaterName: string | null;
   latitude: number | null;
   longitude: number | null;
   gpsLoading: boolean;

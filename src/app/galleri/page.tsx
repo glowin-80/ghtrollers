@@ -30,10 +30,21 @@ function formatDate(dateString: string) {
   return new Intl.DateTimeFormat("sv-SE").format(new Date(dateString));
 }
 
+function getStoredLocationLabel(item: Catch) {
+  const locationName = item.location_name?.trim() ?? "";
+  const waterName = item.water_name?.trim() ?? "";
+
+  if (locationName && waterName && locationName !== waterName) {
+    return `${locationName} (${waterName})`;
+  }
+
+  return locationName || waterName;
+}
+
 function getLocationLabel(item: Catch, isLoggedIn: boolean) {
   if (!isLoggedIn) return "Logga in för att se plats";
 
-  const publicLocationName = item.water_name || item.location_name;
+  const publicLocationName = getStoredLocationLabel(item);
 
   if (item.is_location_private && !publicLocationName) return "Privat plats";
   return publicLocationName || "Plats ej angiven";

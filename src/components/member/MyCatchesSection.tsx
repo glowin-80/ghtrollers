@@ -191,7 +191,12 @@ export default function MyCatchesSection({
             const isHighlighted = highlightedCatchId === item.id;
             const ownerName = getCatchOwnerDisplayName(item, members);
             const registrarName = getCatchRegistrarDisplayName(item, members);
-            const displayLocationName = item.water_name || item.location_name;
+            const locationName = item.location_name?.trim() ?? "";
+            const waterName = item.water_name?.trim() ?? "";
+            const displayLocationName =
+              locationName && waterName && locationName !== waterName
+                ? `${locationName} (${waterName})`
+                : locationName || waterName;
 
             return (
               <div

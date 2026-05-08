@@ -82,19 +82,21 @@ export function useCatchUpload({
   const [confirmMissingLocationOpen, setConfirmMissingLocationOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [validationDialogMessage, setValidationDialogMessage] = useState<string | null>(null);
+  const [selectedWaterName, setSelectedWaterName] = useState<string | null>(null);
 
-  const updateLocationNameFromWater = useCallback(
+  const updateSelectedWaterName = useCallback(
     async (lat: number, lng: number, fallbackLocationName: string) => {
       handleLocationNameChange(fallbackLocationName);
+      setSelectedWaterName(null);
 
       try {
         const water = await identifyWaterBody(lat, lng);
 
         if (water.achievementEligible && water.name) {
-          handleLocationNameChange(water.name);
+          setSelectedWaterName(water.name);
         }
       } catch (error) {
-        console.warn("Could not update selected location from water", error);
+        console.warn("Could not update selected water name", error);
       }
     },
     [handleLocationNameChange]
@@ -107,6 +109,7 @@ export function useCatchUpload({
     setLocationChooserOpen(false);
     setMapOpen(false);
     setConfirmMissingLocationOpen(false);
+    setSelectedWaterName(null);
   }, []);
 
   const resetEntireForm = useCallback(() => {
@@ -137,6 +140,7 @@ export function useCatchUpload({
   const handleSaveManualLocation = useCallback(
     (value: string) => {
       handleLocationNameChange(value);
+      setSelectedWaterName(null);
       setLatitude(null);
       setLongitude(null);
       setGpsError(null);
@@ -166,7 +170,7 @@ export function useCatchUpload({
 
         setLatitude(lat);
         setLongitude(lng);
-        void updateLocationNameFromWater(lat, lng, "GPS-hämtad plats");
+        void updateSelectedWaterName(lat, lng, "GPS-hämtad plats");
         setGpsError(null);
         setGpsLoading(false);
       },
@@ -177,7 +181,7 @@ export function useCatchUpload({
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
     );
-  }, [hasActiveMembership, updateLocationNameFromWater]);
+  }, [hasActiveMembership, updateSelectedWaterName]);
 
   const handleOpenMap = useCallback(() => {
     setGpsError(null);
@@ -193,7 +197,7 @@ export function useCatchUpload({
       setLatitude(lat);
       setLongitude(lng);
       setGpsError(null);
-      void updateLocationNameFromWater(
+      void updateSelectedWaterName(
         lat,
         lng,
         `Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`
@@ -201,7 +205,7 @@ export function useCatchUpload({
       setLocationChooserOpen(false);
       setMapOpen(false);
     },
-    [hasActiveMembership, updateLocationNameFromWater]
+    [hasActiveMembership, updateSelectedWaterName]
   );
 
   const submitCatch = useCallback(
@@ -310,6 +314,7 @@ export function useCatchUpload({
     caughtAbroad,
     isLocationPrivate,
     locationName,
+    selectedWaterName,
     latitude,
     longitude,
     gpsLoading,
