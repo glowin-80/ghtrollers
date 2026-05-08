@@ -3,17 +3,22 @@ export type WaterIdentificationResult = {
   name: string | null;
   waterKey: string | null;
   source: string | null;
-  distanceM?: number | null;
+  distanceM: number | null;
+  achievementEligible: boolean;
+  matchType: "inside" | "nearby" | null;
   setupRequired?: boolean;
   message?: string;
 };
+
+export const WATER_ACHIEVEMENT_MAX_DISTANCE_M = 250;
+export const WATER_DISPLAY_MAX_DISTANCE_M = 1000;
 
 export function normalizeWaterKey(name: string): string {
   return name
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[̀-ͯ]/g, "")
     .replace(/^norra\s+/, "")
     .replace(/^sodra\s+/, "")
     .replace(/^ostra\s+/, "")
@@ -46,6 +51,8 @@ export async function identifyWaterBody(
       waterKey: null,
       source: null,
       distanceM: null,
+      achievementEligible: false,
+      matchType: null,
       message: "Ogiltiga koordinater.",
     };
   }
@@ -67,6 +74,8 @@ export async function identifyWaterBody(
       waterKey: null,
       source: null,
       distanceM: null,
+      achievementEligible: false,
+      matchType: null,
       message: "Kunde inte identifiera vatten just nu.",
     };
   }
@@ -78,7 +87,9 @@ export async function identifyWaterBody(
     name: data.name ?? null,
     waterKey: data.waterKey ?? null,
     source: data.source ?? null,
-    distanceM: data.distanceM ?? null,
+    distanceM: typeof data.distanceM === "number" ? data.distanceM : null,
+    achievementEligible: Boolean(data.achievementEligible),
+    matchType: data.matchType ?? null,
     setupRequired: data.setupRequired,
     message: data.message,
   };

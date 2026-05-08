@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { isValidCoordinate, normalizeWaterKey } from "@/lib/water-identification";
+import {
+  isValidCoordinate,
+  normalizeWaterKey,
+  WATER_ACHIEVEMENT_MAX_DISTANCE_M,
+  WATER_DISPLAY_MAX_DISTANCE_M,
+} from "@/lib/water-identification";
 
 export const runtime = "nodejs";
 
@@ -8,6 +13,8 @@ type WaterRpcRow = {
   water_name?: string | null;
   water_id?: string | null;
   distance_m?: number | null;
+  match_type?: "inside" | "nearby" | null;
+  achievement_eligible?: boolean | null;
   source?: string | null;
 };
 
@@ -34,6 +41,22 @@ function normalizeRpcResult(data: unknown): WaterRpcRow | null {
   return null;
 }
 
+function getAchievementEligible(row: WaterRpcRow | null) {
+  if (!row?.water_name) {
+    return false;
+  }
+
+  if (typeof row.achievement_eligible === "boolean") {
+    return row.achievement_eligible;
+  }
+
+  if (typeof row.distance_m === "number") {
+    return row.distance_m <= WATER_ACHIEVEMENT_MAX_DISTANCE_M;
+  }
+
+  return false;
+}
+
 export async function GET(request: Request) {
   const lat = getCoordinate(request, "lat");
   const lng = getCoordinate(request, "lng");
@@ -46,6 +69,8 @@ export async function GET(request: Request) {
         waterKey: null,
         source: null,
         distanceM: null,
+        achievementEligible: false,
+        matchType: null,
         message: "Ogiltiga koordinater.",
       },
       { status: 400 }
@@ -62,6 +87,8 @@ export async function GET(request: Request) {
       waterKey: null,
       source: null,
       distanceM: null,
+      achievementEligible: false,
+      matchType: null,
       setupRequired: true,
       message: "Vattenidentifiering kräver Supabase service role och databasfunktion.",
     });
@@ -89,6 +116,8 @@ export async function GET(request: Request) {
         waterKey: null,
         source: null,
         distanceM: null,
+        achievementEligible: false,
+        matchType: null,
         setupRequired: true,
         message: "Databasfunktionen identify_water_body saknas eller svarade inte.",
       });
@@ -96,6 +125,9 @@ export async function GET(request: Request) {
 
     const row = normalizeRpcResult(data);
     const name = row?.water_name ?? null;
+    const distanceM = row?.distance_m ?? null;
+    const achievementEligible = getAchievementEligible(row);
+    const matchType = row?.match_type ?? (distanceM === 0 ? "inside" : "nearby");
 
     if (!name) {
       return NextResponse.json({
@@ -103,7 +135,21 @@ export async function GET(request: Request) {
         name: null,
         waterKey: null,
         source: row?.source ?? "smhi_svar2016",
-        distanceM: row?.distance_m ?? null,
+        distanceM,
+        achievementEligible: false,
+        matchType: null,
+      });
+    }
+
+    if (typeof distanceM === "number" && distanceM > WATER_DISPLAY_MAX_DISTANCE_M) {
+      return NextResponse.json({
+        found: false,
+        name: null,
+        waterKey: null,
+        source: row?.source ?? "smhi_svar2016",
+        distanceM,
+        achievementEligible: false,
+        matchType: null,
       });
     }
 
@@ -112,7 +158,9 @@ export async function GET(request: Request) {
       name,
       waterKey: normalizeWaterKey(name),
       source: row?.source ?? "smhi_svar2016",
-      distanceM: row?.distance_m ?? null,
+      distanceM,
+      achievementEligible,
+      matchType,
     });
   } catch (error) {
     console.error("Could not identify water body", error);
@@ -123,6 +171,8 @@ export async function GET(request: Request) {
       waterKey: null,
       source: null,
       distanceM: null,
+      achievementEligible: false,
+      matchType: null,
       setupRequired: true,
       message: "Vattenidentifiering är inte färdigkopplad ännu.",
     });

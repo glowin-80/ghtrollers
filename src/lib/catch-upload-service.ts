@@ -79,7 +79,11 @@ async function identifyWaterForCatch(
   try {
     const water = await identifyWaterBody(latitude, longitude);
 
-    if (!water.found || !water.name || !water.waterKey) {
+    // Dubbel logik:
+    // - water.found kan vara true upp till 1000 meter för visning i UI.
+    // - water.achievementEligible är bara true för säker fångstkoppling (inne i vatten eller max 250 meter).
+    // Därför sparar vi bara water_name/water_key på catch när den är säker nog för achievements.
+    if (!water.achievementEligible || !water.name || !water.waterKey) {
       return {
         waterName: null,
         waterKey: null,

@@ -8,6 +8,7 @@ import type { Catch, FishingSpot } from "@/types/home";
 import type { FishingSpotMapFilter } from "@/types/fishing-spots";
 import {
   identifyWaterBody,
+  WATER_ACHIEVEMENT_MAX_DISTANCE_M,
   type WaterIdentificationResult,
 } from "@/lib/water-identification";
 
@@ -18,6 +19,22 @@ type LeafletCatchesMapProps = {
 };
 
 const defaultCenter: [number, number] = [59.3293, 18.0686];
+
+function formatDistance(distanceM: number | null) {
+  if (distanceM === null) {
+    return null;
+  }
+
+  if (distanceM < 1) {
+    return "0 m";
+  }
+
+  if (distanceM < 1000) {
+    return `${Math.round(distanceM)} m`;
+  }
+
+  return `${(distanceM / 1000).toFixed(1)} km`;
+}
 
 function getWaterStatusText(
   water: WaterIdentificationResult | null,
@@ -32,14 +49,24 @@ function getWaterStatusText(
   }
 
   if (water.found && water.name) {
-    return `Vatten: ${water.name}`;
+    if (water.achievementEligible) {
+      return `Vatten: ${water.name}`;
+    }
+
+    const distance = formatDistance(water.distanceM);
+
+    if (distance) {
+      return `Närmaste vatten: ${water.name} (${distance} bort, räknas inte för achievements över ${WATER_ACHIEVEMENT_MAX_DISTANCE_M} m).`;
+    }
+
+    return `Närmaste vatten: ${water.name} (räknas inte för achievements).`;
   }
 
   if (water.setupRequired) {
     return "Vattenidentifiering kunde inte köras just nu.";
   }
 
-  return "Ingen sjö identifierad på denna punkt.";
+  return "Ingen sjö identifierad nära denna punkt.";
 }
 
 function WaterClickIdentifier({
@@ -67,6 +94,9 @@ function WaterClickIdentifier({
             name: null,
             waterKey: null,
             source: null,
+            distanceM: null,
+            achievementEligible: false,
+            matchType: null,
             message: "Kunde inte identifiera vatten just nu.",
           });
         })
