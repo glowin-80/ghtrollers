@@ -5,9 +5,9 @@ import { isValidCoordinate, normalizeWaterKey } from "@/lib/water-identification
 export const runtime = "nodejs";
 
 type WaterRpcRow = {
-  name?: string | null;
   water_name?: string | null;
-  water_key?: string | null;
+  water_id?: string | null;
+  distance_m?: number | null;
   source?: string | null;
 };
 
@@ -74,8 +74,8 @@ export async function GET(request: Request) {
 
   try {
     const { data, error } = await supabase.rpc("identify_water_body", {
-      p_lat: lat,
-      p_lng: lng,
+      lat,
+      lng,
     });
 
     if (error) {
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
     }
 
     const row = normalizeRpcResult(data);
-    const name = row?.name ?? row?.water_name ?? null;
+    const name = row?.water_name ?? null;
 
     if (!name) {
       return NextResponse.json({
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       found: true,
       name,
-      waterKey: row?.water_key ?? normalizeWaterKey(name),
+      waterKey: normalizeWaterKey(name),
       source: row?.source ?? "smhi_svar2016",
     });
   } catch {
