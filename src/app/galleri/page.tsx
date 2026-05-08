@@ -32,8 +32,11 @@ function formatDate(dateString: string) {
 
 function getLocationLabel(item: Catch, isLoggedIn: boolean) {
   if (!isLoggedIn) return "Logga in för att se plats";
-  if (item.is_location_private && !item.location_name) return "Privat plats";
-  return item.location_name || "Plats ej angiven";
+
+  const publicLocationName = item.water_name || item.location_name;
+
+  if (item.is_location_private && !publicLocationName) return "Privat plats";
+  return publicLocationName || "Plats ej angiven";
 }
 
 export default function GalleriPage() {

@@ -191,6 +191,7 @@ export default function MyCatchesSection({
             const isHighlighted = highlightedCatchId === item.id;
             const ownerName = getCatchOwnerDisplayName(item, members);
             const registrarName = getCatchRegistrarDisplayName(item, members);
+            const displayLocationName = item.water_name || item.location_name;
 
             return (
               <div
@@ -211,10 +212,10 @@ export default function MyCatchesSection({
 
                     <div className="mt-2 text-sm leading-6 text-[#6b7280]">
                       {formatWeight(item.weight_g)} • {formatDate(item.catch_date)}
-                      {item.is_location_private && !item.location_name
+                      {item.is_location_private && !displayLocationName
                         ? " • Privat plats"
-                        : item.location_name
-                          ? ` • ${item.location_name}`
+                        : displayLocationName
+                          ? ` • ${displayLocationName}`
                           : ""}
                     </div>
 
