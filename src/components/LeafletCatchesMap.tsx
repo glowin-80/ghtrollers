@@ -1,11 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { useMemo, useState } from "react";
+import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { divIcon } from "leaflet";
 import type { Catch, FishingSpot } from "@/types/home";
 import type { FishingSpotMapFilter } from "@/types/fishing-spots";
+import {
+  identifyWaterBody,
+  type WaterIdentificationResult,
+} from "@/lib/water-identification";
 
 type LeafletCatchesMapProps = {
   catches: Catch[];
@@ -14,6 +18,67 @@ type LeafletCatchesMapProps = {
 };
 
 const defaultCenter: [number, number] = [59.3293, 18.0686];
+
+
+function getWaterStatusText(
+  water: WaterIdentificationResult | null,
+  loading: boolean
+) {
+  if (loading) {
+    return "Identifierar vatten...";
+  }
+
+  if (!water) {
+    return "Tryck på en sjö i kartan för att testa vattenidentifiering.";
+  }
+
+  if (water.found && water.name) {
+    return `Identifierat vatten: ${water.name}`;
+  }
+
+  if (water.setupRequired) {
+    return "Vattenidentifiering är inte färdigkopplad i databasen ännu.";
+  }
+
+  return "Inget vatten identifierat på denna punkt.";
+}
+
+function WaterClickIdentifier({
+  onResult,
+  onLoadingChange,
+}: {
+  onResult: (value: WaterIdentificationResult | null) => void;
+  onLoadingChange: (value: boolean) => void;
+}) {
+  useMapEvents({
+    click(event) {
+      const lat = event.latlng.lat;
+      const lng = event.latlng.lng;
+
+      onResult(null);
+      onLoadingChange(true);
+
+      identifyWaterBody(lat, lng)
+        .then((result) => {
+          onResult(result);
+        })
+        .catch(() => {
+          onResult({
+            found: false,
+            name: null,
+            waterKey: null,
+            source: null,
+            message: "Kunde inte identifiera vatten just nu.",
+          });
+        })
+        .finally(() => {
+          onLoadingChange(false);
+        });
+    },
+  });
+
+  return null;
+}
 
 function getYearFromCatch(item: Catch): number {
   const raw = item.catch_date || item.created_at || "";
@@ -171,6 +236,9 @@ export default function LeafletCatchesMap({
     [filter, spotsWithCoords]
   );
 
+  const [identifiedWater, setIdentifiedWater] = useState<WaterIdentificationResult | null>(null);
+  const [waterLoading, setWaterLoading] = useState(false);
+
   const center = useMemo<[number, number]>(() => {
     if (visibleSpots.length > 0) {
       return [visibleSpots[0].latitude, visibleSpots[0].longitude];
@@ -187,7 +255,8 @@ export default function LeafletCatchesMap({
   }, [visibleCatches, visibleSpots]);
 
   return (
-    <MapContainer
+    <div>
+      <MapContainer
       center={center}
       zoom={6}
       scrollWheelZoom
@@ -196,6 +265,11 @@ export default function LeafletCatchesMap({
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+
+      <WaterClickIdentifier
+        onResult={setIdentifiedWater}
+        onLoadingChange={setWaterLoading}
       />
 
       <MarkerClusterGroup
@@ -289,6 +363,12 @@ export default function LeafletCatchesMap({
           </Marker>
         ))}
       </MarkerClusterGroup>
-    </MapContainer>
+      </MapContainer>
+
+      <div className="border-t border-[#d8d2c7] bg-[#faf8f4] px-4 py-3 text-sm text-[#374151]">
+        <span className="font-semibold text-[#1f2937]">Vattenstatus: </span>
+        {getWaterStatusText(identifiedWater, waterLoading)}
+      </div>
+    </div>
   );
 }
