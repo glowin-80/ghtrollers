@@ -1,11 +1,16 @@
 "use client";
 
-import { useMemo } from "react";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { useMemo, useState } from "react";
+import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { divIcon } from "leaflet";
 import type { Catch, FishingSpot } from "@/types/home";
 import type { FishingSpotMapFilter } from "@/types/fishing-spots";
+import {
+  identifyWaterBody,
+  WATER_ACHIEVEMENT_MAX_DISTANCE_M,
+  type WaterIdentificationResult,
+} from "@/lib/water-identification";
 
 type LeafletCatchesMapProps = {
   catches: Catch[];
@@ -14,6 +19,95 @@ type LeafletCatchesMapProps = {
 };
 
 const defaultCenter: [number, number] = [59.3293, 18.0686];
+
+function formatDistance(distanceM: number | null) {
+  if (distanceM === null) {
+    return null;
+  }
+
+  if (distanceM < 1) {
+    return "0 m";
+  }
+
+  if (distanceM < 1000) {
+    return `${Math.round(distanceM)} m`;
+  }
+
+  return `${(distanceM / 1000).toFixed(1)} km`;
+}
+
+function getWaterStatusText(
+  water: WaterIdentificationResult | null,
+  loading: boolean
+) {
+  if (loading) {
+    return "Identifierar vatten...";
+  }
+
+  if (!water) {
+    return "Tryck på en sjö i kartan för att testa vattenidentifiering.";
+  }
+
+  if (water.found && water.name) {
+    if (water.achievementEligible) {
+      return `Vatten: ${water.name}`;
+    }
+
+    const distance = formatDistance(water.distanceM);
+
+    if (distance) {
+      return `Närmaste vatten: ${water.name} (${distance} bort, räknas inte för achievements över ${WATER_ACHIEVEMENT_MAX_DISTANCE_M} m).`;
+    }
+
+    return `Närmaste vatten: ${water.name} (räknas inte för achievements).`;
+  }
+
+  if (water.setupRequired) {
+    return "Vattenidentifiering kunde inte köras just nu.";
+  }
+
+  return "Ingen sjö identifierad nära denna punkt.";
+}
+
+function WaterClickIdentifier({
+  onResult,
+  onLoadingChange,
+}: {
+  onResult: (value: WaterIdentificationResult | null) => void;
+  onLoadingChange: (value: boolean) => void;
+}) {
+  useMapEvents({
+    click(event) {
+      const lat = event.latlng.lat;
+      const lng = event.latlng.lng;
+
+      onResult(null);
+      onLoadingChange(true);
+
+      identifyWaterBody(lat, lng)
+        .then((result) => {
+          onResult(result);
+        })
+        .catch(() => {
+          onResult({
+            found: false,
+            name: null,
+            waterKey: null,
+            source: null,
+            distanceM: null,
+            achievementEligible: false,
+            matchType: null,
+            message: "Kunde inte identifiera vatten just nu.",
+          });
+        })
+        .finally(() => {
+          onLoadingChange(false);
+        });
+    },
+  });
+
+  return null;
+}
 
 function getYearFromCatch(item: Catch): number {
   const raw = item.catch_date || item.created_at || "";
@@ -166,10 +260,15 @@ export default function LeafletCatchesMap({
     () => (filter === "spots" ? [] : catchesWithCoords),
     [catchesWithCoords, filter]
   );
+
   const visibleSpots = useMemo(
     () => (filter === "catches" ? [] : spotsWithCoords),
     [filter, spotsWithCoords]
   );
+
+  const [identifiedWater, setIdentifiedWater] =
+    useState<WaterIdentificationResult | null>(null);
+  const [waterLoading, setWaterLoading] = useState(false);
 
   const center = useMemo<[number, number]>(() => {
     if (visibleSpots.length > 0) {
@@ -187,108 +286,130 @@ export default function LeafletCatchesMap({
   }, [visibleCatches, visibleSpots]);
 
   return (
-    <MapContainer
-      center={center}
-      zoom={6}
-      scrollWheelZoom
-      className="h-[420px] w-full"
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-
-      <MarkerClusterGroup
-        chunkedLoading
-        iconCreateFunction={createClusterCustomIcon}
+    <div>
+      <MapContainer
+        center={center}
+        zoom={6}
+        scrollWheelZoom
+        className="h-[420px] w-full"
       >
-        {visibleCatches.map((item) => {
-          const year = getYearFromCatch(item);
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-          return (
+        <WaterClickIdentifier
+          onResult={setIdentifiedWater}
+          onLoadingChange={setWaterLoading}
+        />
+
+        <MarkerClusterGroup
+          chunkedLoading
+          iconCreateFunction={createClusterCustomIcon}
+        >
+          {visibleCatches.map((item) => {
+            const year = getYearFromCatch(item);
+
+            return (
+              <Marker
+                key={`catch-${item.id}`}
+                position={[item.latitude as number, item.longitude as number]}
+                icon={createCatchMarkerIcon(year)}
+              >
+                <Popup>
+                  <div className="min-w-[220px] max-w-[240px]">
+                    {item.image_url ? (
+                      <a
+                        href={item.image_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mb-3 block overflow-hidden rounded-xl border border-[#d8d2c7]"
+                      >
+                        <img
+                          src={item.image_url}
+                          alt={`${item.caught_for} - ${getFishLabel(item)}`}
+                          className="h-[120px] w-full object-cover transition hover:scale-[1.02]"
+                        />
+                      </a>
+                    ) : null}
+
+                    <div className="font-bold text-[#1f2937]">
+                      {item.caught_for}
+                    </div>
+
+                    <div className="text-sm text-[#4b5563]">
+                      {getFishLabel(item)}
+                    </div>
+
+                    <div className="text-sm text-[#4b5563]">
+                      {getWeightLabel(item.weight_g)}
+                    </div>
+
+                    {item.location_name ? (
+                      <div className="text-sm text-[#6b7280]">
+                        {item.location_name}
+                      </div>
+                    ) : null}
+
+                    <div className="text-sm text-[#6b7280]">
+                      {new Date(item.catch_date).toLocaleDateString("sv-SE")}
+                    </div>
+
+                    <div
+                      className="mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+                      style={{
+                        backgroundColor: getYearColor(year).ring,
+                        color: getYearColor(year).bg,
+                      }}
+                    >
+                      År {year}
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+
+          {visibleSpots.map((spot) => (
             <Marker
-              key={`catch-${item.id}`}
-              position={[item.latitude as number, item.longitude as number]}
-              icon={createCatchMarkerIcon(year)}
+              key={`spot-${spot.id}`}
+              position={[spot.latitude, spot.longitude]}
+              icon={createFishingSpotMarkerIcon()}
             >
               <Popup>
-                <div className="min-w-[220px] max-w-[240px]">
-                  {item.image_url ? (
-                    <a
-                      href={item.image_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mb-3 block overflow-hidden rounded-xl border border-[#d8d2c7]"
-                    >
-                      <img
-                        src={item.image_url}
-                        alt={`${item.caught_for} - ${getFishLabel(item)}`}
-                        className="h-[120px] w-full object-cover transition hover:scale-[1.02]"
-                      />
-                    </a>
-                  ) : null}
-
-                  <div className="font-bold text-[#1f2937]">{item.caught_for}</div>
-
-                  <div className="text-sm text-[#4b5563]">{getFishLabel(item)}</div>
-
-                  <div className="text-sm text-[#4b5563]">{getWeightLabel(item.weight_g)}</div>
-
-                  {item.location_name ? (
-                    <div className="text-sm text-[#6b7280]">{item.location_name}</div>
-                  ) : null}
-
-                  <div className="text-sm text-[#6b7280]">
-                    {new Date(item.catch_date).toLocaleDateString("sv-SE")}
+                <div className="min-w-[220px] max-w-[260px]">
+                  <div className="font-bold text-[#1f2937]">
+                    {spot.title?.trim() || "Fiskeplats"}
                   </div>
 
-                  <div
-                    className="mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
-                    style={{
-                      backgroundColor: getYearColor(year).ring,
-                      color: getYearColor(year).bg,
-                    }}
-                  >
-                    År {year}
+                  <div className="mt-1 text-sm text-[#4b5563]">
+                    Markerad av {spot.created_by_name}
+                  </div>
+
+                  {spot.notes?.trim() ? (
+                    <div className="mt-3 rounded-xl border border-[#e9e4dc] bg-[#faf8f4] px-3 py-2 text-sm text-[#4b5563]">
+                      {spot.notes}
+                    </div>
+                  ) : null}
+
+                  <div className="mt-3 text-sm text-[#6b7280]">
+                    {spot.latitude.toFixed(6)}, {spot.longitude.toFixed(6)}
+                  </div>
+
+                  <div className="mt-2 inline-flex rounded-full bg-[#ede9fe] px-2.5 py-1 text-xs font-semibold text-[#6d28d9]">
+                    Fiskeplats
                   </div>
                 </div>
               </Popup>
             </Marker>
-          );
-        })}
+          ))}
+        </MarkerClusterGroup>
+      </MapContainer>
 
-        {visibleSpots.map((spot) => (
-          <Marker
-            key={`spot-${spot.id}`}
-            position={[spot.latitude, spot.longitude]}
-            icon={createFishingSpotMarkerIcon()}
-          >
-            <Popup>
-              <div className="min-w-[220px] max-w-[260px]">
-                <div className="font-bold text-[#1f2937]">
-                  {spot.title?.trim() || "Fiskeplats"}
-                </div>
-
-                <div className="mt-1 text-sm text-[#4b5563]">Markerad av {spot.created_by_name}</div>
-
-                {spot.notes?.trim() ? (
-                  <div className="mt-3 rounded-xl border border-[#e9e4dc] bg-[#faf8f4] px-3 py-2 text-sm text-[#4b5563]">
-                    {spot.notes}
-                  </div>
-                ) : null}
-
-                <div className="mt-3 text-sm text-[#6b7280]">
-                  {spot.latitude.toFixed(6)}, {spot.longitude.toFixed(6)}
-                </div>
-
-                <div className="mt-2 inline-flex rounded-full bg-[#ede9fe] px-2.5 py-1 text-xs font-semibold text-[#6d28d9]">
-                  Fiskeplats
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MarkerClusterGroup>
-    </MapContainer>
+      <div className="border-t border-[#d8d2c7] bg-[#faf8f4] px-4 py-3 text-sm text-[#374151]">
+        <span className="font-semibold text-[#1f2937]">Vattenstatus: </span>
+        {getWaterStatusText(identifiedWater, waterLoading)}
+      </div>
+    </div>
   );
 }

@@ -24,6 +24,7 @@ type UploadCatchFormProps = {
   isLocationPrivate: boolean;
   isGuestAngler?: boolean;
   locationName: string;
+  selectedWaterName: string | null;
   latitude: number | null;
   longitude: number | null;
   gpsLoading: boolean;
@@ -81,6 +82,7 @@ export default function UploadCatchForm({
   isLocationPrivate,
   isGuestAngler = false,
   locationName,
+  selectedWaterName,
   latitude,
   longitude,
   gpsLoading,
@@ -108,7 +110,13 @@ export default function UploadCatchForm({
 }: UploadCatchFormProps) {
   const hasLocationSelection =
     locationName.trim().length > 0 || latitude !== null || longitude !== null;
-  const locationSummary = locationName.trim() || "Saknas";
+  const trimmedLocationName = locationName.trim();
+  const trimmedSelectedWaterName = selectedWaterName?.trim() ?? "";
+  const locationSummary = trimmedLocationName
+    ? trimmedSelectedWaterName
+      ? `${trimmedLocationName} (${trimmedSelectedWaterName})`
+      : trimmedLocationName
+    : "Saknas";
   const locationSummaryTextClass = hasLocationSelection
     ? "text-[#374151]"
     : "text-[#9ca3af]";

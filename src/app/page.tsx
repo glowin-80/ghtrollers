@@ -35,6 +35,7 @@ export default function Home() {
     caughtAbroad,
     isLocationPrivate,
     locationName,
+    selectedWaterName,
     latitude,
     longitude,
     gpsLoading,
@@ -192,6 +193,7 @@ export default function Home() {
               isLocationPrivate={isLocationPrivate}
               isGuestAngler={member?.member_role === "guest_angler"}
               locationName={locationName}
+              selectedWaterName={selectedWaterName}
               latitude={latitude}
               longitude={longitude}
               gpsLoading={gpsLoading}

@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
+import ShareCatchButton from "@/components/shared/ShareCatchButton";
 import { useHomeData } from "@/hooks/useHomeData";
 import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
 import { getCatchMethodSummary } from "@/lib/catch-display";
+import { buildCatchShareDetails } from "@/lib/catch-sharing";
 import type { Catch } from "@/types/home";
 
 function getCatchLabel(item: Catch) {
@@ -30,10 +33,24 @@ function formatDate(dateString: string) {
   return new Intl.DateTimeFormat("sv-SE").format(new Date(dateString));
 }
 
+function getStoredLocationLabel(item: Catch) {
+  const locationName = item.location_name?.trim() ?? "";
+  const waterName = item.water_name?.trim() ?? "";
+
+  if (locationName && waterName && locationName !== waterName) {
+    return `${locationName} (${waterName})`;
+  }
+
+  return locationName || waterName;
+}
+
 function getLocationLabel(item: Catch, isLoggedIn: boolean) {
   if (!isLoggedIn) return "Logga in för att se plats";
-  if (item.is_location_private && !item.location_name) return "Privat plats";
-  return item.location_name || "Plats ej angiven";
+
+  const publicLocationName = getStoredLocationLabel(item);
+
+  if (item.is_location_private && !publicLocationName) return "Privat plats";
+  return publicLocationName || "Plats ej angiven";
 }
 
 export default function GalleriPage() {
@@ -137,6 +154,7 @@ export default function GalleriPage() {
               {filteredCatches.map((item) => {
                 const ownerName = getCatchOwnerDisplayName(item, members);
                 const methodSummary = getCatchMethodSummary(item);
+                const shareDetails = buildCatchShareDetails(item, approvedCatches, members);
 
                 return (
                   <article
@@ -184,6 +202,21 @@ export default function GalleriPage() {
                       </div>
                       <div className="text-[0.76rem] text-[#6b7280]">
                         {formatDate(item.catch_date)}
+                      </div>
+                      <div className="flex items-center justify-between gap-2 pt-2">
+                        <Link
+                          href={`/fangst/${item.id}`}
+                          className="rounded-full border border-[#d8d2c7] bg-white px-3 py-2 text-xs font-semibold text-[#31414b] transition hover:bg-[#f7f4ee]"
+                        >
+                          Se fångst
+                        </Link>
+
+                        <ShareCatchButton
+                          catchId={item.id}
+                          shareTitle={shareDetails.shareTitle}
+                          shareText={shareDetails.shareText}
+                          compact
+                        />
                       </div>
                     </div>
                   </article>

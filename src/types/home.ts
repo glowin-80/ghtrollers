@@ -24,6 +24,8 @@ export type Catch = {
   weight_g: number;
   catch_date: string;
   location_name?: string | null;
+  water_name?: string | null;
+  water_key?: string | null;
   image_url?: string | null;
   latitude?: number | null;
   longitude?: number | null;

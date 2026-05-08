@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { getGeolocationErrorState } from "@/lib/home-upload";
+import { identifyWaterBody } from "@/lib/water-identification";
 import { useCatchUploadForm } from "@/hooks/useCatchUploadForm";
 import { validateCatchUpload } from "@/lib/catch-upload-validation";
 import {
@@ -81,6 +82,25 @@ export function useCatchUpload({
   const [confirmMissingLocationOpen, setConfirmMissingLocationOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [validationDialogMessage, setValidationDialogMessage] = useState<string | null>(null);
+  const [selectedWaterName, setSelectedWaterName] = useState<string | null>(null);
+
+  const updateSelectedWaterName = useCallback(
+    async (lat: number, lng: number, fallbackLocationName: string) => {
+      handleLocationNameChange(fallbackLocationName);
+      setSelectedWaterName(null);
+
+      try {
+        const water = await identifyWaterBody(lat, lng);
+
+        if (water.achievementEligible && water.name) {
+          setSelectedWaterName(water.name);
+        }
+      } catch (error) {
+        console.warn("Could not update selected water name", error);
+      }
+    },
+    [handleLocationNameChange]
+  );
 
   const resetLocationState = useCallback(() => {
     setLatitude(null);
@@ -89,6 +109,7 @@ export function useCatchUpload({
     setLocationChooserOpen(false);
     setMapOpen(false);
     setConfirmMissingLocationOpen(false);
+    setSelectedWaterName(null);
   }, []);
 
   const resetEntireForm = useCallback(() => {
@@ -119,6 +140,7 @@ export function useCatchUpload({
   const handleSaveManualLocation = useCallback(
     (value: string) => {
       handleLocationNameChange(value);
+      setSelectedWaterName(null);
       setLatitude(null);
       setLongitude(null);
       setGpsError(null);
@@ -143,9 +165,12 @@ export function useCatchUpload({
     setGpsLoading(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-        handleLocationNameChange("GPS-hämtad plats");
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        setLatitude(lat);
+        setLongitude(lng);
+        void updateSelectedWaterName(lat, lng, "GPS-hämtad plats");
         setGpsError(null);
         setGpsLoading(false);
       },
@@ -156,7 +181,7 @@ export function useCatchUpload({
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
     );
-  }, [hasActiveMembership, handleLocationNameChange]);
+  }, [hasActiveMembership, updateSelectedWaterName]);
 
   const handleOpenMap = useCallback(() => {
     setGpsError(null);
@@ -172,11 +197,15 @@ export function useCatchUpload({
       setLatitude(lat);
       setLongitude(lng);
       setGpsError(null);
-      handleLocationNameChange(`Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+      void updateSelectedWaterName(
+        lat,
+        lng,
+        `Kartvald plats (${lat.toFixed(4)}, ${lng.toFixed(4)})`
+      );
       setLocationChooserOpen(false);
       setMapOpen(false);
     },
-    [hasActiveMembership, handleLocationNameChange]
+    [hasActiveMembership, updateSelectedWaterName]
   );
 
   const submitCatch = useCallback(
@@ -285,6 +314,7 @@ export function useCatchUpload({
     caughtAbroad,
     isLocationPrivate,
     locationName,
+    selectedWaterName,
     latitude,
     longitude,
     gpsLoading,

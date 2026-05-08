@@ -21,12 +21,24 @@ type RecentApprovedSectionProps = {
   onImageClick: (imageUrl: string) => void;
 };
 
+function getStoredLocationLabel(item: Catch) {
+  const locationName = item.location_name?.trim() ?? "";
+  const waterName = item.water_name?.trim() ?? "";
+
+  if (locationName && waterName && locationName !== waterName) {
+    return `${locationName} (${waterName})`;
+  }
+
+  return locationName || waterName;
+}
+
 function getLocationLine(item: Catch, isLoggedIn: boolean) {
   if (!isLoggedIn) {
     return `Logga in för att se plats · ${formatCatchDateForDisplay(item.catch_date)}`;
   }
 
-  const locationLabel = item.is_location_private && !item.location_name ? "Privat plats" : item.location_name || "Plats ej angiven";
+  const publicLocationName = getStoredLocationLabel(item);
+  const locationLabel = item.is_location_private && !publicLocationName ? "Privat plats" : publicLocationName || "Plats ej angiven";
   return `${locationLabel} · ${formatCatchDateForDisplay(item.catch_date)}`;
 }
 
