@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import ShareCatchButton from "@/components/shared/ShareCatchButton";
 import { useHomeData } from "@/hooks/useHomeData";
@@ -202,7 +203,14 @@ export default function GalleriPage() {
                       <div className="text-[0.76rem] text-[#6b7280]">
                         {formatDate(item.catch_date)}
                       </div>
-                      <div className="pt-2">
+                      <div className="flex items-center justify-between gap-2 pt-2">
+                        <Link
+                          href={`/fangst/${item.id}`}
+                          className="rounded-full border border-[#d8d2c7] bg-white px-3 py-2 text-xs font-semibold text-[#31414b] transition hover:bg-[#f7f4ee]"
+                        >
+                          Se fångst
+                        </Link>
+
                         <ShareCatchButton
                           catchId={item.id}
                           shareTitle={shareDetails.shareTitle}
