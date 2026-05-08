@@ -3,6 +3,7 @@ export type WaterIdentificationResult = {
   name: string | null;
   waterKey: string | null;
   source: string | null;
+  distanceM?: number | null;
   setupRequired?: boolean;
   message?: string;
 };
@@ -44,6 +45,7 @@ export async function identifyWaterBody(
       name: null,
       waterKey: null,
       source: null,
+      distanceM: null,
       message: "Ogiltiga koordinater.",
     };
   }
@@ -64,6 +66,7 @@ export async function identifyWaterBody(
       name: null,
       waterKey: null,
       source: null,
+      distanceM: null,
       message: "Kunde inte identifiera vatten just nu.",
     };
   }
@@ -75,6 +78,7 @@ export async function identifyWaterBody(
     name: data.name ?? null,
     waterKey: data.waterKey ?? null,
     source: data.source ?? null,
+    distanceM: data.distanceM ?? null,
     setupRequired: data.setupRequired,
     message: data.message,
   };

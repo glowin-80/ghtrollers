@@ -45,6 +45,7 @@ export async function GET(request: Request) {
         name: null,
         waterKey: null,
         source: null,
+        distanceM: null,
         message: "Ogiltiga koordinater.",
       },
       { status: 400 }
@@ -60,6 +61,7 @@ export async function GET(request: Request) {
       name: null,
       waterKey: null,
       source: null,
+      distanceM: null,
       setupRequired: true,
       message: "Vattenidentifiering kräver Supabase service role och databasfunktion.",
     });
@@ -79,11 +81,14 @@ export async function GET(request: Request) {
     });
 
     if (error) {
+      console.error("identify_water_body rpc error", error);
+
       return NextResponse.json({
         found: false,
         name: null,
         waterKey: null,
         source: null,
+        distanceM: null,
         setupRequired: true,
         message: "Databasfunktionen identify_water_body saknas eller svarade inte.",
       });
@@ -98,6 +103,7 @@ export async function GET(request: Request) {
         name: null,
         waterKey: null,
         source: row?.source ?? "smhi_svar2016",
+        distanceM: row?.distance_m ?? null,
       });
     }
 
@@ -106,13 +112,17 @@ export async function GET(request: Request) {
       name,
       waterKey: normalizeWaterKey(name),
       source: row?.source ?? "smhi_svar2016",
+      distanceM: row?.distance_m ?? null,
     });
-  } catch {
+  } catch (error) {
+    console.error("Could not identify water body", error);
+
     return NextResponse.json({
       found: false,
       name: null,
       waterKey: null,
       source: null,
+      distanceM: null,
       setupRequired: true,
       message: "Vattenidentifiering är inte färdigkopplad ännu.",
     });

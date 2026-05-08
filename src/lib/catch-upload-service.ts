@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { uploadCatchImage } from "@/lib/home-upload";
+import { identifyWaterBody, isValidCoordinate } from "@/lib/water-identification";
 
 export class CatchUploadDatabaseError extends Error {
   constructor(message = "Fel vid sparning.") {
@@ -27,6 +28,11 @@ export type SubmitCatchPayload = {
   imageFile: File;
 };
 
+type CatchWaterIdentification = {
+  waterName: string | null;
+  waterKey: string | null;
+};
+
 function getStoragePathFromPublicUrl(publicUrl: string) {
   const marker = "/storage/v1/object/public/catch-images/";
   const index = publicUrl.indexOf(marker);
@@ -52,8 +58,54 @@ async function cleanupUploadedCatchImage(imageUrl: string) {
   }
 }
 
+async function identifyWaterForCatch(
+  latitude: number | null,
+  longitude: number | null
+): Promise<CatchWaterIdentification> {
+  if (latitude === null || longitude === null) {
+    return {
+      waterName: null,
+      waterKey: null,
+    };
+  }
+
+  if (!isValidCoordinate(latitude, longitude)) {
+    return {
+      waterName: null,
+      waterKey: null,
+    };
+  }
+
+  try {
+    const water = await identifyWaterBody(latitude, longitude);
+
+    if (!water.found || !water.name || !water.waterKey) {
+      return {
+        waterName: null,
+        waterKey: null,
+      };
+    }
+
+    return {
+      waterName: water.name,
+      waterKey: water.waterKey,
+    };
+  } catch (error) {
+    console.warn("Could not identify water for catch upload", error);
+
+    return {
+      waterName: null,
+      waterKey: null,
+    };
+  }
+}
+
 export async function submitCatchWithImage(payload: SubmitCatchPayload) {
   const uploadResult = await uploadCatchImage(payload.imageFile);
+  const waterIdentification = await identifyWaterForCatch(
+    payload.latitude,
+    payload.longitude
+  );
 
   const { error } = await supabase.from("catches").insert([
     {
@@ -71,6 +123,8 @@ export async function submitCatchWithImage(payload: SubmitCatchPayload) {
       caught_abroad: payload.caughtAbroad,
       is_location_private: payload.isLocationPrivate,
       location_name: payload.locationName.trim() || null,
+      water_name: waterIdentification.waterName,
+      water_key: waterIdentification.waterKey,
       image_url: uploadResult.imageUrl,
       latitude: payload.latitude,
       longitude: payload.longitude,
