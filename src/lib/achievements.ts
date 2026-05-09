@@ -161,17 +161,19 @@ export const reportedCatchAchievements: AchievementDefinition[] = [
   },
 ];
 
+export const waterBaselineAchievement: AchievementDefinition = {
+  id: "water_00",
+  categoryId: "waters",
+  title: "Strandspanare",
+  description:
+    "Du har inte fiskat något vatten ännu, men kartan är redan uppslagen och första platsen väntar.",
+  minValue: 0,
+  maxValue: 0,
+  imageSrc: "/Achievments/catch/catchBadge_0.svg",
+  sortOrder: 0,
+};
+
 export const waterAchievements: AchievementDefinition[] = [
-  {
-    id: "water_00",
-    categoryId: "waters",
-    title: "Strandspanare",
-    description: "Du står vid kanten och spanar ut. Någon gång börjar varje fiskekarta här.",
-    minValue: 0,
-    maxValue: 0,
-    imageSrc: "/Achievments/catch/catchBadge_0.svg",
-    sortOrder: 0,
-  },
   {
     id: "water_01",
     categoryId: "waters",
@@ -276,6 +278,10 @@ export function getAchievementsForCategory(categoryId: string) {
 export function getCurrentAchievementByValue(value: number, categoryId = "reported_catches") {
   if (categoryId === "reported_catches" && value <= 0) {
     return reportedCatchBaselineAchievement;
+  }
+
+  if (categoryId === "waters" && value <= 0) {
+    return waterBaselineAchievement;
   }
 
   const achievements = getAchievementsForCategory(categoryId);
