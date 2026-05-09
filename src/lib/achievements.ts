@@ -34,18 +34,18 @@ export const achievementCategories: AchievementCategory[] = [
       "En helt egen kategori för lite humor, progression och viljan att rapportera fler fångster — även när de inte avgör tävlingen.",
   },
   {
+    id: "fishing_spots",
+    label: "Registrerade fiskeplatser",
+    status: "coming_soon",
+    description: "Kommer snart.",
+  },
+  {
     id: "waters",
     label: "Fiskade vatten",
     status: "coming_soon",
     comingSoonLabel: "Soon there!!",
     description:
-      "Här räknas hur många olika vatten du har fångster från. Samma sjö räknas bara en gång, även om du rapporterat flera fångster där. Endast fångster med GPS-hämtad eller kartvald plats räknas; fångster med fritextplats räknas inte. Kategorien visas som förhandsvisning tills märken och notiser aktiveras.",
-  },
-  {
-    id: "fishing_spots",
-    label: "Registrerade fiskeplatser",
-    status: "coming_soon",
-    description: "Kommer snart.",
+      "Här räknas hur många olika vatten du har fångster från. Samma sjö räknas bara en gång, även om du rapporterat flera fångster där. Kategorien visas som förhandsvisning tills märken och notiser aktiveras.",
   },
   {
     id: "species",
@@ -180,8 +180,7 @@ export const waterAchievements: AchievementDefinition[] = [
     id: "water_01",
     categoryId: "waters",
     title: "Första kastet",
-    description:
-      "Ett vatten är avklarat. Nu vet du att kartan har fler historier att bjuda på.",
+    description: "Ett vatten är avklarat. Nu vet du att kartan har fler historier att bjuda på.",
     minValue: 1,
     maxValue: 1,
     imageSrc: "/Achievments/catch/catchBadge_1.png",
@@ -191,8 +190,7 @@ export const waterAchievements: AchievementDefinition[] = [
     id: "water_02",
     categoryId: "waters",
     title: "Vattenletare",
-    description:
-      "Du börjar lämna det gamla vanliga bakom dig och testar vatten med nyfiken blick.",
+    description: "Du börjar lämna det gamla vanliga bakom dig och testar vatten med nyfiken blick.",
     minValue: 2,
     maxValue: 5,
     imageSrc: "/Achievments/catch/catchBadge_2.png",
@@ -202,8 +200,7 @@ export const waterAchievements: AchievementDefinition[] = [
     id: "water_03",
     categoryId: "waters",
     title: "Sjövandrare",
-    description:
-      "Du rör dig mellan sjöar, vikar och vatten. Stövlarna får jobba och kartan får nya märken.",
+    description: "Du rör dig mellan sjöar, vikar och vatten. Stövlarna får jobba och kartan får nya märken.",
     minValue: 6,
     maxValue: 10,
     imageSrc: "/Achievments/catch/catchBadge_3.png",
@@ -213,8 +210,7 @@ export const waterAchievements: AchievementDefinition[] = [
     id: "water_04",
     categoryId: "waters",
     title: "Kartfiskare",
-    description:
-      "Du chansar inte bara längre. Du planerar, jämför och hittar nya vatten med mening.",
+    description: "Du chansar inte bara längre. Du planerar, jämför och hittar nya vatten med mening.",
     minValue: 11,
     maxValue: 16,
     imageSrc: "/Achievments/catch/catchBadge_4.png",
@@ -224,8 +220,7 @@ export const waterAchievements: AchievementDefinition[] = [
     id: "water_05",
     categoryId: "waters",
     title: "Vattenjägare",
-    description:
-      "Du jagar inte bara fisk längre. Du jagar nästa vatten, nästa chans och nästa berättelse.",
+    description: "Du jagar inte bara fisk längre. Du jagar nästa vatten, nästa chans och nästa berättelse.",
     minValue: 17,
     maxValue: 25,
     imageSrc: "/Achievments/catch/catchBadge_5.png",
@@ -235,8 +230,7 @@ export const waterAchievements: AchievementDefinition[] = [
     id: "water_06",
     categoryId: "waters",
     title: "Sjökännare",
-    description:
-      "Du har varit runt. När andra ser blått på kartan ser du möjligheter, djup och gamla hugg.",
+    description: "Du har varit runt. När andra ser blått på kartan ser du möjligheter, djup och gamla hugg.",
     minValue: 26,
     maxValue: 35,
     imageSrc: "/Achievments/catch/catchBadge_6.png",
@@ -246,8 +240,7 @@ export const waterAchievements: AchievementDefinition[] = [
     id: "water_07",
     categoryId: "waters",
     title: "Vattenmästare",
-    description:
-      "Du fiskar inte bara i många vatten. Du börjar förstå hur olika de faktiskt är.",
+    description: "Du fiskar inte bara i många vatten. Du börjar förstå hur olika de faktiskt är.",
     minValue: 36,
     maxValue: 49,
     imageSrc: "/Achievments/catch/catchBadge_7.png",
@@ -257,8 +250,7 @@ export const waterAchievements: AchievementDefinition[] = [
     id: "water_08",
     categoryId: "waters",
     title: "Gäddhängs upptäckare",
-    description:
-      "Du har sett mer vatten än de flesta ens hinner prata om. Det här är ren upptäckarglädje.",
+    description: "Du har sett mer vatten än de flesta ens hinner prata om. Det här är ren upptäckarglädje.",
     minValue: 50,
     maxValue: null,
     imageSrc: "/Achievments/catch/catchBadge_8.png",
@@ -285,10 +277,7 @@ export function getAchievementsForCategory(categoryId: string) {
     .sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
-export function getCurrentAchievementByValue(
-  value: number,
-  categoryId = "reported_catches"
-) {
+export function getCurrentAchievementByValue(value: number, categoryId = "reported_catches") {
   if (categoryId === "reported_catches" && value <= 0) {
     return reportedCatchBaselineAchievement;
   }
@@ -308,21 +297,13 @@ export function getCurrentAchievementByValue(
   );
 }
 
-export function getNextAchievementByValue(
-  value: number,
-  categoryId = "reported_catches"
-) {
+export function getNextAchievementByValue(value: number, categoryId = "reported_catches") {
   const achievements = getAchievementsForCategory(categoryId);
   return achievements.find((achievement) => achievement.minValue > value) ?? null;
 }
 
-export function getUnlockedAchievementsByValue(
-  value: number,
-  categoryId = "reported_catches"
-) {
-  return getAchievementsForCategory(categoryId).filter(
-    (achievement) => value >= achievement.minValue
-  );
+export function getUnlockedAchievementsByValue(value: number, categoryId = "reported_catches") {
+  return getAchievementsForCategory(categoryId).filter((achievement) => value >= achievement.minValue);
 }
 
 export function getNewlyUnlockedAchievementByValue(
@@ -357,11 +338,7 @@ export function getResolvedAchievementsByValue(
     ...achievement,
     unlocked: value >= achievement.minValue,
     current: current?.id === achievement.id,
-    progressLabel: formatAchievementRange(
-      achievement.minValue,
-      achievement.maxValue,
-      categoryId
-    ),
+    progressLabel: formatAchievementRange(achievement.minValue, achievement.maxValue, categoryId),
   }));
 }
 
@@ -393,10 +370,7 @@ export function formatAchievementRange(
   return `${minValue}–${maxValue} ${unit}`;
 }
 
-export function getRemainingToNextAchievement(
-  value: number,
-  categoryId = "reported_catches"
-) {
+export function getRemainingToNextAchievement(value: number, categoryId = "reported_catches") {
   const next = getNextAchievementByValue(value, categoryId);
 
   if (!next) {
@@ -424,7 +398,7 @@ export function getAchievementProgressValue(params: {
 }
 
 export function getAllUnlockedAchievements(params: { catchCount: number }) {
-  return [...getUnlockedAchievementsByValue(params.catchCount, "reported_catches")].sort(
-    (a, b) => b.sortOrder - a.sortOrder
-  );
+  return [
+    ...getUnlockedAchievementsByValue(params.catchCount, "reported_catches"),
+  ].sort((a, b) => b.sortOrder - a.sortOrder);
 }

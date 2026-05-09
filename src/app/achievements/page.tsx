@@ -14,6 +14,18 @@ import {
   getResolvedAchievementsByValue,
 } from "@/lib/achievements";
 
+function formatAchievementCategoryOptionLabel(category: {
+  label: string;
+  status: string;
+  comingSoonLabel?: string;
+}) {
+  if (category.status !== "coming_soon") {
+    return category.label;
+  }
+
+  return `${category.label} — ${category.comingSoonLabel ?? "Coming soon"}`;
+}
+
 function isPreviewAchievementCategory(categoryId: string) {
   return categoryId === "waters";
 }
@@ -256,9 +268,7 @@ export default function AchievementsPage() {
               >
                 {achievementCategories.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.status === "coming_soon"
-                      ? `${category.label} — Coming soon`
-                      : category.label}
+                    {formatAchievementCategoryOptionLabel(category)}
                   </option>
                 ))}
               </select>
