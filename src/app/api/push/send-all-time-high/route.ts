@@ -248,6 +248,7 @@ export async function POST(request: Request) {
     url: allTimeHighEvent.url,
     icon: "/header.png",
     badge: "/header.png",
+    appBadgeAction: "increment",
   });
   let sentCount = 0;
   let failedCount = 0;

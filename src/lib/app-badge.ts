@@ -1,53 +1,73 @@
-type BadgeNavigator = Navigator & {
-  setAppBadge?: (contents?: number) => Promise<void>;
-  clearAppBadge?: () => Promise<void>;
-};
+const CLEAR_NOTIFICATION_APP_BADGE_MESSAGE =
+  "GADDHANG_CLEAR_NOTIFICATION_APP_BADGE";
 
-function getBadgeNavigator() {
-  if (typeof navigator === "undefined") {
-    return null;
+declare global {
+  interface Navigator {
+    setAppBadge?: (contents?: number) => Promise<void>;
+    clearAppBadge?: () => Promise<void>;
   }
+}
 
-  return navigator as BadgeNavigator;
+function getSafeBadgeCount(count: number) {
+  return Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
 }
 
 export async function setAppBadgeCount(count: number) {
-  const badgeNavigator = getBadgeNavigator();
-
-  if (!badgeNavigator?.setAppBadge) {
+  if (typeof navigator === "undefined") {
     return;
   }
 
+  const safeCount = getSafeBadgeCount(count);
+
   try {
-    if (count > 0) {
-      await badgeNavigator.setAppBadge(count);
-    } else if (badgeNavigator.clearAppBadge) {
-      await badgeNavigator.clearAppBadge();
-    } else {
-      await badgeNavigator.setAppBadge(0);
+    if (safeCount > 0 && typeof navigator.setAppBadge === "function") {
+      await navigator.setAppBadge(safeCount);
+      return;
     }
+
+    await clearAppBadgeCount();
   } catch (error) {
-    console.warn("Could not update app badge.", error);
+    console.warn("Could not set app badge count.", error);
   }
 }
 
 export async function clearAppBadgeCount() {
-  const badgeNavigator = getBadgeNavigator();
-
-  if (!badgeNavigator) {
+  if (typeof navigator === "undefined") {
     return;
   }
 
   try {
-    if (badgeNavigator.clearAppBadge) {
-      await badgeNavigator.clearAppBadge();
+    if (typeof navigator.clearAppBadge === "function") {
+      await navigator.clearAppBadge();
       return;
     }
 
-    if (badgeNavigator.setAppBadge) {
-      await badgeNavigator.setAppBadge(0);
+    if (typeof navigator.setAppBadge === "function") {
+      await navigator.setAppBadge(0);
     }
   } catch (error) {
-    console.warn("Could not clear app badge.", error);
+    console.warn("Could not clear app badge count.", error);
   }
+}
+
+async function notifyServiceWorkerToClearAppBadge() {
+  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) {
+    return;
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const worker = registration.active ?? navigator.serviceWorker.controller;
+
+    worker?.postMessage({ type: CLEAR_NOTIFICATION_APP_BADGE_MESSAGE });
+  } catch (error) {
+    console.warn("Could not notify service worker to clear app badge.", error);
+  }
+}
+
+export async function clearNotificationAppBadge() {
+  await Promise.all([
+    clearAppBadgeCount(),
+    notifyServiceWorkerToClearAppBadge(),
+  ]);
 }

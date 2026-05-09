@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Analytics } from "@vercel/analytics/react";
 import Header from "@/components/Header";
 import AppProviders from "@/components/providers/AppProviders";
+import AppBadgeResetter from "@/components/pwa/AppBadgeResetter";
 
 type RootAppShellProps = {
   children: ReactNode;
@@ -55,7 +56,7 @@ export default function RootAppShell({ children }: RootAppShellProps) {
 
       <div className="relative z-10">
         <AppProviders>
-          {renderSfvofShell ? children : <><Header />{children}</>}
+          {renderSfvofShell ? children : <><AppBadgeResetter /><Header />{children}</>}
         </AppProviders>
       </div>
 
