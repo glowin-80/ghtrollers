@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthMember } from "@/hooks/useAuthMember";
+import { useAdminPendingMemberBadge } from "@/hooks/useAdminPendingMemberBadge";
 import {
   getMobileCardTheme,
   mobileMenuItems,
@@ -22,7 +23,10 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const { isLoggedIn, profileImageUrl } = useAuthMember();
+  const { isLoggedIn, isAdmin, profileImageUrl } = useAuthMember();
+  const { count: pendingMemberBadgeCount } = useAdminPendingMemberBadge({
+    enabled: isAdmin,
+  });
 
   const [activeSection, setActiveSection] = useState("leaderboard");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -180,6 +184,7 @@ export default function Header() {
                   })
                 }
                 imageUrl={isLoggedIn ? profileImageUrl : null}
+                badgeCount={isAdmin ? pendingMemberBadgeCount : 0}
               />
             </div>
 
