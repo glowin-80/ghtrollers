@@ -6,6 +6,7 @@ import { fetchActiveAchievementMembers, type AchievementMemberSummary } from "@/
 import {
   achievementCategories,
   getAchievementCategory,
+  getAchievementProgressValue,
   getCurrentAchievementByValue,
 } from "@/lib/achievements";
 
@@ -17,8 +18,18 @@ type RankedAchievementMember = AchievementMemberSummary & {
   categoryValue: number;
 };
 
+function isPreviewCategory(categoryId: string) {
+  return categoryId === "waters";
+}
+
+function shouldShowMemberOverview(categoryId: string, status: string) {
+  return status === "active" || isPreviewCategory(categoryId);
+}
+
 function formatCategoryValue(categoryId: string, value: number) {
   switch (categoryId) {
+    case "waters":
+      return value === 1 ? "1 vatten" : `${value} vatten`;
     case "reported_catches":
       return `${value} fångster`;
     default:
@@ -54,7 +65,12 @@ export default function GaddhangAchievementsPage() {
         setLoading(true);
         setError(null);
 
-        if (selectedCategory.status === "coming_soon") {
+        const showMemberOverview = shouldShowMemberOverview(
+          selectedCategoryId,
+          selectedCategory.status
+        );
+
+        if (!showMemberOverview) {
           if (!mounted) return;
           setMembers([]);
           setExpandedMemberId(null);
@@ -68,15 +84,11 @@ export default function GaddhangAchievementsPage() {
 
         const rankedMembers: RankedAchievementMember[] = resolvedMembers
           .map((member: AchievementMemberSummary) => {
-            let categoryValue = 0;
-
-            switch (selectedCategoryId) {
-              case "reported_catches":
-                categoryValue = member.catchCount ?? 0;
-                break;
-              default:
-                categoryValue = 0;
-            }
+            const categoryValue = getAchievementProgressValue({
+              categoryId: selectedCategoryId,
+              catchCount: member.catchCount ?? 0,
+              uniqueWaterCount: member.uniqueWaterCount ?? 0,
+            });
 
             const achievement = getCurrentAchievementByValue(
               categoryValue,
@@ -86,11 +98,13 @@ export default function GaddhangAchievementsPage() {
             return {
               ...member,
               categoryValue,
-              achievementTitle: achievement?.title ?? "Fiskesugen",
-              achievementDescription: achievement?.description ?? "",
+              achievementTitle: achievement?.title ?? "Ingen nivå ännu",
+              achievementDescription:
+                achievement?.description ??
+                "När medlemmen börjar samla framsteg i kategorin visas nivån här.",
               achievementImageSrc:
-                achievement?.imageSrc ?? "/Achievments/catch/catchBadge_1.png",
-              achievementSortOrder: achievement?.sortOrder ?? 1,
+                achievement?.imageSrc ?? "/Achievments/catch/catchBadge_0.svg",
+              achievementSortOrder: achievement?.sortOrder ?? 0,
             };
           })
           .sort((a, b) => {
@@ -293,7 +307,7 @@ export default function GaddhangAchievementsPage() {
           ) : null}
         </section>
 
-        {selectedCategory.status === "coming_soon" ? (
+        {!shouldShowMemberOverview(selectedCategoryId, selectedCategory.status) ? (
           <section className="rounded-[30px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-6">
             <div className="rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#fbfaf7] px-5 py-10 text-center">
               <div className="text-[1.1rem] font-bold text-[#1f2937]">

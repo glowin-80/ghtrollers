@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { fetchCurrentMemberProfile, fetchMemberCatchesForMember } from "@/lib/member-service";
+import { fetchCurrentMemberProfile, fetchMemberCatchesForMember, getUniqueWaterCount } from "@/lib/member-service";
 import {
   achievementCategories,
   formatAchievementRange,
   getAchievementCategory,
+  getAchievementProgressValue,
   getAllUnlockedAchievements,
   getCurrentAchievementByValue,
   getRemainingToNextAchievement,
@@ -57,6 +58,7 @@ export default function AchievementsPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState("reported_catches");
   const [memberName, setMemberName] = useState<string | null>(null);
   const [catchCount, setCatchCount] = useState(0);
+  const [uniqueWaterCount, setUniqueWaterCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,6 +78,7 @@ export default function AchievementsPage() {
 
         if (!member) {
           setCatchCount(0);
+          setUniqueWaterCount(0);
           setLoading(false);
           return;
         }
@@ -85,6 +88,7 @@ export default function AchievementsPage() {
         if (!mounted) return;
 
         setCatchCount(catches.length);
+        setUniqueWaterCount(getUniqueWaterCount(catches));
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -104,24 +108,34 @@ export default function AchievementsPage() {
   const selectedCategory =
     getAchievementCategory(selectedCategoryId) ?? achievementCategories[0];
 
+  const selectedCategoryValue = useMemo(
+    () =>
+      getAchievementProgressValue({
+        categoryId: selectedCategoryId,
+        catchCount,
+        uniqueWaterCount,
+      }),
+    [catchCount, selectedCategoryId, uniqueWaterCount]
+  );
+
   const myUnlockedAchievements = useMemo(
     () => getAllUnlockedAchievements({ catchCount }),
     [catchCount]
   );
 
   const resolvedAchievements = useMemo(
-    () => getResolvedAchievementsByValue(catchCount, selectedCategoryId),
-    [catchCount, selectedCategoryId]
+    () => getResolvedAchievementsByValue(selectedCategoryValue, selectedCategoryId),
+    [selectedCategoryValue, selectedCategoryId]
   );
 
   const remainingToNext = useMemo(
-    () => getRemainingToNextAchievement(catchCount, selectedCategoryId),
-    [catchCount, selectedCategoryId]
+    () => getRemainingToNextAchievement(selectedCategoryValue, selectedCategoryId),
+    [selectedCategoryValue, selectedCategoryId]
   );
 
   const currentAchievement = useMemo(
-    () => getCurrentAchievementByValue(catchCount, selectedCategoryId),
-    [catchCount, selectedCategoryId]
+    () => getCurrentAchievementByValue(selectedCategoryValue, selectedCategoryId),
+    [selectedCategoryValue, selectedCategoryId]
   );
 
   return (
@@ -257,7 +271,7 @@ export default function AchievementsPage() {
                   : currentAchievement?.description ?? "När du börjar samla framsteg visas din nivå här."}
               </p>
               <div className="mt-4 text-sm font-semibold text-[#374151]">
-                {selectedCategory.label}: {catchCount}
+                {selectedCategory.label}: {selectedCategoryValue}
               </div>
               {remainingToNext ? (
                 <div className="mt-2 text-sm text-[#6b7280]">
@@ -310,7 +324,8 @@ export default function AchievementsPage() {
                     <span className="rounded-full bg-white px-3 py-1 font-semibold text-[#374151]">
                       {formatAchievementRange(
                         achievement.minValue,
-                        achievement.maxValue
+                        achievement.maxValue,
+                        selectedCategoryId
                       )}
                     </span>
 
