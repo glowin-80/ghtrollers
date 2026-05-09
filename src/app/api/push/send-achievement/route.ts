@@ -55,6 +55,7 @@ function buildNotificationPayload(params: {
     url: "/achievements",
     icon: "/header.png",
     badge: "/header.png",
+    appBadgeAction: "increment",
   };
 }
 

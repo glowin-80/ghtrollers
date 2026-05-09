@@ -85,6 +85,7 @@ function buildNotificationPayload(catchItem: ApprovedCatchNotificationSource) {
     url: `/fangst/${catchItem.id}`,
     icon: "/header.png",
     badge: "/header.png",
+    appBadgeAction: "increment",
   };
 }
 
