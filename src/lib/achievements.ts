@@ -43,7 +43,7 @@ export const achievementCategories: AchievementCategory[] = [
     label: "Fiskade vatten",
     status: "coming_soon",
     description:
-      "Här räknas hur många olika vatten du har fångster från. Samma sjö räknas bara en gång, även om du rapporterat flera fångster där. Kategorien visas som förhandsvisning tills märken och notiser aktiveras.",
+      "Här räknas hur många olika vatten du har fångster från. Samma sjö räknas bara en gång, även om du rapporterat flera fångster där. Endast fångster med GPS-hämtad eller kartvald plats räknas; fångster med fritextplats räknas inte. Kategorien visas som förhandsvisning tills märken och notiser aktiveras.",
   },
   {
     id: "species",
