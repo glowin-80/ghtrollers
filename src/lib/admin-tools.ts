@@ -37,6 +37,17 @@ export type PendingCatch = {
   compressed_image_size_bytes: number | null;
 };
 
+export async function fetchPendingMembersCount() {
+  const { count, error } = await supabase
+    .from("members")
+    .select("id", { count: "exact", head: true })
+    .eq("is_active", false)
+    .eq("is_admin", false);
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
 export async function fetchPendingMembers() {
   const { data, error } = await supabase
     .from("members")

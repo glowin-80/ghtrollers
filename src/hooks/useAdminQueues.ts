@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { approvePendingCatch, approvePendingMember, deletePendingCatch, deletePendingMember, fetchPendingCatches, fetchPendingMembers, makePendingMemberAdmin, type PendingCatch, type PendingMember } from "@/lib/admin-tools";
+import { dispatchAdminPendingMemberBadgeUpdated } from "@/lib/admin-pending-member-badge-events";
 import { approvePendingFishingSpot, approvePendingFishingSpotEdit, deletePendingFishingSpot, fetchPendingFishingSpots, rejectPendingFishingSpotEdit, type PendingFishingSpot } from "@/lib/fishing-spots";
 
 export function useAdminQueues(adminMemberId: string | null, isSuperAdmin = false) {
@@ -14,6 +15,10 @@ export function useAdminQueues(adminMemberId: string | null, isSuperAdmin = fals
   const pendingMembersCount = useMemo(() => pendingMembers.length, [pendingMembers]);
   const pendingCatchesCount = useMemo(() => pendingCatches.length, [pendingCatches]);
   const pendingFishingSpotsCount = useMemo(() => pendingFishingSpots.length, [pendingFishingSpots]);
+
+  useEffect(() => {
+    dispatchAdminPendingMemberBadgeUpdated(pendingMembersCount);
+  }, [pendingMembersCount]);
 
   const loadPendingMembers = useCallback(async () => { try { setLoadingMembers(true); setError(null); setPendingMembers(await fetchPendingMembers()); } catch (err) { console.error(err); setError("Kunde inte ladda väntande medlemsansökningar."); } finally { setLoadingMembers(false); } }, []);
   const loadPendingCatches = useCallback(async () => { try { setLoadingCatches(true); setError(null); setPendingCatches(await fetchPendingCatches()); } catch (err) { console.error(err); setError("Kunde inte ladda väntande fångster."); } finally { setLoadingCatches(false); } }, []);
