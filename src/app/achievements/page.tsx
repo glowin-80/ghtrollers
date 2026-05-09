@@ -14,11 +14,18 @@ import {
   getResolvedAchievementsByValue,
 } from "@/lib/achievements";
 
-function LockedAchievementBadge() {
+function isPreviewAchievementCategory(categoryId: string) {
+  return categoryId === "waters";
+}
+
+function LockedAchievementBadge({ unlocked = false }: { unlocked?: boolean }) {
   return (
     <div
-      aria-label="Låst achievement"
-      className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#c7b584] bg-[radial-gradient(circle_at_35%_28%,#f8f2df_0%,#d8c38a_24%,#786b52_48%,#202833_100%)] shadow-[0_6px_14px_rgba(18,35,28,0.14),inset_0_1px_0_rgba(255,255,255,0.42)]"
+      aria-label={unlocked ? "Achievement upplåst" : "Låst achievement"}
+      className={[
+        "relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#c7b584] bg-[radial-gradient(circle_at_35%_28%,#f8f2df_0%,#d8c38a_24%,#786b52_48%,#202833_100%)] shadow-[0_6px_14px_rgba(18,35,28,0.14),inset_0_1px_0_rgba(255,255,255,0.42)]",
+        unlocked ? "opacity-100 ring-2 ring-[#324b2f]/25" : "opacity-60",
+      ].join(" ")}
     >
       <div className="absolute inset-[6px] rounded-full border border-white/25 bg-black/35" />
       <div className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[#d8c38a]/75 bg-[#202833]/90 text-[18px] font-black text-[#f5e6b8] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
@@ -31,27 +38,8 @@ function LockedAchievementBadge() {
   );
 }
 
-function AchievementBadgeImage({
-  imageSrc,
-  title,
-  unlocked,
-}: {
-  imageSrc: string;
-  title: string;
-  unlocked: boolean;
-}) {
-  if (!unlocked) {
-    return <LockedAchievementBadge />;
-  }
-
-  return (
-    <img
-      src={imageSrc}
-      alt={title}
-      className="h-16 w-16 shrink-0 object-contain"
-      loading="lazy"
-    />
-  );
+function AchievementBadgeImage({ unlocked }: { unlocked: boolean }) {
+  return <LockedAchievementBadge unlocked={unlocked} />;
 }
 
 export default function AchievementsPage() {
@@ -138,6 +126,9 @@ export default function AchievementsPage() {
     [selectedCategoryValue, selectedCategoryId]
   );
 
+  const shouldShowAchievementCards =
+    selectedCategory.status === "active" || isPreviewAchievementCategory(selectedCategoryId);
+
   return (
     <main className="px-4 pb-8 pt-4">
       <div className="mx-auto max-w-5xl space-y-4">
@@ -187,12 +178,7 @@ export default function AchievementsPage() {
                   key={achievement.id}
                   className="flex items-center gap-4 rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-4 py-4"
                 >
-                  <img
-                    src={achievement.imageSrc}
-                    alt={achievement.title}
-                    className="h-16 w-16 shrink-0 object-contain"
-                    loading="lazy"
-                  />
+                  <LockedAchievementBadge unlocked />
                   <div className="min-w-0">
                     <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
                       {getAchievementCategory(achievement.categoryId)?.label ??
@@ -285,12 +271,13 @@ export default function AchievementsPage() {
 
           {selectedCategory.status === "coming_soon" ? (
             <div className="mt-4 rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#fcfbf8] px-5 py-5 text-sm leading-7 text-[#6b7280]">
-              Den här achievement-kategorin kommer i ett senare steg. När den
-              blir live kommer dina framsteg att visas här.
+              {isPreviewAchievementCategory(selectedCategoryId)
+                ? "Förhandsvisning: nivåerna visas och räknas, men kategorin triggar inga upplåsta märken eller push-notiser ännu."
+                : "Den här achievement-kategorin kommer i ett senare steg. När den blir live kommer dina framsteg att visas här."}
             </div>
           ) : null}
 
-          {selectedCategory.status === "active" ? (
+          {shouldShowAchievementCards ? (
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {resolvedAchievements.map((achievement) => (
                 <div
@@ -301,11 +288,7 @@ export default function AchievementsPage() {
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-4">
-                    <AchievementBadgeImage
-                      imageSrc={achievement.imageSrc}
-                      title={achievement.title}
-                      unlocked={achievement.unlocked}
-                    />
+                    <AchievementBadgeImage unlocked={achievement.unlocked} />
                     <div className="min-w-0">
                       <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
                         {achievement.current ? "Nuvarande nivå" : "Achievement"}
