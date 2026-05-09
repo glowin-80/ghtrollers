@@ -34,18 +34,18 @@ export const achievementCategories: AchievementCategory[] = [
       "En helt egen kategori för lite humor, progression och viljan att rapportera fler fångster — även när de inte avgör tävlingen.",
   },
   {
-    id: "fishing_spots",
-    label: "Registrerade fiskeplatser",
-    status: "coming_soon",
-    description: "Kommer snart.",
-  },
-  {
     id: "waters",
     label: "Fiskade vatten",
     status: "coming_soon",
     comingSoonLabel: "Soon there!!",
     description:
-      "Här räknas hur många olika vatten du har fångster från. Samma sjö räknas bara en gång, även om du rapporterat flera fångster där. Kategorien visas som förhandsvisning tills märken och notiser aktiveras.",
+      "Här räknas hur många olika vatten du har fångster från. Samma sjö räknas bara en gång, även om du rapporterat flera fångster där. Endast fångster med GPS-hämtad eller kartvald plats räknas; fångster med fritextplats räknas inte. Kategorien visas som förhandsvisning tills märken och notiser aktiveras.",
+  },
+  {
+    id: "fishing_spots",
+    label: "Registrerade fiskeplatser",
+    status: "coming_soon",
+    description: "Kommer snart.",
   },
   {
     id: "species",
