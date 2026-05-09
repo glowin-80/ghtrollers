@@ -249,7 +249,7 @@ export const waterAchievements: AchievementDefinition[] = [
   {
     id: "water_08",
     categoryId: "waters",
-    title: "Gäddhängs upptäckare",
+    title: "Gäddhängsnavigator",
     description: "Du har sett mer vatten än de flesta ens hinner prata om. Det här är ren upptäckarglädje.",
     minValue: 50,
     maxValue: null,
