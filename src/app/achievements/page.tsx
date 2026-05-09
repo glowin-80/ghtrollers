@@ -38,8 +38,33 @@ function LockedAchievementBadge({ unlocked = false }: { unlocked?: boolean }) {
   );
 }
 
-function AchievementBadgeImage({ unlocked }: { unlocked: boolean }) {
-  return <LockedAchievementBadge unlocked={unlocked} />;
+function AchievementBadgeImage({
+  categoryId,
+  imageSrc,
+  title,
+  unlocked,
+}: {
+  categoryId: string;
+  imageSrc: string;
+  title: string;
+  unlocked: boolean;
+}) {
+  if (categoryId === "waters") {
+    return <LockedAchievementBadge unlocked={unlocked} />;
+  }
+
+  if (!unlocked) {
+    return <LockedAchievementBadge />;
+  }
+
+  return (
+    <img
+      src={imageSrc}
+      alt={title}
+      className="h-16 w-16 shrink-0 object-contain"
+      loading="lazy"
+    />
+  );
 }
 
 export default function AchievementsPage() {
@@ -178,7 +203,16 @@ export default function AchievementsPage() {
                   key={achievement.id}
                   className="flex items-center gap-4 rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-4 py-4"
                 >
-                  <LockedAchievementBadge unlocked />
+                  {achievement.categoryId === "waters" ? (
+                    <LockedAchievementBadge unlocked />
+                  ) : (
+                    <img
+                      src={achievement.imageSrc}
+                      alt={achievement.title}
+                      className="h-16 w-16 shrink-0 object-contain"
+                      loading="lazy"
+                    />
+                  )}
                   <div className="min-w-0">
                     <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
                       {getAchievementCategory(achievement.categoryId)?.label ??
@@ -288,7 +322,12 @@ export default function AchievementsPage() {
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-4">
-                    <AchievementBadgeImage unlocked={achievement.unlocked} />
+                    <AchievementBadgeImage
+                      categoryId={selectedCategory.id}
+                      imageSrc={achievement.imageSrc}
+                      title={achievement.title}
+                      unlocked={achievement.unlocked}
+                    />
                     <div className="min-w-0">
                       <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
                         {achievement.current ? "Nuvarande nivå" : "Achievement"}

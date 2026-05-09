@@ -355,6 +355,10 @@ export function formatAchievementRange(
     return `${minValue}+ ${unit}`;
   }
 
+  if (minValue === maxValue) {
+    return `${minValue} ${unit}`;
+  }
+
   return `${minValue}–${maxValue} ${unit}`;
 }
 

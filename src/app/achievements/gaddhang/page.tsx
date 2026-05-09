@@ -48,6 +48,34 @@ function LockedAchievementBadge({ size = "md" }: { size?: "sm" | "md" | "lg" }) 
   );
 }
 
+function AchievementBadgeVisual({
+  categoryId,
+  imageSrc,
+  title,
+  size = "md",
+}: {
+  categoryId: string;
+  imageSrc: string;
+  title: string;
+  size?: "sm" | "md" | "lg";
+}) {
+  if (categoryId === "waters") {
+    return <LockedAchievementBadge size={size} />;
+  }
+
+  const sizeClass =
+    size === "lg" ? "h-20 w-20" : size === "sm" ? "h-14 w-14" : "h-16 w-16";
+
+  return (
+    <img
+      src={imageSrc}
+      alt={title}
+      className={["shrink-0 object-contain", sizeClass].join(" ")}
+      loading="lazy"
+    />
+  );
+}
+
 function isPreviewCategory(categoryId: string) {
   return categoryId === "waters";
 }
@@ -268,7 +296,12 @@ export default function GaddhangAchievementsPage() {
               </div>
               {topMember ? (
                 <div className="mt-3 flex items-center gap-3">
-                  <LockedAchievementBadge size="sm" />
+                  <AchievementBadgeVisual
+                    categoryId={selectedCategoryId}
+                    imageSrc={topMember.achievementImageSrc}
+                    title={topMember.achievementTitle}
+                    size="sm"
+                  />
                   <div className="min-w-0">
                     <div className="text-[1rem] font-bold text-[#1f2937]">
                       {topMember.achievementTitle}
@@ -416,7 +449,12 @@ export default function GaddhangAchievementsPage() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <LockedAchievementBadge size="sm" />
+                          <AchievementBadgeVisual
+                            categoryId={selectedCategoryId}
+                            imageSrc={member.achievementImageSrc}
+                            title={member.achievementTitle}
+                            size="sm"
+                          />
                           <span className="hidden rounded-full border border-[#d8d2c7] bg-white px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#6b7280] sm:inline-flex">
                             {isExpanded ? "Dölj" : "Visa mer"}
                           </span>
@@ -426,7 +464,12 @@ export default function GaddhangAchievementsPage() {
                       {isExpanded ? (
                         <div className="border-t border-[#efe7d7] bg-white/70 px-5 py-4">
                           <div className="flex items-start gap-4">
-                            <LockedAchievementBadge size="lg" />
+                            <AchievementBadgeVisual
+                              categoryId={selectedCategoryId}
+                              imageSrc={member.achievementImageSrc}
+                              title={member.achievementTitle}
+                              size="lg"
+                            />
 
                             <div className="min-w-0">
                               <div className="text-[1rem] font-bold text-[#1f2937]">
