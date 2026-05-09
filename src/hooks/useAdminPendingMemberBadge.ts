@@ -1,8 +1,9 @@
+// src/hooks/useAdminPendingMemberBadge.ts
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { clearAppBadgeCount, setAppBadgeCount } from "@/lib/app-badge";
+import { setAppBadgeCount } from "@/lib/app-badge";
 import {
   ADMIN_PENDING_MEMBER_BADGE_UPDATED_EVENT,
   type AdminPendingMemberBadgeUpdatedDetail,
@@ -11,6 +12,7 @@ import type { MemberProfile } from "@/types/member-page";
 
 export function useAdminPendingMemberBadge(member: MemberProfile | null) {
   const [pendingMemberCount, setPendingMemberCount] = useState(0);
+  const lastAppliedAppBadgeCountRef = useRef<number | null>(null);
   const isAdmin = Boolean(
     member?.is_active && (member.is_admin || member.is_super_admin)
   );
@@ -20,11 +22,11 @@ export function useAdminPendingMemberBadge(member: MemberProfile | null) {
       const safeCount = Math.max(0, count);
       setPendingMemberCount(safeCount);
 
-      if (!isAdmin) {
-        void clearAppBadgeCount();
+      if (!isAdmin || lastAppliedAppBadgeCountRef.current === safeCount) {
         return;
       }
 
+      lastAppliedAppBadgeCountRef.current = safeCount;
       void setAppBadgeCount(safeCount);
     },
     [isAdmin]
@@ -33,6 +35,7 @@ export function useAdminPendingMemberBadge(member: MemberProfile | null) {
   const refreshPendingMemberCount = useCallback(async () => {
     if (!isAdmin) {
       applyBadgeCount(0);
+      lastAppliedAppBadgeCountRef.current = null;
       return;
     }
 
