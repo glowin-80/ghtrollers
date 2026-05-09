@@ -2,23 +2,6 @@ function getFallbackIcon() {
   return "★";
 }
 
-function NotificationBadge({ count }: { count?: number }) {
-  if (!count || count <= 0) {
-    return null;
-  }
-
-  const label = count > 99 ? "99+" : String(count);
-
-  return (
-    <span
-      className="absolute -right-1 -top-2 z-20 flex min-h-[22px] min-w-[22px] items-center justify-center rounded-full border-2 border-white bg-red-600 px-1.5 text-[11px] font-extrabold leading-none text-white shadow-[0_3px_8px_rgba(0,0,0,0.28)]"
-      aria-label={`${label} väntande medlemsansökningar`}
-    >
-      {label}
-    </span>
-  );
-}
-
 export function TopBubble({ imageUrl, alt }: { imageUrl?: string | null; alt: string }) {
   if (imageUrl) {
     return (
@@ -71,8 +54,12 @@ export function MobileTopButton({
       onClick={onClick}
       className="relative flex h-[52px] w-full items-center overflow-visible rounded-full border border-[#bfa76a] bg-[linear-gradient(180deg,#2b4c20_0%,#183417_100%)] pr-[12px] pl-[64px] shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition-transform duration-200 active:scale-[0.99]"
     >
-      <NotificationBadge count={badgeCount} />
       <TopBubble imageUrl={imageUrl} alt={label} />
+      {badgeCount > 0 ? (
+        <span className="absolute -right-1 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full border-2 border-white bg-red-600 px-1.5 text-[12px] font-black leading-none text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)]">
+          {badgeCount > 99 ? "99+" : badgeCount}
+        </span>
+      ) : null}
       <span className="truncate text-[15px] font-semibold uppercase tracking-[0.04em] text-[#ead8ab]">{label}</span>
       {showArrow ? (
         <span
@@ -97,6 +84,7 @@ export function ThemedNavButton({
   themeArrow,
   isActive = false,
   compact = false,
+  badgeCount = 0,
 }: {
   label: string;
   onClick: () => void;
@@ -105,6 +93,7 @@ export function ThemedNavButton({
   themeArrow: string;
   isActive?: boolean;
   compact?: boolean;
+  badgeCount?: number;
 }) {
   return (
     <button
@@ -120,6 +109,11 @@ export function ThemedNavButton({
       ].join(" ")}
     >
       <div className="pointer-events-none absolute inset-[1px] rounded-full border border-white/10" />
+      {badgeCount > 0 ? (
+        <span className="absolute -right-1 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full border-2 border-white bg-red-600 px-1.5 text-[12px] font-black leading-none text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)]">
+          {badgeCount > 99 ? "99+" : badgeCount}
+        </span>
+      ) : null}
       <SmallMenuBubble className={themeIconCircle} />
       <div className="min-w-0 flex-1 pr-[4px]">
         <div
