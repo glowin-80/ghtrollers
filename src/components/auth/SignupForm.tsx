@@ -4,6 +4,14 @@ import Link from "next/link";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
+async function triggerAdminPendingMemberBadgePush() {
+  try {
+    await fetch("/api/push/send-admin-pending-member", { method: "POST" });
+  } catch (error) {
+    console.warn("Could not trigger admin pending member badge push.", error);
+  }
+}
+
 export default function SignupForm() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("junior");
@@ -60,6 +68,8 @@ export default function SignupForm() {
       setLoading(false);
       return;
     }
+
+    await triggerAdminPendingMemberBadgePush();
 
     setSuccess(
       "Vi har skickat ett verifieringsmail till din e-post. Bekräfta din adress först. Därefter kan du logga in och invänta att medlemskapet granskas."

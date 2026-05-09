@@ -23,10 +23,8 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const { isLoggedIn, isAdmin, profileImageUrl } = useAuthMember();
-  const { count: pendingMemberBadgeCount } = useAdminPendingMemberBadge({
-    enabled: isAdmin,
-  });
+  const { isLoggedIn, member, profileImageUrl } = useAuthMember();
+  const { pendingMemberCount } = useAdminPendingMemberBadge(member);
 
   const [activeSection, setActiveSection] = useState("leaderboard");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -137,6 +135,7 @@ export default function Header() {
         themeArrow={theme.arrow}
         isActive={isActive}
         compact
+        badgeCount={item.href === "/min-sida" ? pendingMemberCount : 0}
       />
     );
   }
@@ -184,7 +183,7 @@ export default function Header() {
                   })
                 }
                 imageUrl={isLoggedIn ? profileImageUrl : null}
-                badgeCount={isAdmin ? pendingMemberBadgeCount : 0}
+                badgeCount={pendingMemberCount}
               />
             </div>
 

@@ -16,6 +16,21 @@ self.addEventListener("push", (event) => {
     }
   }
 
+  const appBadgeCount =
+    typeof payload.appBadgeCount === "number" && Number.isFinite(payload.appBadgeCount)
+      ? Math.max(0, Math.floor(payload.appBadgeCount))
+      : null;
+
+  const badgePromise =
+    appBadgeCount !== null && typeof self.registration.setAppBadge === "function"
+      ? self.registration.setAppBadge(appBadgeCount)
+      : Promise.resolve();
+
+  if (payload.suppressNotification) {
+    event.waitUntil(badgePromise);
+    return;
+  }
+
   const title = payload.title || "Gäddhäng Trollers";
   const options = {
     body: payload.body || "Du har en ny notis från Gäddhäng Trollers.",
@@ -26,7 +41,7 @@ self.addEventListener("push", (event) => {
     },
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(Promise.all([badgePromise, self.registration.showNotification(title, options)]));
 });
 
 self.addEventListener("notificationclick", (event) => {

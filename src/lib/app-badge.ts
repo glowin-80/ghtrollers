@@ -11,37 +11,43 @@ function getBadgeNavigator() {
   return navigator as BadgeNavigator;
 }
 
-export async function setPwaAppBadge(count: number) {
+export async function setAppBadgeCount(count: number) {
   const badgeNavigator = getBadgeNavigator();
 
   if (!badgeNavigator?.setAppBadge) {
     return;
   }
 
-  const safeCount = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
-
   try {
-    if (safeCount > 0) {
-      await badgeNavigator.setAppBadge(safeCount);
-      return;
+    if (count > 0) {
+      await badgeNavigator.setAppBadge(count);
+    } else if (badgeNavigator.clearAppBadge) {
+      await badgeNavigator.clearAppBadge();
+    } else {
+      await badgeNavigator.setAppBadge(0);
     }
-
-    await clearPwaAppBadge();
   } catch (error) {
-    console.warn("Could not set PWA app badge.", error);
+    console.warn("Could not update app badge.", error);
   }
 }
 
-export async function clearPwaAppBadge() {
+export async function clearAppBadgeCount() {
   const badgeNavigator = getBadgeNavigator();
 
-  if (!badgeNavigator?.clearAppBadge) {
+  if (!badgeNavigator) {
     return;
   }
 
   try {
-    await badgeNavigator.clearAppBadge();
+    if (badgeNavigator.clearAppBadge) {
+      await badgeNavigator.clearAppBadge();
+      return;
+    }
+
+    if (badgeNavigator.setAppBadge) {
+      await badgeNavigator.setAppBadge(0);
+    }
   } catch (error) {
-    console.warn("Could not clear PWA app badge.", error);
+    console.warn("Could not clear app badge.", error);
   }
 }
