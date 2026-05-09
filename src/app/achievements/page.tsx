@@ -2,22 +2,42 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { fetchCurrentMemberProfile, fetchMemberCatchesForMember } from "@/lib/member-service";
+import { fetchCurrentMemberProfile, fetchMemberCatchesForMember, getUniqueWaterCount } from "@/lib/member-service";
 import {
   achievementCategories,
   formatAchievementRange,
   getAchievementCategory,
+  getAchievementProgressValue,
   getAllUnlockedAchievements,
   getCurrentAchievementByValue,
   getRemainingToNextAchievement,
   getResolvedAchievementsByValue,
 } from "@/lib/achievements";
 
-function LockedAchievementBadge() {
+function formatAchievementCategoryOptionLabel(category: {
+  label: string;
+  status: string;
+  comingSoonLabel?: string;
+}) {
+  if (category.status !== "coming_soon") {
+    return category.label;
+  }
+
+  return `${category.label} — ${category.comingSoonLabel ?? "Coming soon"}`;
+}
+
+function isPreviewAchievementCategory(categoryId: string) {
+  return categoryId === "waters";
+}
+
+function LockedAchievementBadge({ unlocked = false }: { unlocked?: boolean }) {
   return (
     <div
-      aria-label="Låst achievement"
-      className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#c7b584] bg-[radial-gradient(circle_at_35%_28%,#f8f2df_0%,#d8c38a_24%,#786b52_48%,#202833_100%)] shadow-[0_6px_14px_rgba(18,35,28,0.14),inset_0_1px_0_rgba(255,255,255,0.42)]"
+      aria-label={unlocked ? "Achievement upplåst" : "Låst achievement"}
+      className={[
+        "relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#c7b584] bg-[radial-gradient(circle_at_35%_28%,#f8f2df_0%,#d8c38a_24%,#786b52_48%,#202833_100%)] shadow-[0_6px_14px_rgba(18,35,28,0.14),inset_0_1px_0_rgba(255,255,255,0.42)]",
+        unlocked ? "opacity-100 ring-2 ring-[#324b2f]/25" : "opacity-60",
+      ].join(" ")}
     >
       <div className="absolute inset-[6px] rounded-full border border-white/25 bg-black/35" />
       <div className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[#d8c38a]/75 bg-[#202833]/90 text-[18px] font-black text-[#f5e6b8] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
@@ -31,14 +51,20 @@ function LockedAchievementBadge() {
 }
 
 function AchievementBadgeImage({
+  categoryId,
   imageSrc,
   title,
   unlocked,
 }: {
+  categoryId: string;
   imageSrc: string;
   title: string;
   unlocked: boolean;
 }) {
+  if (categoryId === "waters") {
+    return <LockedAchievementBadge unlocked={unlocked} />;
+  }
+
   if (!unlocked) {
     return <LockedAchievementBadge />;
   }
@@ -57,6 +83,7 @@ export default function AchievementsPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState("reported_catches");
   const [memberName, setMemberName] = useState<string | null>(null);
   const [catchCount, setCatchCount] = useState(0);
+  const [uniqueWaterCount, setUniqueWaterCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,6 +103,7 @@ export default function AchievementsPage() {
 
         if (!member) {
           setCatchCount(0);
+          setUniqueWaterCount(0);
           setLoading(false);
           return;
         }
@@ -85,6 +113,7 @@ export default function AchievementsPage() {
         if (!mounted) return;
 
         setCatchCount(catches.length);
+        setUniqueWaterCount(getUniqueWaterCount(catches));
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -104,25 +133,38 @@ export default function AchievementsPage() {
   const selectedCategory =
     getAchievementCategory(selectedCategoryId) ?? achievementCategories[0];
 
+  const selectedCategoryValue = useMemo(
+    () =>
+      getAchievementProgressValue({
+        categoryId: selectedCategoryId,
+        catchCount,
+        uniqueWaterCount,
+      }),
+    [catchCount, selectedCategoryId, uniqueWaterCount]
+  );
+
   const myUnlockedAchievements = useMemo(
     () => getAllUnlockedAchievements({ catchCount }),
     [catchCount]
   );
 
   const resolvedAchievements = useMemo(
-    () => getResolvedAchievementsByValue(catchCount, selectedCategoryId),
-    [catchCount, selectedCategoryId]
+    () => getResolvedAchievementsByValue(selectedCategoryValue, selectedCategoryId),
+    [selectedCategoryValue, selectedCategoryId]
   );
 
   const remainingToNext = useMemo(
-    () => getRemainingToNextAchievement(catchCount, selectedCategoryId),
-    [catchCount, selectedCategoryId]
+    () => getRemainingToNextAchievement(selectedCategoryValue, selectedCategoryId),
+    [selectedCategoryValue, selectedCategoryId]
   );
 
   const currentAchievement = useMemo(
-    () => getCurrentAchievementByValue(catchCount, selectedCategoryId),
-    [catchCount, selectedCategoryId]
+    () => getCurrentAchievementByValue(selectedCategoryValue, selectedCategoryId),
+    [selectedCategoryValue, selectedCategoryId]
   );
+
+  const shouldShowAchievementCards =
+    selectedCategory.status === "active" || isPreviewAchievementCategory(selectedCategoryId);
 
   return (
     <main className="px-4 pb-8 pt-4">
@@ -173,12 +215,16 @@ export default function AchievementsPage() {
                   key={achievement.id}
                   className="flex items-center gap-4 rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-4 py-4"
                 >
-                  <img
-                    src={achievement.imageSrc}
-                    alt={achievement.title}
-                    className="h-16 w-16 shrink-0 object-contain"
-                    loading="lazy"
-                  />
+                  {achievement.categoryId === "waters" ? (
+                    <LockedAchievementBadge unlocked />
+                  ) : (
+                    <img
+                      src={achievement.imageSrc}
+                      alt={achievement.title}
+                      className="h-16 w-16 shrink-0 object-contain"
+                      loading="lazy"
+                    />
+                  )}
                   <div className="min-w-0">
                     <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
                       {getAchievementCategory(achievement.categoryId)?.label ??
@@ -222,9 +268,7 @@ export default function AchievementsPage() {
               >
                 {achievementCategories.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.status === "coming_soon"
-                      ? `${category.label} — Coming soon`
-                      : category.label}
+                    {formatAchievementCategoryOptionLabel(category)}
                   </option>
                 ))}
               </select>
@@ -257,7 +301,7 @@ export default function AchievementsPage() {
                   : currentAchievement?.description ?? "När du börjar samla framsteg visas din nivå här."}
               </p>
               <div className="mt-4 text-sm font-semibold text-[#374151]">
-                {selectedCategory.label}: {catchCount}
+                {selectedCategory.label}: {selectedCategoryValue}
               </div>
               {remainingToNext ? (
                 <div className="mt-2 text-sm text-[#6b7280]">
@@ -271,12 +315,13 @@ export default function AchievementsPage() {
 
           {selectedCategory.status === "coming_soon" ? (
             <div className="mt-4 rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#fcfbf8] px-5 py-5 text-sm leading-7 text-[#6b7280]">
-              Den här achievement-kategorin kommer i ett senare steg. När den
-              blir live kommer dina framsteg att visas här.
+              {isPreviewAchievementCategory(selectedCategoryId)
+                ? "Förhandsvisning: nivåerna visas och räknas, men kategorin triggar inga upplåsta märken eller push-notiser ännu."
+                : "Den här achievement-kategorin kommer i ett senare steg. När den blir live kommer dina framsteg att visas här."}
             </div>
           ) : null}
 
-          {selectedCategory.status === "active" ? (
+          {shouldShowAchievementCards ? (
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {resolvedAchievements.map((achievement) => (
                 <div
@@ -288,6 +333,7 @@ export default function AchievementsPage() {
                 >
                   <div className="flex items-center gap-4">
                     <AchievementBadgeImage
+                      categoryId={selectedCategory.id}
                       imageSrc={achievement.imageSrc}
                       title={achievement.title}
                       unlocked={achievement.unlocked}
@@ -310,7 +356,8 @@ export default function AchievementsPage() {
                     <span className="rounded-full bg-white px-3 py-1 font-semibold text-[#374151]">
                       {formatAchievementRange(
                         achievement.minValue,
-                        achievement.maxValue
+                        achievement.maxValue,
+                        selectedCategoryId
                       )}
                     </span>
 

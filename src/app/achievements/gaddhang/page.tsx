@@ -6,8 +6,21 @@ import { fetchActiveAchievementMembers, type AchievementMemberSummary } from "@/
 import {
   achievementCategories,
   getAchievementCategory,
+  getAchievementProgressValue,
   getCurrentAchievementByValue,
 } from "@/lib/achievements";
+
+function formatAchievementCategoryOptionLabel(category: {
+  label: string;
+  status: string;
+  comingSoonLabel?: string;
+}) {
+  if (category.status !== "coming_soon") {
+    return category.label;
+  }
+
+  return `${category.label} — ${category.comingSoonLabel ?? "Coming soon"}`;
+}
 
 type RankedAchievementMember = AchievementMemberSummary & {
   achievementTitle: string;
@@ -17,8 +30,76 @@ type RankedAchievementMember = AchievementMemberSummary & {
   categoryValue: number;
 };
 
+
+function LockedAchievementBadge({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
+  const sizeClass =
+    size === "lg" ? "h-20 w-20" : size === "sm" ? "h-14 w-14" : "h-16 w-16";
+  const questionClass = size === "lg" ? "h-11 w-11 text-[20px]" : "h-8 w-8 text-[16px]";
+
+  return (
+    <div
+      aria-label="Achievement"
+      className={[
+        "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#c7b584] bg-[radial-gradient(circle_at_35%_28%,#f8f2df_0%,#d8c38a_24%,#786b52_48%,#202833_100%)] shadow-[0_6px_14px_rgba(18,35,28,0.14),inset_0_1px_0_rgba(255,255,255,0.42)] ring-2 ring-[#324b2f]/20",
+        sizeClass,
+      ].join(" ")}
+    >
+      <div className="absolute inset-[6px] rounded-full border border-white/25 bg-black/35" />
+      <div
+        className={[
+          "relative flex items-center justify-center rounded-full border border-[#d8c38a]/75 bg-[#202833]/90 font-black text-[#f5e6b8] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
+          questionClass,
+        ].join(" ")}
+      >
+        ?
+      </div>
+      <div className="absolute bottom-[5px] rounded-full bg-black/45 px-2 py-[1px] text-[8px] font-black uppercase tracking-[0.12em] text-[#f5e6b8]">
+        Låst
+      </div>
+    </div>
+  );
+}
+
+function AchievementBadgeVisual({
+  categoryId,
+  imageSrc,
+  title,
+  size = "md",
+}: {
+  categoryId: string;
+  imageSrc: string;
+  title: string;
+  size?: "sm" | "md" | "lg";
+}) {
+  if (categoryId === "waters") {
+    return <LockedAchievementBadge size={size} />;
+  }
+
+  const sizeClass =
+    size === "lg" ? "h-20 w-20" : size === "sm" ? "h-14 w-14" : "h-16 w-16";
+
+  return (
+    <img
+      src={imageSrc}
+      alt={title}
+      className={["shrink-0 object-contain", sizeClass].join(" ")}
+      loading="lazy"
+    />
+  );
+}
+
+function isPreviewCategory(categoryId: string) {
+  return categoryId === "waters";
+}
+
+function shouldShowMemberOverview(categoryId: string, status: string) {
+  return status === "active" || isPreviewCategory(categoryId);
+}
+
 function formatCategoryValue(categoryId: string, value: number) {
   switch (categoryId) {
+    case "waters":
+      return value === 1 ? "1 vatten" : `${value} vatten`;
     case "reported_catches":
       return `${value} fångster`;
     default:
@@ -54,7 +135,12 @@ export default function GaddhangAchievementsPage() {
         setLoading(true);
         setError(null);
 
-        if (selectedCategory.status === "coming_soon") {
+        const showMemberOverview = shouldShowMemberOverview(
+          selectedCategoryId,
+          selectedCategory.status
+        );
+
+        if (!showMemberOverview) {
           if (!mounted) return;
           setMembers([]);
           setExpandedMemberId(null);
@@ -68,15 +154,11 @@ export default function GaddhangAchievementsPage() {
 
         const rankedMembers: RankedAchievementMember[] = resolvedMembers
           .map((member: AchievementMemberSummary) => {
-            let categoryValue = 0;
-
-            switch (selectedCategoryId) {
-              case "reported_catches":
-                categoryValue = member.catchCount ?? 0;
-                break;
-              default:
-                categoryValue = 0;
-            }
+            const categoryValue = getAchievementProgressValue({
+              categoryId: selectedCategoryId,
+              catchCount: member.catchCount ?? 0,
+              uniqueWaterCount: member.uniqueWaterCount ?? 0,
+            });
 
             const achievement = getCurrentAchievementByValue(
               categoryValue,
@@ -86,11 +168,13 @@ export default function GaddhangAchievementsPage() {
             return {
               ...member,
               categoryValue,
-              achievementTitle: achievement?.title ?? "Fiskesugen",
-              achievementDescription: achievement?.description ?? "",
+              achievementTitle: achievement?.title ?? "Ingen nivå ännu",
+              achievementDescription:
+                achievement?.description ??
+                "När medlemmen börjar samla framsteg i kategorin visas nivån här.",
               achievementImageSrc:
-                achievement?.imageSrc ?? "/Achievments/catch/catchBadge_1.png",
-              achievementSortOrder: achievement?.sortOrder ?? 1,
+                achievement?.imageSrc ?? "/Achievments/catch/catchBadge_0.svg",
+              achievementSortOrder: achievement?.sortOrder ?? 0,
             };
           })
           .sort((a, b) => {
@@ -196,9 +280,7 @@ export default function GaddhangAchievementsPage() {
               >
                 {achievementCategories.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.status === "coming_soon"
-                      ? `${category.label} — Coming soon`
-                      : category.label}
+                    {formatAchievementCategoryOptionLabel(category)}
                   </option>
                 ))}
               </select>
@@ -224,11 +306,11 @@ export default function GaddhangAchievementsPage() {
               </div>
               {topMember ? (
                 <div className="mt-3 flex items-center gap-3">
-                  <img
-                    src={topMember.achievementImageSrc}
-                    alt={topMember.achievementTitle}
-                    className="h-14 w-14 shrink-0 object-contain"
-                    loading="lazy"
+                  <AchievementBadgeVisual
+                    categoryId={selectedCategoryId}
+                    imageSrc={topMember.achievementImageSrc}
+                    title={topMember.achievementTitle}
+                    size="sm"
                   />
                   <div className="min-w-0">
                     <div className="text-[1rem] font-bold text-[#1f2937]">
@@ -293,7 +375,7 @@ export default function GaddhangAchievementsPage() {
           ) : null}
         </section>
 
-        {selectedCategory.status === "coming_soon" ? (
+        {!shouldShowMemberOverview(selectedCategoryId, selectedCategory.status) ? (
           <section className="rounded-[30px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-6">
             <div className="rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#fbfaf7] px-5 py-10 text-center">
               <div className="text-[1.1rem] font-bold text-[#1f2937]">
@@ -377,11 +459,11 @@ export default function GaddhangAchievementsPage() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <img
-                            src={member.achievementImageSrc}
-                            alt={member.achievementTitle}
-                            className="h-14 w-14 shrink-0 object-contain"
-                            loading="lazy"
+                          <AchievementBadgeVisual
+                            categoryId={selectedCategoryId}
+                            imageSrc={member.achievementImageSrc}
+                            title={member.achievementTitle}
+                            size="sm"
                           />
                           <span className="hidden rounded-full border border-[#d8d2c7] bg-white px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#6b7280] sm:inline-flex">
                             {isExpanded ? "Dölj" : "Visa mer"}
@@ -392,11 +474,11 @@ export default function GaddhangAchievementsPage() {
                       {isExpanded ? (
                         <div className="border-t border-[#efe7d7] bg-white/70 px-5 py-4">
                           <div className="flex items-start gap-4">
-                            <img
-                              src={member.achievementImageSrc}
-                              alt={member.achievementTitle}
-                              className="h-20 w-20 shrink-0 object-contain"
-                              loading="lazy"
+                            <AchievementBadgeVisual
+                              categoryId={selectedCategoryId}
+                              imageSrc={member.achievementImageSrc}
+                              title={member.achievementTitle}
+                              size="lg"
                             />
 
                             <div className="min-w-0">
