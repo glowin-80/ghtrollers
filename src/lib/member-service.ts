@@ -1,11 +1,13 @@
 import { supabase } from "@/lib/supabase";
 import { getCurrentAuthMemberState } from "@/lib/auth-member";
+import { getApprovedPublicFishingSpotCount } from "@/lib/fishing-spot-achievements";
 import { catchMatchesMemberIdentity, dedupeCatchesById, getMemberIdentityCount } from "@/lib/catch-identity";
 import type { MemberCatch, MemberProfile } from "@/types/member-page";
 
 export type AchievementMemberSummary = MemberProfile & {
   catchCount: number;
   uniqueWaterCount: number;
+  fishingSpotCount: number;
 };
 
 const MEMBER_CATCHES_SELECT =
@@ -14,6 +16,7 @@ const MEMBER_CATCHES_SELECT =
 function normalizeWaterName(value: string) {
   return value.trim().replace(/\s+/g, " ").toLocaleLowerCase("sv-SE");
 }
+
 
 export function getUniqueWaterCount(catches: Pick<MemberCatch, "water_key" | "water_name">[]) {
   const uniqueWaters = new Set<string>();
@@ -115,11 +118,25 @@ export async function fetchActiveAchievementMembers(): Promise<AchievementMember
     throw catchesError;
   }
 
+  const { data: fishingSpots, error: fishingSpotsError } = await supabase
+    .from("fishing_spots")
+    .select("id, created_by_member_id, status, is_private")
+    .eq("status", "approved")
+    .or("is_private.is.false,is_private.is.null");
+
+  if (fishingSpotsError) {
+    throw fishingSpotsError;
+  }
+
   return ((members ?? []) as MemberProfile[]).map((member) => {
     const memberCatches = dedupeCatchesById(
       ((catches ?? []) as MemberCatch[]).filter((catchItem) =>
         catchMatchesMemberIdentity(catchItem, member)
       )
+    );
+
+    const memberFishingSpots = (fishingSpots ?? []).filter(
+      (spot) => spot.created_by_member_id === member.id
     );
 
     return {
@@ -132,6 +149,7 @@ export async function fetchActiveAchievementMembers(): Promise<AchievementMember
         member
       ),
       uniqueWaterCount: getUniqueWaterCount(memberCatches),
+      fishingSpotCount: getApprovedPublicFishingSpotCount(memberFishingSpots),
     };
   });
 }

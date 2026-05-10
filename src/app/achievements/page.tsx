@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { fetchCurrentMemberProfile, fetchMemberCatchesForMember, getUniqueWaterCount } from "@/lib/member-service";
+import {
+  fetchCurrentMemberProfile,
+  fetchMemberCatchesForMember,
+  getUniqueWaterCount,
+} from "@/lib/member-service";
+import { fetchOwnFishingSpots } from "@/lib/fishing-spots";
+import { getApprovedPublicFishingSpotCount } from "@/lib/fishing-spot-achievements";
 import {
   achievementCategories,
   formatAchievementRange,
@@ -85,6 +91,7 @@ export default function AchievementsPage() {
   const [memberName, setMemberName] = useState<string | null>(null);
   const [catchCount, setCatchCount] = useState(0);
   const [uniqueWaterCount, setUniqueWaterCount] = useState(0);
+  const [fishingSpotCount, setFishingSpotCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,16 +112,21 @@ export default function AchievementsPage() {
         if (!member) {
           setCatchCount(0);
           setUniqueWaterCount(0);
+          setFishingSpotCount(0);
           setLoading(false);
           return;
         }
 
-        const catches = await fetchMemberCatchesForMember(member);
+        const [catches, fishingSpots] = await Promise.all([
+          fetchMemberCatchesForMember(member),
+          fetchOwnFishingSpots(member.id),
+        ]);
 
         if (!mounted) return;
 
         setCatchCount(catches.length);
         setUniqueWaterCount(getUniqueWaterCount(catches));
+        setFishingSpotCount(getApprovedPublicFishingSpotCount(fishingSpots));
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -140,13 +152,14 @@ export default function AchievementsPage() {
         categoryId: selectedCategoryId,
         catchCount,
         uniqueWaterCount,
+        fishingSpotCount,
       }),
-    [catchCount, selectedCategoryId, uniqueWaterCount]
+    [catchCount, fishingSpotCount, selectedCategoryId, uniqueWaterCount]
   );
 
   const myUnlockedAchievements = useMemo(
-    () => getAllUnlockedAchievements({ catchCount, uniqueWaterCount }),
-    [catchCount, uniqueWaterCount]
+    () => getAllUnlockedAchievements({ catchCount, uniqueWaterCount, fishingSpotCount }),
+    [catchCount, fishingSpotCount, uniqueWaterCount]
   );
 
   const resolvedAchievements = useMemo(
