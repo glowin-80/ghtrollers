@@ -3,6 +3,7 @@
 import PendingMembersSection from "@/components/member/admin/PendingMembersSection";
 import PendingCatchesSection from "@/components/member/admin/PendingCatchesSection";
 import PendingFishingSpotsSection from "@/components/member/admin/PendingFishingSpotsSection";
+import BroadcastPushPanel from "@/components/member/super-admin/BroadcastPushPanel";
 import { useAuthMember } from "@/hooks/useAuthMember";
 import { useAdminQueues } from "@/hooks/useAdminQueues";
 
@@ -79,6 +80,8 @@ export default function AdminToolsCard() {
           Väntande fiskeplatser: <span className="font-bold">{pendingFishingSpotsCount}</span>
         </div>
       </div>
+
+      {isSuperAdmin ? <BroadcastPushPanel /> : null}
 
       <PendingMembersSection
         pendingMembers={pendingMembers}
