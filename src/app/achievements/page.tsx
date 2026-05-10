@@ -26,10 +26,6 @@ function formatAchievementCategoryOptionLabel(category: {
   return `${category.label} — ${category.comingSoonLabel ?? "Coming soon"}`;
 }
 
-function isPreviewAchievementCategory(categoryId: string) {
-  return categoryId === "waters";
-}
-
 function LockedAchievementBadge({
   unlocked = false,
   label = "Låst",
@@ -149,8 +145,8 @@ export default function AchievementsPage() {
   );
 
   const myUnlockedAchievements = useMemo(
-    () => getAllUnlockedAchievements({ catchCount }),
-    [catchCount]
+    () => getAllUnlockedAchievements({ catchCount, uniqueWaterCount }),
+    [catchCount, uniqueWaterCount]
   );
 
   const resolvedAchievements = useMemo(
@@ -168,8 +164,7 @@ export default function AchievementsPage() {
     [selectedCategoryValue, selectedCategoryId]
   );
 
-  const shouldShowAchievementCards =
-    selectedCategory.status === "active" || isPreviewAchievementCategory(selectedCategoryId);
+  const shouldShowAchievementCards = selectedCategory.status === "active";
 
   return (
     <main className="px-4 pb-8 pt-4">
@@ -316,9 +311,7 @@ export default function AchievementsPage() {
 
           {selectedCategory.status === "coming_soon" ? (
             <div className="mt-4 rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#fcfbf8] px-5 py-5 text-sm leading-7 text-[#6b7280]">
-              {isPreviewAchievementCategory(selectedCategoryId)
-                ? "Förhandsvisning: nivåerna visas och räknas, men kategorin triggar inga upplåsta märken eller push-notiser ännu."
-                : "Den här achievement-kategorin kommer i ett senare steg. När den blir live kommer dina framsteg att visas här."}
+              Den här achievement-kategorin kommer i ett senare steg. När den blir live kommer dina framsteg att visas här.
             </div>
           ) : null}
 

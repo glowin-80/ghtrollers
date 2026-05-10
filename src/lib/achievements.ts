@@ -36,10 +36,9 @@ export const achievementCategories: AchievementCategory[] = [
   {
     id: "waters",
     label: "Fiskade vatten",
-    status: "coming_soon",
-    comingSoonLabel: "Soon there!!",
+    status: "active",
     description:
-      "Här räknas hur många olika vatten du har fångster från. Samma sjö räknas bara en gång, även om du rapporterat flera fångster där. Endast fångster med GPS-hämtad eller kartvald plats räknas; fångster med fritextplats räknas inte. Kategorien visas som förhandsvisning tills märken och notiser aktiveras.",
+      "Här räknas hur många olika vatten du har fångster från. Samma sjö räknas bara en gång, även om du rapporterat flera fångster där. Endast fångster med GPS-hämtad eller kartvald plats räknas; fångster med fritextplats räknas inte.",
   },
   {
     id: "fishing_spots",
@@ -265,6 +264,7 @@ export const achievementDefinitions: AchievementDefinition[] = [
 
 export const activeAchievementDefinitions: AchievementDefinition[] = [
   ...reportedCatchAchievements,
+  ...waterAchievements,
 ];
 
 export function getAchievementCategory(categoryId: string) {
@@ -397,8 +397,18 @@ export function getAchievementProgressValue(params: {
   }
 }
 
-export function getAllUnlockedAchievements(params: { catchCount: number }) {
+export function getAllUnlockedAchievements(params: {
+  catchCount: number;
+  uniqueWaterCount: number;
+}) {
   return [
     ...getUnlockedAchievementsByValue(params.catchCount, "reported_catches"),
-  ].sort((a, b) => b.sortOrder - a.sortOrder);
+    ...getUnlockedAchievementsByValue(params.uniqueWaterCount, "waters"),
+  ].sort((a, b) => {
+    if (b.sortOrder !== a.sortOrder) {
+      return b.sortOrder - a.sortOrder;
+    }
+
+    return a.categoryId.localeCompare(b.categoryId, "sv");
+  });
 }

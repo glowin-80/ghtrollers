@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import webPush from "web-push";
-import { getNewlyUnlockedAchievementByValue } from "@/lib/achievements";
+import { getNewlyUnlockedAchievementByValue, type AchievementDefinition } from "@/lib/achievements";
 import {
   createPushServiceRoleSupabaseClient,
   getAuthenticatedPushMemberContext,
@@ -19,6 +19,14 @@ type AchievementCatchSource = {
   caught_for: string | null;
   caught_for_member_id: string | null;
   status: string | null;
+  water_name: string | null;
+  water_key: string | null;
+};
+
+type AchievementCatchWaterSource = {
+  id: string;
+  water_name: string | null;
+  water_key: string | null;
 };
 
 type WebPushSendError = Error & {
@@ -43,6 +51,33 @@ function getFirstName(name: string | null) {
   }
 
   return trimmedName.split(/\s+/)[0] || "En medlem";
+}
+
+function normalizeWaterName(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLocaleLowerCase("sv-SE");
+}
+
+function getUniqueWaterCount(catches: AchievementCatchWaterSource[]) {
+  const uniqueWaters = new Set<string>();
+
+  catches.forEach((catchItem) => {
+    const waterKey = catchItem.water_key?.trim();
+
+    if (waterKey) {
+      uniqueWaters.add(`key:${waterKey}`);
+      return;
+    }
+
+    const waterName = catchItem.water_name
+      ? normalizeWaterName(catchItem.water_name)
+      : "";
+
+    if (waterName) {
+      uniqueWaters.add(`name:${waterName}`);
+    }
+  });
+
+  return uniqueWaters.size;
 }
 
 function buildNotificationPayload(params: {
@@ -103,7 +138,7 @@ export async function POST(request: Request) {
 
   const { data: catchData, error: catchError } = await serviceSupabase
     .from("catches")
-    .select("id, caught_for, caught_for_member_id, status")
+    .select("id, caught_for, caught_for_member_id, status, water_name, water_key")
     .eq("id", catchId)
     .maybeSingle();
 
@@ -155,13 +190,69 @@ export async function POST(request: Request) {
 
   const currentApprovedCatchCount = afterCount ?? 0;
   const previousApprovedCatchCount = Math.max(currentApprovedCatchCount - 1, 0);
-  const newlyUnlockedAchievement = getNewlyUnlockedAchievementByValue(
+  const newlyUnlockedAchievements: AchievementDefinition[] = [];
+
+  const newlyUnlockedCatchAchievement = getNewlyUnlockedAchievementByValue(
     previousApprovedCatchCount,
     currentApprovedCatchCount,
     "reported_catches"
   );
 
-  if (!newlyUnlockedAchievement) {
+  if (newlyUnlockedCatchAchievement) {
+    newlyUnlockedAchievements.push(newlyUnlockedCatchAchievement);
+  }
+
+  if (catchItem.water_key || catchItem.water_name) {
+    let approvedWaterCatchesQuery = serviceSupabase
+      .from("catches")
+      .select("id, water_name, water_key")
+      .eq("status", "approved")
+      .or("water_name.not.is.null,water_key.not.is.null");
+
+    if (ownerMemberId) {
+      approvedWaterCatchesQuery = approvedWaterCatchesQuery.eq(
+        "caught_for_member_id",
+        ownerMemberId
+      );
+    } else {
+      approvedWaterCatchesQuery = approvedWaterCatchesQuery.eq(
+        "caught_for",
+        catchItem.caught_for ?? ""
+      );
+    }
+
+    const { data: waterCatchesData, error: waterCountError } = await approvedWaterCatchesQuery;
+
+    if (waterCountError) {
+      console.error(
+        "Could not count unique waters for achievement push notification.",
+        waterCountError
+      );
+
+      return NextResponse.json(
+        { error: "Could not count unique waters." },
+        { status: 500 }
+      );
+    }
+
+    const currentWaterCatches = (waterCatchesData ?? []) as AchievementCatchWaterSource[];
+    const previousWaterCatches = currentWaterCatches.filter(
+      (waterCatch) => waterCatch.id !== catchItem.id
+    );
+    const currentUniqueWaterCount = getUniqueWaterCount(currentWaterCatches);
+    const previousUniqueWaterCount = getUniqueWaterCount(previousWaterCatches);
+    const newlyUnlockedWaterAchievement = getNewlyUnlockedAchievementByValue(
+      previousUniqueWaterCount,
+      currentUniqueWaterCount,
+      "waters"
+    );
+
+    if (newlyUnlockedWaterAchievement) {
+      newlyUnlockedAchievements.push(newlyUnlockedWaterAchievement);
+    }
+  }
+
+  if (!newlyUnlockedAchievements.length) {
     return NextResponse.json({
       ok: true,
       skipped: true,
@@ -190,47 +281,51 @@ export async function POST(request: Request) {
   }
 
   const subscriptions = (subscriptionsData ?? []) as PushSubscriptionRow[];
-  const payload = JSON.stringify(
-    buildNotificationPayload({
-      memberName: catchItem.caught_for,
-      achievementTitle: newlyUnlockedAchievement.title,
-    })
-  );
   let sentCount = 0;
   let failedCount = 0;
   const inactiveSubscriptionIds: string[] = [];
 
   await Promise.all(
-    subscriptions.map(async (subscription) => {
-      try {
-        await webPush.sendNotification(
-          {
-            endpoint: subscription.endpoint,
-            keys: {
-              p256dh: subscription.p256dh_key,
-              auth: subscription.auth_key,
+    newlyUnlockedAchievements.flatMap((achievement) => {
+      const payload = JSON.stringify(
+        buildNotificationPayload({
+          memberName: catchItem.caught_for,
+          achievementTitle: achievement.title,
+        })
+      );
+
+      return subscriptions.map(async (subscription) => {
+        try {
+          await webPush.sendNotification(
+            {
+              endpoint: subscription.endpoint,
+              keys: {
+                p256dh: subscription.p256dh_key,
+                auth: subscription.auth_key,
+              },
             },
-          },
-          payload
-        );
+            payload
+          );
 
-        sentCount += 1;
-      } catch (error) {
-        failedCount += 1;
-        console.error("Could not send achievement push notification.", error);
+          sentCount += 1;
+        } catch (error) {
+          failedCount += 1;
+          console.error("Could not send achievement push notification.", error);
 
-        if (isInactiveSubscriptionError(error)) {
-          inactiveSubscriptionIds.push(subscription.id);
+          if (isInactiveSubscriptionError(error)) {
+            inactiveSubscriptionIds.push(subscription.id);
+          }
         }
-      }
+      });
     })
   );
 
   if (inactiveSubscriptionIds.length > 0) {
+    const uniqueInactiveSubscriptionIds = Array.from(new Set(inactiveSubscriptionIds));
     const { error: deactivateError } = await serviceSupabase
       .from("push_subscriptions")
       .update({ is_active: false, updated_at: new Date().toISOString() })
-      .in("id", inactiveSubscriptionIds);
+      .in("id", uniqueInactiveSubscriptionIds);
 
     if (deactivateError) {
       console.error(
@@ -243,7 +338,8 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     skipped: false,
-    achievementTitle: newlyUnlockedAchievement.title,
+    achievementTitle: newlyUnlockedAchievements.at(-1)?.title ?? null,
+    achievementTitles: newlyUnlockedAchievements.map((achievement) => achievement.title),
     beforeCount: previousApprovedCatchCount,
     afterCount: currentApprovedCatchCount,
     sentCount,

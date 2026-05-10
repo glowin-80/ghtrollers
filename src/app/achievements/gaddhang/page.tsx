@@ -97,12 +97,8 @@ function AchievementBadgeVisual({
   );
 }
 
-function isPreviewCategory(categoryId: string) {
-  return categoryId === "waters";
-}
-
-function shouldShowMemberOverview(categoryId: string, status: string) {
-  return status === "active" || isPreviewCategory(categoryId);
+function shouldShowMemberOverview(status: string) {
+  return status === "active";
 }
 
 function formatCategoryValue(categoryId: string, value: number) {
@@ -144,10 +140,7 @@ export default function GaddhangAchievementsPage() {
         setLoading(true);
         setError(null);
 
-        const showMemberOverview = shouldShowMemberOverview(
-          selectedCategoryId,
-          selectedCategory.status
-        );
+        const showMemberOverview = shouldShowMemberOverview(selectedCategory.status);
 
         if (!showMemberOverview) {
           if (!mounted) return;
@@ -384,7 +377,7 @@ export default function GaddhangAchievementsPage() {
           ) : null}
         </section>
 
-        {!shouldShowMemberOverview(selectedCategoryId, selectedCategory.status) ? (
+        {!shouldShowMemberOverview(selectedCategory.status) ? (
           <section className="rounded-[30px] border border-[#d8d2c7] bg-white/95 p-5 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-6">
             <div className="rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#fbfaf7] px-5 py-10 text-center">
               <div className="text-[1.1rem] font-bold text-[#1f2937]">
