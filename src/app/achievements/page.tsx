@@ -30,7 +30,13 @@ function isPreviewAchievementCategory(categoryId: string) {
   return categoryId === "waters";
 }
 
-function LockedAchievementBadge({ unlocked = false }: { unlocked?: boolean }) {
+function LockedAchievementBadge({
+  unlocked = false,
+  label = "Låst",
+}: {
+  unlocked?: boolean;
+  label?: string;
+}) {
   return (
     <div
       aria-label={unlocked ? "Achievement upplåst" : "Låst achievement"}
@@ -44,7 +50,7 @@ function LockedAchievementBadge({ unlocked = false }: { unlocked?: boolean }) {
         ?
       </div>
       <div className="absolute bottom-[5px] rounded-full bg-black/45 px-2 py-[1px] text-[8px] font-black uppercase tracking-[0.12em] text-[#f5e6b8]">
-        Låst
+        {label}
       </div>
     </div>
   );
@@ -61,12 +67,11 @@ function AchievementBadgeImage({
   title: string;
   unlocked: boolean;
 }) {
-  if (categoryId === "waters") {
-    return <LockedAchievementBadge unlocked={unlocked} />;
-  }
+  const isWaterBaseline =
+    categoryId === "waters" && !imageSrc.startsWith("/Achievments/waters/");
 
   if (!unlocked) {
-    return <LockedAchievementBadge />;
+    return <LockedAchievementBadge label={isWaterBaseline ? "Spanare" : "Låst"} />;
   }
 
   return (
@@ -215,16 +220,12 @@ export default function AchievementsPage() {
                   key={achievement.id}
                   className="flex items-center gap-4 rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-4 py-4"
                 >
-                  {achievement.categoryId === "waters" ? (
-                    <LockedAchievementBadge unlocked />
-                  ) : (
-                    <img
-                      src={achievement.imageSrc}
-                      alt={achievement.title}
-                      className="h-16 w-16 shrink-0 object-contain"
-                      loading="lazy"
-                    />
-                  )}
+                  <img
+                    src={achievement.imageSrc}
+                    alt={achievement.title}
+                    className="h-16 w-16 shrink-0 object-contain"
+                    loading="lazy"
+                  />
                   <div className="min-w-0">
                     <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
                       {getAchievementCategory(achievement.categoryId)?.label ??
