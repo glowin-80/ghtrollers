@@ -1,6 +1,7 @@
 const APP_BADGE_STATE_CACHE = "gaddhang-app-badge-state-v1";
 const APP_BADGE_STATE_URL = "/__gaddhang-app-badge-state.json";
 const CLEAR_NOTIFICATION_APP_BADGE_MESSAGE = "GADDHANG_CLEAR_NOTIFICATION_APP_BADGE";
+const INCREMENT_NOTIFICATION_APP_BADGE_ACTION = "increment";
 
 async function readStoredAppBadgeCount() {
   try {
@@ -23,10 +24,14 @@ async function readStoredAppBadgeCount() {
 
 async function writeStoredAppBadgeCount(count) {
   try {
+    const safeCount = Number.isFinite(Number(count))
+      ? Math.max(0, Math.floor(Number(count)))
+      : 0;
     const cache = await caches.open(APP_BADGE_STATE_CACHE);
+
     await cache.put(
       APP_BADGE_STATE_URL,
-      new Response(JSON.stringify({ count }), {
+      new Response(JSON.stringify({ count: safeCount }), {
         headers: { "Content-Type": "application/json" },
       })
     );
@@ -72,26 +77,32 @@ async function clearNotificationAppBadge() {
   await clearNativeAppBadge();
 }
 
-self.addEventListener("push", (event) => {
-  let payload = {
+function readPushPayload(event) {
+  const fallbackPayload = {
     title: "Gäddhäng Trollers",
     body: "Du har en ny notis från Gäddhäng Trollers.",
     url: "/",
   };
 
-  if (event.data) {
-    try {
-      payload = {
-        ...payload,
-        ...event.data.json(),
-      };
-    } catch {
-      payload.body = event.data.text();
-    }
+  if (!event.data) {
+    return fallbackPayload;
   }
 
-  const title = payload.title || "Gäddhäng Trollers";
-  const options = {
+  try {
+    return {
+      ...fallbackPayload,
+      ...event.data.json(),
+    };
+  } catch {
+    return {
+      ...fallbackPayload,
+      body: event.data.text(),
+    };
+  }
+}
+
+function buildNotificationOptions(payload) {
+  return {
     body: payload.body || "Du har en ny notis från Gäddhäng Trollers.",
     icon: payload.icon || "/header.png",
     badge: payload.badge || "/header.png",
@@ -99,13 +110,22 @@ self.addEventListener("push", (event) => {
       url: payload.url || "/",
     },
   };
-  const tasks = [self.registration.showNotification(title, options)];
+}
 
-  if (payload.appBadgeAction === "increment") {
-    tasks.push(incrementNotificationAppBadge());
+async function showPushNotificationAndUpdateBadge(payload) {
+  const title = payload.title || "Gäddhäng Trollers";
+
+  await self.registration.showNotification(title, buildNotificationOptions(payload));
+
+  if (payload.appBadgeAction === INCREMENT_NOTIFICATION_APP_BADGE_ACTION) {
+    await incrementNotificationAppBadge();
   }
+}
 
-  event.waitUntil(Promise.all(tasks));
+self.addEventListener("push", (event) => {
+  const payload = readPushPayload(event);
+
+  event.waitUntil(showPushNotificationAndUpdateBadge(payload));
 });
 
 self.addEventListener("message", (event) => {
