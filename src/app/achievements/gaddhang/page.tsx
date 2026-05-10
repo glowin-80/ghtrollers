@@ -31,7 +31,13 @@ type RankedAchievementMember = AchievementMemberSummary & {
 };
 
 
-function LockedAchievementBadge({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
+function LockedAchievementBadge({
+  size = "md",
+  label = "Låst",
+}: {
+  size?: "sm" | "md" | "lg";
+  label?: string;
+}) {
   const sizeClass =
     size === "lg" ? "h-20 w-20" : size === "sm" ? "h-14 w-14" : "h-16 w-16";
   const questionClass = size === "lg" ? "h-11 w-11 text-[20px]" : "h-8 w-8 text-[16px]";
@@ -54,7 +60,7 @@ function LockedAchievementBadge({ size = "md" }: { size?: "sm" | "md" | "lg" }) 
         ?
       </div>
       <div className="absolute bottom-[5px] rounded-full bg-black/45 px-2 py-[1px] text-[8px] font-black uppercase tracking-[0.12em] text-[#f5e6b8]">
-        Låst
+        {label}
       </div>
     </div>
   );
@@ -75,7 +81,7 @@ function AchievementBadgeVisual({
     categoryId === "waters" && !imageSrc.startsWith("/Achievments/waters/");
 
   if (isWaterBaseline) {
-    return <LockedAchievementBadge size={size} />;
+    return <LockedAchievementBadge size={size} label="Spanare" />;
   }
 
   const sizeClass =

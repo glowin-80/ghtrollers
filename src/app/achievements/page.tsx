@@ -30,7 +30,13 @@ function isPreviewAchievementCategory(categoryId: string) {
   return categoryId === "waters";
 }
 
-function LockedAchievementBadge({ unlocked = false }: { unlocked?: boolean }) {
+function LockedAchievementBadge({
+  unlocked = false,
+  label = "Låst",
+}: {
+  unlocked?: boolean;
+  label?: string;
+}) {
   return (
     <div
       aria-label={unlocked ? "Achievement upplåst" : "Låst achievement"}
@@ -44,13 +50,14 @@ function LockedAchievementBadge({ unlocked = false }: { unlocked?: boolean }) {
         ?
       </div>
       <div className="absolute bottom-[5px] rounded-full bg-black/45 px-2 py-[1px] text-[8px] font-black uppercase tracking-[0.12em] text-[#f5e6b8]">
-        Låst
+        {label}
       </div>
     </div>
   );
 }
 
 function AchievementBadgeImage({
+  categoryId,
   imageSrc,
   title,
   unlocked,
@@ -60,8 +67,11 @@ function AchievementBadgeImage({
   title: string;
   unlocked: boolean;
 }) {
+  const isWaterBaseline =
+    categoryId === "waters" && !imageSrc.startsWith("/Achievments/waters/");
+
   if (!unlocked) {
-    return <LockedAchievementBadge />;
+    return <LockedAchievementBadge label={isWaterBaseline ? "Spanare" : "Låst"} />;
   }
 
   return (
