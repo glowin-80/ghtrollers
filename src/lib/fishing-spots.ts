@@ -251,39 +251,14 @@ export async function fetchPendingFishingSpots(viewer?: {
   }));
 }
 
-function isApprovedPublicFishingSpot(spot: {
-  status?: string | null;
-  is_private?: boolean | null;
-}) {
-  return spot.status === "approved" && spot.is_private !== true;
-}
 
-async function fetchFishingSpotAchievementEligibility(spotId: string) {
-  const { data, error } = await supabase
-    .from("fishing_spots")
-    .select("status, is_private")
-    .eq("id", spotId)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return data ? isApprovedPublicFishingSpot(data) : false;
-}
-
-async function sendFishingSpotAchievementPushNotification(
-  spotId: string,
-  beforeEligible: boolean
-) {
+async function sendFishingSpotAchievementPushNotification(spotId: string) {
   const { data } = await supabase.auth.getSession();
   const accessToken = data.session?.access_token;
 
   if (!accessToken) {
-    console.warn(
-      "Could not send fishing spot achievement push notification. Auth session is missing."
-    );
-    return null;
+    console.warn("Could not send fishing spot achievement push notification. Auth session is missing.");
+    return;
   }
 
   const response = await fetch("/api/push/send-fishing-spot-achievement", {
@@ -292,24 +267,19 @@ async function sendFishingSpotAchievementPushNotification(
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({ spotId, beforeEligible }),
+    body: JSON.stringify({ spotId }),
   });
 
   if (!response.ok) {
     const details = await response.text().catch(() => "");
     console.warn("Could not send fishing spot achievement push notification.", details);
-    return null;
   }
-
-  return await response.json().catch(() => null);
 }
 
 export async function approvePendingFishingSpot(
   spotId: string,
   approverMemberId: string
 ) {
-  const beforeEligible = await fetchFishingSpotAchievementEligibility(spotId);
-
   const { error } = await supabase
     .from("fishing_spots")
     .update({
@@ -324,12 +294,9 @@ export async function approvePendingFishingSpot(
   }
 
   try {
-    await sendFishingSpotAchievementPushNotification(spotId, beforeEligible);
+    await sendFishingSpotAchievementPushNotification(spotId);
   } catch (pushError) {
-    console.warn(
-      "The fishing spot was approved, but the achievement push notification could not be sent.",
-      pushError
-    );
+    console.warn("The fishing spot was approved, but the achievement push notification could not be sent.", pushError);
   }
 }
 
@@ -337,8 +304,6 @@ export async function approvePendingFishingSpotEdit(
   spotId: string,
   approverMemberId: string
 ) {
-  const beforeEligible = await fetchFishingSpotAchievementEligibility(spotId);
-
   const { data, error } = await supabase.rpc("approve_fishing_spot_edit", {
     p_spot_id: spotId,
     p_admin_member_id: approverMemberId,
@@ -346,15 +311,6 @@ export async function approvePendingFishingSpotEdit(
 
   if (error) {
     throw error;
-  }
-
-  try {
-    await sendFishingSpotAchievementPushNotification(spotId, beforeEligible);
-  } catch (pushError) {
-    console.warn(
-      "The fishing spot edit was approved, but the achievement push notification could not be sent.",
-      pushError
-    );
   }
 
   return data;

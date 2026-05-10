@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import webPush from "web-push";
 import { getNewlyUnlockedAchievementByValue, type AchievementDefinition } from "@/lib/achievements";
+import { recordAchievementUnlocks } from "@/lib/achievement-unlocks";
 import {
   createPushServiceRoleSupabaseClient,
   getAuthenticatedPushMemberContext,
@@ -21,6 +22,7 @@ type AchievementCatchSource = {
   status: string | null;
   water_name: string | null;
   water_key: string | null;
+  created_at: string | null;
 };
 
 type AchievementCatchWaterSource = {
@@ -138,7 +140,7 @@ export async function POST(request: Request) {
 
   const { data: catchData, error: catchError } = await serviceSupabase
     .from("catches")
-    .select("id, caught_for, caught_for_member_id, status, water_name, water_key")
+    .select("id, caught_for, caught_for_member_id, status, water_name, water_key, created_at")
     .eq("id", catchId)
     .maybeSingle();
 
@@ -164,7 +166,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const ownerMemberId = catchItem.caught_for_member_id?.trim() || null;
+  let ownerMemberId = catchItem.caught_for_member_id?.trim() || null;
+
+  if (!ownerMemberId && catchItem.caught_for?.trim()) {
+    const { data: ownerMemberData, error: ownerMemberError } = await serviceSupabase
+      .from("members")
+      .select("id")
+      .eq("name", catchItem.caught_for.trim())
+      .maybeSingle();
+
+    if (ownerMemberError) {
+      console.error("Could not resolve achievement owner member.", ownerMemberError);
+    } else {
+      ownerMemberId = typeof ownerMemberData?.id === "string" ? ownerMemberData.id : null;
+    }
+  }
 
   let approvedCatchCountQuery = serviceSupabase
     .from("catches")
@@ -262,6 +278,39 @@ export async function POST(request: Request) {
     });
   }
 
+  if (!ownerMemberId) {
+    return NextResponse.json({
+      ok: true,
+      skipped: true,
+      reason: "Achievement owner member could not be resolved.",
+      beforeCount: previousApprovedCatchCount,
+      afterCount: currentApprovedCatchCount,
+    });
+  }
+
+  const unlockResults = await recordAchievementUnlocks(serviceSupabase, {
+    memberId: ownerMemberId,
+    achievements: newlyUnlockedAchievements,
+    unlockedAt: catchItem.created_at,
+    source: "live",
+    sourceTable: "catches",
+    sourceId: catchItem.id,
+  });
+
+  const achievementsToNotify = newlyUnlockedAchievements.filter((_, index) =>
+    unlockResults[index]?.inserted
+  );
+
+  if (!achievementsToNotify.length) {
+    return NextResponse.json({
+      ok: true,
+      skipped: true,
+      reason: "Achievement was already registered.",
+      beforeCount: previousApprovedCatchCount,
+      afterCount: currentApprovedCatchCount,
+    });
+  }
+
   webPush.setVapidDetails(vapid.subject, vapid.publicKey, vapid.privateKey);
 
   const { data: subscriptionsData, error: subscriptionsError } =
@@ -286,7 +335,7 @@ export async function POST(request: Request) {
   const inactiveSubscriptionIds: string[] = [];
 
   await Promise.all(
-    newlyUnlockedAchievements.flatMap((achievement) => {
+    achievementsToNotify.flatMap((achievement) => {
       const payload = JSON.stringify(
         buildNotificationPayload({
           memberName: catchItem.caught_for,
@@ -338,8 +387,8 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     skipped: false,
-    achievementTitle: newlyUnlockedAchievements.at(-1)?.title ?? null,
-    achievementTitles: newlyUnlockedAchievements.map((achievement) => achievement.title),
+    achievementTitle: achievementsToNotify.at(-1)?.title ?? null,
+    achievementTitles: achievementsToNotify.map((achievement) => achievement.title),
     beforeCount: previousApprovedCatchCount,
     afterCount: currentApprovedCatchCount,
     sentCount,

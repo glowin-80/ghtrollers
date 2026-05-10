@@ -8,6 +8,8 @@ import {
   getUniqueWaterCount,
 } from "@/lib/member-service";
 import { fetchOwnFishingSpots } from "@/lib/fishing-spots";
+import { fetchCurrentMemberAchievementUnlocks } from "@/lib/achievement-unlocks-client";
+import { getAchievementUnlockedAt, type AchievementUnlockMap } from "@/lib/achievement-unlocks";
 import { getApprovedPublicFishingSpotCount } from "@/lib/fishing-spot-achievements";
 import {
   achievementCategories,
@@ -30,6 +32,16 @@ function formatAchievementCategoryOptionLabel(category: {
   }
 
   return `${category.label} — ${category.comingSoonLabel ?? "Coming soon"}`;
+}
+
+function formatUnlockedDate(value: string | null) {
+  if (!value) return null;
+
+  return new Intl.DateTimeFormat("sv-SE", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(value));
 }
 
 function LockedAchievementBadge({
@@ -92,6 +104,7 @@ export default function AchievementsPage() {
   const [catchCount, setCatchCount] = useState(0);
   const [uniqueWaterCount, setUniqueWaterCount] = useState(0);
   const [fishingSpotCount, setFishingSpotCount] = useState(0);
+  const [achievementUnlocks, setAchievementUnlocks] = useState<AchievementUnlockMap>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -113,13 +126,15 @@ export default function AchievementsPage() {
           setCatchCount(0);
           setUniqueWaterCount(0);
           setFishingSpotCount(0);
+          setAchievementUnlocks({});
           setLoading(false);
           return;
         }
 
-        const [catches, fishingSpots] = await Promise.all([
+        const [catches, fishingSpots, unlocks] = await Promise.all([
           fetchMemberCatchesForMember(member),
           fetchOwnFishingSpots(member.id),
+          fetchCurrentMemberAchievementUnlocks(member.id),
         ]);
 
         if (!mounted) return;
@@ -127,6 +142,7 @@ export default function AchievementsPage() {
         setCatchCount(catches.length);
         setUniqueWaterCount(getUniqueWaterCount(catches));
         setFishingSpotCount(getApprovedPublicFishingSpotCount(fishingSpots));
+        setAchievementUnlocks(unlocks);
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -242,6 +258,11 @@ export default function AchievementsPage() {
                     <div className="mt-1 text-lg font-bold leading-tight text-[#1f2937]">
                       {achievement.title}
                     </div>
+                    {formatUnlockedDate(getAchievementUnlockedAt(achievementUnlocks, achievement)) ? (
+                      <div className="mt-1 text-xs font-semibold text-[#6b7280]">
+                        Upplåst {formatUnlockedDate(getAchievementUnlockedAt(achievementUnlocks, achievement))}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               ))}
