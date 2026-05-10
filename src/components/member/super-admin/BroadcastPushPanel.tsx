@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 
 const DEFAULT_BROADCAST_TITLE = "Gäddhäng Trollers";
 const DEFAULT_BROADCAST_BODY =
-  "🎉 Nytt achievement upplåst! Nu är kategorin Fiskade vatten aktiv i Gäddhäng.";
+  "🎉 Nytt achievement upplåst! Nu är kategorin Registrerade fiskeplatser aktiv i Gäddhäng.";
 const DEFAULT_BROADCAST_URL = "/achievements";
 
 type BroadcastResponse = {

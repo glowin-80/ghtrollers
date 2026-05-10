@@ -279,7 +279,7 @@ export const fishingSpotAchievements: AchievementDefinition[] = [
       "Du har bidragit med din första godkända offentliga fiskeplats till Gäddhäng-kartan.",
     minValue: 1,
     maxValue: 4,
-    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_1.svg",
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_1.png",
     sortOrder: 1,
   },
   {
@@ -290,7 +290,7 @@ export const fishingSpotAchievements: AchievementDefinition[] = [
       "Du börjar visa vägen. Fina platser hittar in på kartan tack vare dig.",
     minValue: 5,
     maxValue: 9,
-    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_2.svg",
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_2.png",
     sortOrder: 2,
   },
   {
@@ -301,7 +301,7 @@ export const fishingSpotAchievements: AchievementDefinition[] = [
       "Du hjälper dina fina Gäddhängare att hitta fler vatten, fler lägen och fler chanser.",
     minValue: 10,
     maxValue: 24,
-    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_3.svg",
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_3.png",
     sortOrder: 3,
   },
   {
@@ -312,7 +312,7 @@ export const fishingSpotAchievements: AchievementDefinition[] = [
       "Du jagar inte bara fisk längre. Du jagar platser som gör hela kartan bättre.",
     minValue: 25,
     maxValue: 49,
-    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_4.svg",
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_4.png",
     sortOrder: 4,
   },
   {
@@ -323,7 +323,7 @@ export const fishingSpotAchievements: AchievementDefinition[] = [
       "Du har koll på fler vatten än de flesta och delar med dig av platser som lyfter Gäddhäng.",
     minValue: 50,
     maxValue: 99,
-    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_5.svg",
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_5.png",
     sortOrder: 5,
   },
   {
@@ -334,7 +334,7 @@ export const fishingSpotAchievements: AchievementDefinition[] = [
       "Nu är du en av dem som verkligen bygger kartan. Dina bidrag gör skillnad för hela gänget.",
     minValue: 100,
     maxValue: 199,
-    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_6.svg",
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_6.png",
     sortOrder: 6,
   },
   {
@@ -345,7 +345,7 @@ export const fishingSpotAchievements: AchievementDefinition[] = [
       "Det här är kartbidrag på legendarisk nivå. Dina fina Gäddhängare har mycket att tacka dig för.",
     minValue: 200,
     maxValue: null,
-    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_7.svg",
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_7.png",
     sortOrder: 7,
   },
 ];

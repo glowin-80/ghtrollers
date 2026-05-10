@@ -72,6 +72,22 @@ type PushSupabaseDatabase = {
         Update: never;
         Relationships: [];
       };
+      fishing_spots: {
+        Row: {
+          id: string;
+          created_by_member_id: string | null;
+          created_by_name: string | null;
+          status: string | null;
+          is_private: boolean | null;
+          updated_at: string | null;
+        };
+        Insert: never;
+        Update: {
+          is_active?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       push_subscriptions: {
         Row: {
           id: string;

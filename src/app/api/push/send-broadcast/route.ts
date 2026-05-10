@@ -22,7 +22,7 @@ type WebPushSendError = Error & {
 
 const DEFAULT_BROADCAST_TITLE = "Gäddhäng Trollers";
 const DEFAULT_BROADCAST_BODY =
-  "🎉 Nytt achievement upplåst! Nu är kategorin Fiskade vatten aktiv i Gäddhäng.";
+  "🎉 Nytt achievement upplåst! Nu är kategorin Registrerade fiskeplatser aktiv i Gäddhäng.";
 const DEFAULT_BROADCAST_URL = "/achievements";
 const MAX_TITLE_LENGTH = 80;
 const MAX_BODY_LENGTH = 240;
