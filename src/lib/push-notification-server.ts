@@ -63,6 +63,8 @@ type PushSupabaseDatabase = {
           is_location_private: boolean | null;
           original_image_size_bytes: number | null;
           compressed_image_size_bytes: number | null;
+          water_name: string | null;
+          water_key: string | null;
           status: string | null;
           created_at: string | null;
         };
