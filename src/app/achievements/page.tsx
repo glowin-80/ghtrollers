@@ -51,7 +51,6 @@ function LockedAchievementBadge({ unlocked = false }: { unlocked?: boolean }) {
 }
 
 function AchievementBadgeImage({
-  categoryId,
   imageSrc,
   title,
   unlocked,
@@ -61,10 +60,6 @@ function AchievementBadgeImage({
   title: string;
   unlocked: boolean;
 }) {
-  if (categoryId === "waters") {
-    return <LockedAchievementBadge unlocked={unlocked} />;
-  }
-
   if (!unlocked) {
     return <LockedAchievementBadge />;
   }
@@ -215,16 +210,12 @@ export default function AchievementsPage() {
                   key={achievement.id}
                   className="flex items-center gap-4 rounded-[24px] border border-[#e5ddd0] bg-[#fcfbf8] px-4 py-4"
                 >
-                  {achievement.categoryId === "waters" ? (
-                    <LockedAchievementBadge unlocked />
-                  ) : (
-                    <img
-                      src={achievement.imageSrc}
-                      alt={achievement.title}
-                      className="h-16 w-16 shrink-0 object-contain"
-                      loading="lazy"
-                    />
-                  )}
+                  <img
+                    src={achievement.imageSrc}
+                    alt={achievement.title}
+                    className="h-16 w-16 shrink-0 object-contain"
+                    loading="lazy"
+                  />
                   <div className="min-w-0">
                     <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b7449]">
                       {getAchievementCategory(achievement.categoryId)?.label ??

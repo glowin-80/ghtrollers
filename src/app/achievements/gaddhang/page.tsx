@@ -71,7 +71,10 @@ function AchievementBadgeVisual({
   title: string;
   size?: "sm" | "md" | "lg";
 }) {
-  if (categoryId === "waters") {
+  const isWaterBaseline =
+    categoryId === "waters" && !imageSrc.startsWith("/Achievments/waters/");
+
+  if (isWaterBaseline) {
     return <LockedAchievementBadge size={size} />;
   }
 

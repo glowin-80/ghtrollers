@@ -183,7 +183,7 @@ export const waterAchievements: AchievementDefinition[] = [
     description: "Ett vatten är avklarat. Nu vet du att kartan har fler historier att bjuda på.",
     minValue: 1,
     maxValue: 1,
-    imageSrc: "/Achievments/catch/catchBadge_1.png",
+    imageSrc: "/Achievments/waters/waterBadge_1.png",
     sortOrder: 1,
   },
   {
@@ -193,7 +193,7 @@ export const waterAchievements: AchievementDefinition[] = [
     description: "Du börjar lämna det gamla vanliga bakom dig och testar vatten med nyfiken blick.",
     minValue: 2,
     maxValue: 5,
-    imageSrc: "/Achievments/catch/catchBadge_2.png",
+    imageSrc: "/Achievments/waters/waterBadge_2.png",
     sortOrder: 2,
   },
   {
@@ -203,7 +203,7 @@ export const waterAchievements: AchievementDefinition[] = [
     description: "Du rör dig mellan sjöar, vikar och vatten. Stövlarna får jobba och kartan får nya märken.",
     minValue: 6,
     maxValue: 10,
-    imageSrc: "/Achievments/catch/catchBadge_3.png",
+    imageSrc: "/Achievments/waters/waterBadge_3.png",
     sortOrder: 3,
   },
   {
@@ -213,7 +213,7 @@ export const waterAchievements: AchievementDefinition[] = [
     description: "Du chansar inte bara längre. Du planerar, jämför och hittar nya vatten med mening.",
     minValue: 11,
     maxValue: 16,
-    imageSrc: "/Achievments/catch/catchBadge_4.png",
+    imageSrc: "/Achievments/waters/waterBadge_4.png",
     sortOrder: 4,
   },
   {
@@ -223,7 +223,7 @@ export const waterAchievements: AchievementDefinition[] = [
     description: "Du jagar inte bara fisk längre. Du jagar nästa vatten, nästa chans och nästa berättelse.",
     minValue: 17,
     maxValue: 25,
-    imageSrc: "/Achievments/catch/catchBadge_5.png",
+    imageSrc: "/Achievments/waters/waterBadge_5.png",
     sortOrder: 5,
   },
   {
@@ -233,7 +233,7 @@ export const waterAchievements: AchievementDefinition[] = [
     description: "Du har varit runt. När andra ser blått på kartan ser du möjligheter, djup och gamla hugg.",
     minValue: 26,
     maxValue: 35,
-    imageSrc: "/Achievments/catch/catchBadge_6.png",
+    imageSrc: "/Achievments/waters/waterBadge_6.png",
     sortOrder: 6,
   },
   {
@@ -243,7 +243,7 @@ export const waterAchievements: AchievementDefinition[] = [
     description: "Du fiskar inte bara i många vatten. Du börjar förstå hur olika de faktiskt är.",
     minValue: 36,
     maxValue: 49,
-    imageSrc: "/Achievments/catch/catchBadge_7.png",
+    imageSrc: "/Achievments/waters/waterBadge_7.png",
     sortOrder: 7,
   },
   {
@@ -253,7 +253,7 @@ export const waterAchievements: AchievementDefinition[] = [
     description: "Du har sett mer vatten än de flesta ens hinner prata om. Det här är ren upptäckarglädje.",
     minValue: 50,
     maxValue: null,
-    imageSrc: "/Achievments/catch/catchBadge_8.png",
+    imageSrc: "/Achievments/waters/waterBadge_8.png",
     sortOrder: 8,
   },
 ];
