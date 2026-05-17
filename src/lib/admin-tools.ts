@@ -129,7 +129,7 @@ export async function deletePendingMember(memberId: string) {
 
 async function sendPushNotificationRequest<TResponse = unknown>(
   path: string,
-  catchId: string,
+  body: Record<string, string>,
   warningMessage: string
 ): Promise<TResponse | null> {
   const { data } = await supabase.auth.getSession();
@@ -146,7 +146,7 @@ async function sendPushNotificationRequest<TResponse = unknown>(
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({ catchId }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
@@ -161,7 +161,7 @@ async function sendPushNotificationRequest<TResponse = unknown>(
 async function sendNewApprovedCatchPushNotification(catchId: string) {
   await sendPushNotificationRequest(
     "/api/push/send-new-catch",
-    catchId,
+    { catchId },
     "Could not send new catch push notification."
   );
 }
@@ -175,7 +175,7 @@ type AllTimeHighPushResponse = {
 async function sendAllTimeHighPushNotification(catchId: string) {
   return await sendPushNotificationRequest<AllTimeHighPushResponse>(
     "/api/push/send-all-time-high",
-    catchId,
+    { catchId },
     "Could not send all-time-high push notification."
   );
 }
@@ -183,8 +183,16 @@ async function sendAllTimeHighPushNotification(catchId: string) {
 async function sendAchievementPushNotification(catchId: string) {
   await sendPushNotificationRequest(
     "/api/push/send-achievement",
-    catchId,
+    { catchId },
     "Could not send achievement push notification."
+  );
+}
+
+async function sendFishingSpotAchievementPushNotification(spotId: string) {
+  await sendPushNotificationRequest(
+    "/api/push/send-fishing-spot-achievement",
+    { spotId },
+    "Could not send fishing spot achievement push notification."
   );
 }
 

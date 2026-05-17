@@ -43,8 +43,9 @@ export const achievementCategories: AchievementCategory[] = [
   {
     id: "fishing_spots",
     label: "Registrerade fiskeplatser",
-    status: "coming_soon",
-    description: "Kommer snart.",
+    status: "active",
+    description:
+      "Bidra med fina fiskeplatser åt dina fina Gäddhängare. Endast godkända offentliga fiskeplatser från Markera fiskeplats räknas.",
   },
   {
     id: "species",
@@ -257,14 +258,108 @@ export const waterAchievements: AchievementDefinition[] = [
   },
 ];
 
+export const fishingSpotBaselineAchievement: AchievementDefinition = {
+  id: "fishing_spot_00",
+  categoryId: "fishing_spots",
+  title: "Kartlös",
+  description:
+    "Du har inte registrerat någon godkänd offentlig fiskeplats ännu, men kartan väntar på ditt första bidrag.",
+  minValue: 0,
+  maxValue: 0,
+  imageSrc: "/Achievments/catch/catchBadge_0.svg",
+  sortOrder: 0,
+};
+
+export const fishingSpotAchievements: AchievementDefinition[] = [
+  {
+    id: "fishing_spot_01",
+    categoryId: "fishing_spots",
+    title: "Platsletare",
+    description:
+      "Du har bidragit med din första godkända offentliga fiskeplats till Gäddhäng-kartan.",
+    minValue: 1,
+    maxValue: 4,
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_1.png",
+    sortOrder: 1,
+  },
+  {
+    id: "fishing_spot_02",
+    categoryId: "fishing_spots",
+    title: "Gäddhängsnavigator",
+    description:
+      "Du börjar visa vägen. Fina platser hittar in på kartan tack vare dig.",
+    minValue: 5,
+    maxValue: 9,
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_2.png",
+    sortOrder: 2,
+  },
+  {
+    id: "fishing_spot_03",
+    categoryId: "fishing_spots",
+    title: "Vattenvägvisare",
+    description:
+      "Du hjälper dina fina Gäddhängare att hitta fler vatten, fler lägen och fler chanser.",
+    minValue: 10,
+    maxValue: 24,
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_3.png",
+    sortOrder: 3,
+  },
+  {
+    id: "fishing_spot_04",
+    categoryId: "fishing_spots",
+    title: "Fiskeplatsjägare",
+    description:
+      "Du jagar inte bara fisk längre. Du jagar platser som gör hela kartan bättre.",
+    minValue: 25,
+    maxValue: 49,
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_4.png",
+    sortOrder: 4,
+  },
+  {
+    id: "fishing_spot_05",
+    categoryId: "fishing_spots",
+    title: "Sjökännare",
+    description:
+      "Du har koll på fler vatten än de flesta och delar med dig av platser som lyfter Gäddhäng.",
+    minValue: 50,
+    maxValue: 99,
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_5.png",
+    sortOrder: 5,
+  },
+  {
+    id: "fishing_spot_06",
+    categoryId: "fishing_spots",
+    title: "Kartmästare",
+    description:
+      "Nu är du en av dem som verkligen bygger kartan. Dina bidrag gör skillnad för hela gänget.",
+    minValue: 100,
+    maxValue: 199,
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_6.png",
+    sortOrder: 6,
+  },
+  {
+    id: "fishing_spot_07",
+    categoryId: "fishing_spots",
+    title: "Gäddhängsguide",
+    description:
+      "Det här är kartbidrag på legendarisk nivå. Dina fina Gäddhängare har mycket att tacka dig för.",
+    minValue: 200,
+    maxValue: null,
+    imageSrc: "/Achievments/fishing-spots/fishingSpotBadge_7.png",
+    sortOrder: 7,
+  },
+];
+
 export const achievementDefinitions: AchievementDefinition[] = [
   ...reportedCatchAchievements,
   ...waterAchievements,
+  ...fishingSpotAchievements,
 ];
 
 export const activeAchievementDefinitions: AchievementDefinition[] = [
   ...reportedCatchAchievements,
   ...waterAchievements,
+  ...fishingSpotAchievements,
 ];
 
 export function getAchievementCategory(categoryId: string) {
@@ -284,6 +379,10 @@ export function getCurrentAchievementByValue(value: number, categoryId = "report
 
   if (categoryId === "waters" && value <= 0) {
     return waterBaselineAchievement;
+  }
+
+  if (categoryId === "fishing_spots" && value <= 0) {
+    return fishingSpotBaselineAchievement;
   }
 
   const achievements = getAchievementsForCategory(categoryId);
@@ -346,6 +445,8 @@ export function getAchievementUnitLabel(categoryId = "reported_catches") {
   switch (categoryId) {
     case "waters":
       return "vatten";
+    case "fishing_spots":
+      return "fiskeplatser";
     case "reported_catches":
     default:
       return "fångster";
@@ -387,10 +488,13 @@ export function getAchievementProgressValue(params: {
   categoryId: string;
   catchCount: number;
   uniqueWaterCount: number;
+  fishingSpotCount?: number;
 }) {
   switch (params.categoryId) {
     case "waters":
       return params.uniqueWaterCount;
+    case "fishing_spots":
+      return params.fishingSpotCount ?? 0;
     case "reported_catches":
     default:
       return params.catchCount;
@@ -400,10 +504,12 @@ export function getAchievementProgressValue(params: {
 export function getAllUnlockedAchievements(params: {
   catchCount: number;
   uniqueWaterCount: number;
+  fishingSpotCount?: number;
 }) {
   return [
     ...getUnlockedAchievementsByValue(params.catchCount, "reported_catches"),
     ...getUnlockedAchievementsByValue(params.uniqueWaterCount, "waters"),
+    ...getUnlockedAchievementsByValue(params.fishingSpotCount ?? 0, "fishing_spots"),
   ].sort((a, b) => {
     if (b.sortOrder !== a.sortOrder) {
       return b.sortOrder - a.sortOrder;

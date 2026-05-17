@@ -251,6 +251,31 @@ export async function fetchPendingFishingSpots(viewer?: {
   }));
 }
 
+
+async function sendFishingSpotAchievementPushNotification(spotId: string) {
+  const { data } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+
+  if (!accessToken) {
+    console.warn("Could not send fishing spot achievement push notification. Auth session is missing.");
+    return;
+  }
+
+  const response = await fetch("/api/push/send-fishing-spot-achievement", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ spotId }),
+  });
+
+  if (!response.ok) {
+    const details = await response.text().catch(() => "");
+    console.warn("Could not send fishing spot achievement push notification.", details);
+  }
+}
+
 export async function approvePendingFishingSpot(
   spotId: string,
   approverMemberId: string
@@ -266,6 +291,12 @@ export async function approvePendingFishingSpot(
 
   if (error) {
     throw error;
+  }
+
+  try {
+    await sendFishingSpotAchievementPushNotification(spotId);
+  } catch (pushError) {
+    console.warn("The fishing spot was approved, but the achievement push notification could not be sent.", pushError);
   }
 }
 

@@ -105,6 +105,8 @@ function formatCategoryValue(categoryId: string, value: number) {
   switch (categoryId) {
     case "waters":
       return value === 1 ? "1 vatten" : `${value} vatten`;
+    case "fishing_spots":
+      return value === 1 ? "1 fiskeplats" : `${value} fiskeplatser`;
     case "reported_catches":
       return `${value} fångster`;
     default:
@@ -160,6 +162,7 @@ export default function GaddhangAchievementsPage() {
               categoryId: selectedCategoryId,
               catchCount: member.catchCount ?? 0,
               uniqueWaterCount: member.uniqueWaterCount ?? 0,
+              fishingSpotCount: member.fishingSpotCount ?? 0,
             });
 
             const achievement = getCurrentAchievementByValue(

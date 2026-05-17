@@ -63,11 +63,36 @@ type PushSupabaseDatabase = {
           is_location_private: boolean | null;
           original_image_size_bytes: number | null;
           compressed_image_size_bytes: number | null;
+          water_name: string | null;
+          water_key: string | null;
           status: string | null;
           created_at: string | null;
         };
         Insert: never;
         Update: never;
+        Relationships: [];
+      };
+
+      fishing_spots: {
+        Row: {
+          id: string;
+          created_at: string | null;
+          updated_at: string | null;
+          created_by_member_id: string | null;
+          created_by_name: string | null;
+          latitude: number | null;
+          longitude: number | null;
+          title: string | null;
+          notes: string | null;
+          is_private: boolean | null;
+          status: string | null;
+          approved_at: string | null;
+        };
+        Insert: never;
+        Update: {
+          is_active?: boolean;
+          updated_at?: string;
+        };
         Relationships: [];
       };
       push_subscriptions: {
@@ -116,6 +141,32 @@ type PushSupabaseDatabase = {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
+      };
+      member_achievements: {
+        Row: {
+          id: string;
+          member_id: string;
+          category_id: string;
+          achievement_id: string;
+          unlocked_at: string;
+          source: string;
+          source_table: string | null;
+          source_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          member_id: string;
+          category_id: string;
+          achievement_id: string;
+          unlocked_at: string;
+          source?: string;
+          source_table?: string | null;
+          source_id?: string | null;
+          created_at?: string;
+        };
+        Update: never;
         Relationships: [];
       };
     };
