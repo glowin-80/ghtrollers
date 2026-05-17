@@ -58,9 +58,7 @@ export default function CatchReactionBar({
   const visibleSummaries = summaries.filter((summary) => summary.count > 0);
 
   function handlePickReaction(emoji: CatchReactionEmoji) {
-    if (!canReact) {
-      return;
-    }
+    if (!canReact) return;
 
     onToggleReaction(catchId, emoji);
     setPickerOpen(false);
@@ -124,7 +122,7 @@ export default function CatchReactionBar({
             !canReact ? "cursor-not-allowed opacity-70 hover:bg-white" : ""
           }`}
         >
-          🔥
+          👍
         </button>
 
         {pickerOpen ? (
