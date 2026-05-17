@@ -135,15 +135,7 @@ function RecentApprovedSectionComponent({
                       </div>
                     </div>
 
-                    <CatchReactionBar
-                      catchId={item.id}
-                      reactions={reactionState[item.id]}
-                      canReact={canReact}
-                      onToggleReaction={onToggleReaction}
-                      compact
-                    />
-
-                    <div className="mt-3 flex items-center justify-between gap-2">
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
                       <Link
                         href={`/fangst/${item.id}`}
                         className="rounded-full border border-[#d7d0c3] bg-white px-3 py-1.5 text-xs font-semibold text-[#31414b] transition hover:bg-[#f2efe8]"
@@ -155,6 +147,14 @@ function RecentApprovedSectionComponent({
                         catchId={item.id}
                         shareTitle={shareDetails.shareTitle}
                         shareText={shareDetails.shareText}
+                        compact
+                      />
+
+                      <CatchReactionBar
+                        catchId={item.id}
+                        reactions={reactionState[item.id]}
+                        canReact={canReact}
+                        onToggleReaction={onToggleReaction}
                         compact
                       />
                     </div>
