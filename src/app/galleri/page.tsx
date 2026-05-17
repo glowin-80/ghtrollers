@@ -174,12 +174,12 @@ export default function GalleriPage() {
                 return (
                   <article
                     key={item.id}
-                    className="relative overflow-hidden rounded-[22px] border border-[#d8d2c7] bg-[#fffdf9] shadow-sm"
+                    className="relative overflow-visible rounded-[22px] border border-[#d8d2c7] bg-[#fffdf9] shadow-sm"
                   >
                     <button
                       type="button"
                       onClick={() => item.image_url && setSelectedImage(item.image_url)}
-                      className="block w-full bg-[#ebe7de] text-left"
+                      className="block w-full overflow-hidden rounded-t-[22px] bg-[#ebe7de] text-left"
                       aria-label={`Öppna bild för ${ownerName}`}
                     >
                       {item.image_url ? (
