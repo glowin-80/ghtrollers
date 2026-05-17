@@ -7,6 +7,7 @@ import {
   buildLeaderboard,
 } from "@/lib/home";
 import type { LeaderboardFilter } from "@/types/home";
+import { useCatchReactions } from "@/hooks/useCatchReactions";
 import { useHomeData } from "@/hooks/useHomeData";
 import { useCatchUpload } from "@/hooks/useCatchUpload";
 import LeaderboardSection from "@/components/home/LeaderboardSection";
@@ -131,6 +132,16 @@ export default function Home() {
     return approvedCatches.slice(0, 8);
   }, [approvedCatches]);
 
+  const recentApprovedCatchIds = useMemo(() => {
+    return recentApprovedCatches.map((catchItem) => catchItem.id);
+  }, [recentApprovedCatches]);
+
+  const { errorMessage: reactionErrorMessage, reactionState, toggleReaction } = useCatchReactions({
+    catchIds: recentApprovedCatchIds,
+    currentMemberId: member?.id ?? null,
+    canReact: hasActiveMembership,
+  });
+
   const handleFilterChange = useCallback((value: LeaderboardFilter) => {
     setFilter(value);
   }, []);
@@ -244,7 +255,16 @@ export default function Home() {
               isLoggedIn={isLoggedIn}
               members={members}
               onImageClick={handleImageClick}
+              reactionState={reactionState}
+              canReact={hasActiveMembership}
+              onToggleReaction={toggleReaction}
             />
+
+            {reactionErrorMessage ? (
+              <div className="mt-3 rounded-[18px] border border-[#ead2a4] bg-[#fff8e7] px-3 py-2 text-xs font-semibold text-[#6b4f1d]">
+                {reactionErrorMessage}
+              </div>
+            ) : null}
           </div>
 
           {selectedImage ? (

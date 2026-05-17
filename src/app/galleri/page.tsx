@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import CatchReactionBar from "@/components/reactions/CatchReactionBar";
 import ShareCatchButton from "@/components/shared/ShareCatchButton";
+import { useCatchReactions } from "@/hooks/useCatchReactions";
 import { useHomeData } from "@/hooks/useHomeData";
 import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
 import { getCatchMethodSummary } from "@/lib/catch-display";
@@ -54,7 +56,7 @@ function getLocationLabel(item: Catch, isLoggedIn: boolean) {
 }
 
 export default function GalleriPage() {
-  const { approvedCatches, isLoggedIn, members } = useHomeData();
+  const { approvedCatches, hasActiveMembership, isLoggedIn, member, members } = useHomeData();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const currentSwedenYear = useMemo(() => {
@@ -89,6 +91,12 @@ export default function GalleriPage() {
   }, [approvedCatches, selectedYear]);
 
   const selectedYearLabel = selectedYear === "all" ? "Alla år" : selectedYear;
+  const filteredCatchIds = useMemo(() => filteredCatches.map((item) => item.id), [filteredCatches]);
+  const { errorMessage: reactionErrorMessage, reactionState, toggleReaction } = useCatchReactions({
+    catchIds: filteredCatchIds,
+    currentMemberId: member?.id ?? null,
+    canReact: hasActiveMembership,
+  });
 
   return (
     <main className="px-4 pb-10 pt-4">
@@ -144,6 +152,12 @@ export default function GalleriPage() {
               {selectedYearLabel}
             </span>
           </div>
+
+          {reactionErrorMessage ? (
+            <div className="mt-4 rounded-[18px] border border-[#ead2a4] bg-[#fff8e7] px-3 py-2 text-xs font-semibold text-[#6b4f1d]">
+              {reactionErrorMessage}
+            </div>
+          ) : null}
 
           {filteredCatches.length === 0 ? (
             <div className="mt-5 rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#faf8f4] px-4 py-8 text-sm text-[#6b7280]">
@@ -203,6 +217,14 @@ export default function GalleriPage() {
                       <div className="text-[0.76rem] text-[#6b7280]">
                         {formatDate(item.catch_date)}
                       </div>
+                      <CatchReactionBar
+                        catchId={item.id}
+                        reactions={reactionState[item.id]}
+                        canReact={hasActiveMembership}
+                        onToggleReaction={toggleReaction}
+                        compact
+                      />
+
                       <div className="flex items-center justify-between gap-2 pt-2">
                         <Link
                           href={`/fangst/${item.id}`}
