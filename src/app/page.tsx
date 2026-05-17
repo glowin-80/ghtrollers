@@ -139,6 +139,7 @@ export default function Home() {
   const { errorMessage: reactionErrorMessage, reactionState, toggleReaction } = useCatchReactions({
     catchIds: recentApprovedCatchIds,
     currentMemberId: member?.id ?? null,
+    currentMemberName: member?.name ?? null,
     canReact: hasActiveMembership,
   });
 

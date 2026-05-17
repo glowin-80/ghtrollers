@@ -12,19 +12,26 @@ import {
 type UseCatchReactionsOptions = {
   catchIds: string[];
   currentMemberId: string | null;
+  currentMemberName?: string | null;
   canReact: boolean;
 };
+
+function createEmptySummaries() {
+  return CATCH_REACTION_EMOJIS.map((emoji) => ({
+    emoji,
+    count: 0,
+    reactedByMe: false,
+    memberNames: [],
+  }));
+}
 
 function toggleReactionInState(params: {
   state: CatchReactionState;
   catchId: string;
   emoji: CatchReactionEmoji;
+  currentMemberName: string;
 }) {
-  const currentSummaries = params.state[params.catchId] ?? CATCH_REACTION_EMOJIS.map((emoji) => ({
-    emoji,
-    count: 0,
-    reactedByMe: false,
-  }));
+  const currentSummaries = params.state[params.catchId] ?? createEmptySummaries();
 
   return {
     ...params.state,
@@ -34,10 +41,16 @@ function toggleReactionInState(params: {
       }
 
       const nextReactedByMe = !summary.reactedByMe;
+      const currentNames = summary.memberNames ?? [];
+      const nextNames = nextReactedByMe
+        ? [...new Set([...currentNames, params.currentMemberName])]
+        : currentNames.filter((name) => name !== params.currentMemberName);
+
       return {
         ...summary,
         reactedByMe: nextReactedByMe,
         count: Math.max(0, summary.count + (nextReactedByMe ? 1 : -1)),
+        memberNames: nextNames,
       };
     }),
   };
@@ -46,6 +59,7 @@ function toggleReactionInState(params: {
 export function useCatchReactions({
   catchIds,
   currentMemberId,
+  currentMemberName,
   canReact,
 }: UseCatchReactionsOptions) {
   const stableCatchIds = useMemo(() => [...new Set(catchIds.filter(Boolean))], [catchIds]);
@@ -111,8 +125,11 @@ export function useCatchReactions({
       const currentSummary = reactionState[catchId]?.find((summary) => summary.emoji === emoji);
       const shouldRemove = Boolean(currentSummary?.reactedByMe);
       const previousState = reactionState;
+      const optimisticMemberName = currentMemberName?.trim() || "Du";
 
-      setReactionState((currentState) => toggleReactionInState({ state: currentState, catchId, emoji }));
+      setReactionState((currentState) =>
+        toggleReactionInState({ state: currentState, catchId, emoji, currentMemberName: optimisticMemberName })
+      );
       setErrorMessage(null);
 
       try {
@@ -127,7 +144,7 @@ export function useCatchReactions({
         setErrorMessage("Kunde inte spara reaktionen.");
       }
     },
-    [canReact, currentMemberId, reactionState]
+    [canReact, currentMemberId, currentMemberName, reactionState]
   );
 
   return {

@@ -89,7 +89,7 @@ function RecentApprovedSectionComponent({
             return (
               <li
                 key={item.id}
-                className="overflow-hidden rounded-[22px] border border-[#cfd6cf] bg-white shadow-sm"
+                className="relative overflow-hidden rounded-[22px] border border-[#cfd6cf] bg-white shadow-sm"
               >
                 <div className="flex min-h-[104px]">
                   <button

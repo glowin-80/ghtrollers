@@ -95,6 +95,7 @@ export default function GalleriPage() {
   const { errorMessage: reactionErrorMessage, reactionState, toggleReaction } = useCatchReactions({
     catchIds: filteredCatchIds,
     currentMemberId: member?.id ?? null,
+    currentMemberName: member?.name ?? null,
     canReact: hasActiveMembership,
   });
 
@@ -173,7 +174,7 @@ export default function GalleriPage() {
                 return (
                   <article
                     key={item.id}
-                    className="overflow-hidden rounded-[22px] border border-[#d8d2c7] bg-[#fffdf9] shadow-sm"
+                    className="relative overflow-hidden rounded-[22px] border border-[#d8d2c7] bg-[#fffdf9] shadow-sm"
                   >
                     <button
                       type="button"

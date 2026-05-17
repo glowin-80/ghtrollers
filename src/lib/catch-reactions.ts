@@ -8,6 +8,7 @@ export type CatchReactionSummary = {
   emoji: CatchReactionEmoji;
   count: number;
   reactedByMe: boolean;
+  memberNames: string[];
 };
 
 export type CatchReactionState = Record<string, CatchReactionSummary[]>;
@@ -16,6 +17,11 @@ type CatchReactionRow = {
   catch_id: string;
   member_id: string;
   emoji: string;
+};
+
+type ReactionMemberRow = {
+  id: string;
+  name: string | null;
 };
 
 export function isAllowedCatchReactionEmoji(value: string): value is CatchReactionEmoji {
@@ -27,6 +33,7 @@ function createEmptyReactionSummary(): CatchReactionSummary[] {
     emoji,
     count: 0,
     reactedByMe: false,
+    memberNames: [],
   }));
 }
 
@@ -37,13 +44,19 @@ export function createEmptyCatchReactionState(catchIds: string[]): CatchReaction
   }, {});
 }
 
+function getMemberDisplayName(memberId: string, memberNameById: Map<string, string>) {
+  return memberNameById.get(memberId) ?? "Okänd medlem";
+}
+
 export function buildCatchReactionState(params: {
   catchIds: string[];
   rows: CatchReactionRow[];
   currentMemberId: string | null;
+  memberNameById?: Map<string, string>;
 }): CatchReactionState {
   const state = createEmptyCatchReactionState(params.catchIds);
   const catchIdSet = new Set(params.catchIds);
+  const memberNameById = params.memberNameById ?? new Map<string, string>();
 
   for (const row of params.rows) {
     if (!catchIdSet.has(row.catch_id) || !isAllowedCatchReactionEmoji(row.emoji)) {
@@ -57,13 +70,42 @@ export function buildCatchReactionState(params: {
     }
 
     summary.count += 1;
+    summary.memberNames.push(getMemberDisplayName(row.member_id, memberNameById));
 
     if (params.currentMemberId && row.member_id === params.currentMemberId) {
       summary.reactedByMe = true;
     }
   }
 
+  for (const catchSummaries of Object.values(state)) {
+    for (const summary of catchSummaries) {
+      summary.memberNames = [...new Set(summary.memberNames)].sort((a, b) => a.localeCompare(b, "sv"));
+    }
+  }
+
   return state;
+}
+
+async function fetchReactionMemberNames(memberIds: string[]) {
+  const uniqueMemberIds = [...new Set(memberIds.filter(Boolean))];
+
+  if (uniqueMemberIds.length === 0) {
+    return new Map<string, string>();
+  }
+
+  const { data, error } = await supabase
+    .from("members")
+    .select("id, name")
+    .in("id", uniqueMemberIds);
+
+  if (error) {
+    throw error;
+  }
+
+  return ((data ?? []) as ReactionMemberRow[]).reduce<Map<string, string>>((acc, member) => {
+    acc.set(member.id, member.name?.trim() || "Okänd medlem");
+    return acc;
+  }, new Map<string, string>());
 }
 
 export async function fetchCatchReactions(params: {
@@ -85,10 +127,14 @@ export async function fetchCatchReactions(params: {
     throw error;
   }
 
+  const rows = (data ?? []) as CatchReactionRow[];
+  const memberNameById = await fetchReactionMemberNames(rows.map((row) => row.member_id));
+
   return buildCatchReactionState({
     catchIds: uniqueCatchIds,
-    rows: (data ?? []) as CatchReactionRow[],
+    rows,
     currentMemberId: params.currentMemberId,
+    memberNameById,
   });
 }
 
