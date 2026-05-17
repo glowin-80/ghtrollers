@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { memo } from "react";
+import CatchReactionBar from "@/components/reactions/CatchReactionBar";
 import ShareCatchButton from "@/components/shared/ShareCatchButton";
 import {
   buildCatchShareDetails,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/catch-sharing";
 import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
 import { getCatchMethodSummary } from "@/lib/catch-display";
+import type { CatchReactionState, CatchReactionEmoji } from "@/lib/catch-reactions";
 import type { Catch, Member } from "@/types/home";
 
 type RecentApprovedSectionProps = {
@@ -19,6 +21,9 @@ type RecentApprovedSectionProps = {
   isLoggedIn: boolean;
   members: Member[];
   onImageClick: (imageUrl: string) => void;
+  reactionState: CatchReactionState;
+  canReact: boolean;
+  onToggleReaction: (catchId: string, emoji: CatchReactionEmoji) => void;
 };
 
 function getStoredLocationLabel(item: Catch) {
@@ -48,6 +53,9 @@ function RecentApprovedSectionComponent({
   isLoggedIn,
   members,
   onImageClick,
+  reactionState,
+  canReact,
+  onToggleReaction,
 }: RecentApprovedSectionProps) {
   return (
     <section className="rounded-[28px] border border-[#d6ddd7] bg-[#f6f5ef] p-4 shadow-[0_8px_24px_rgba(18,35,28,0.06)] sm:p-5">
@@ -81,7 +89,7 @@ function RecentApprovedSectionComponent({
             return (
               <li
                 key={item.id}
-                className="overflow-hidden rounded-[22px] border border-[#cfd6cf] bg-white shadow-sm"
+                className="relative overflow-visible rounded-[22px] border border-[#cfd6cf] bg-white shadow-sm"
               >
                 <div className="flex min-h-[104px]">
                   <button
@@ -127,7 +135,7 @@ function RecentApprovedSectionComponent({
                       </div>
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between gap-2">
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
                       <Link
                         href={`/fangst/${item.id}`}
                         className="rounded-full border border-[#d7d0c3] bg-white px-3 py-1.5 text-xs font-semibold text-[#31414b] transition hover:bg-[#f2efe8]"
@@ -139,6 +147,14 @@ function RecentApprovedSectionComponent({
                         catchId={item.id}
                         shareTitle={shareDetails.shareTitle}
                         shareText={shareDetails.shareText}
+                        compact
+                      />
+
+                      <CatchReactionBar
+                        catchId={item.id}
+                        reactions={reactionState[item.id]}
+                        canReact={canReact}
+                        onToggleReaction={onToggleReaction}
                         compact
                       />
                     </div>

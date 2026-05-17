@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import CatchReactionBar from "@/components/reactions/CatchReactionBar";
 import ShareCatchButton from "@/components/shared/ShareCatchButton";
+import { useCatchReactions } from "@/hooks/useCatchReactions";
 import { useHomeData } from "@/hooks/useHomeData";
 import { getCatchOwnerDisplayName } from "@/lib/catch-identity";
 import { getCatchMethodSummary } from "@/lib/catch-display";
@@ -54,7 +56,7 @@ function getLocationLabel(item: Catch, isLoggedIn: boolean) {
 }
 
 export default function GalleriPage() {
-  const { approvedCatches, isLoggedIn, members } = useHomeData();
+  const { approvedCatches, hasActiveMembership, isLoggedIn, member, members } = useHomeData();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const currentSwedenYear = useMemo(() => {
@@ -89,6 +91,13 @@ export default function GalleriPage() {
   }, [approvedCatches, selectedYear]);
 
   const selectedYearLabel = selectedYear === "all" ? "Alla år" : selectedYear;
+  const filteredCatchIds = useMemo(() => filteredCatches.map((item) => item.id), [filteredCatches]);
+  const { errorMessage: reactionErrorMessage, reactionState, toggleReaction } = useCatchReactions({
+    catchIds: filteredCatchIds,
+    currentMemberId: member?.id ?? null,
+    currentMemberName: member?.name ?? null,
+    canReact: hasActiveMembership,
+  });
 
   return (
     <main className="px-4 pb-10 pt-4">
@@ -145,6 +154,12 @@ export default function GalleriPage() {
             </span>
           </div>
 
+          {reactionErrorMessage ? (
+            <div className="mt-4 rounded-[18px] border border-[#ead2a4] bg-[#fff8e7] px-3 py-2 text-xs font-semibold text-[#6b4f1d]">
+              {reactionErrorMessage}
+            </div>
+          ) : null}
+
           {filteredCatches.length === 0 ? (
             <div className="mt-5 rounded-[24px] border border-dashed border-[#d8d2c7] bg-[#faf8f4] px-4 py-8 text-sm text-[#6b7280]">
               Inga godkända fångster finns i galleriet för {selectedYearLabel}.
@@ -159,12 +174,12 @@ export default function GalleriPage() {
                 return (
                   <article
                     key={item.id}
-                    className="overflow-hidden rounded-[22px] border border-[#d8d2c7] bg-[#fffdf9] shadow-sm"
+                    className="relative overflow-visible rounded-[22px] border border-[#d8d2c7] bg-[#fffdf9] shadow-sm"
                   >
                     <button
                       type="button"
                       onClick={() => item.image_url && setSelectedImage(item.image_url)}
-                      className="block w-full bg-[#ebe7de] text-left"
+                      className="block w-full overflow-hidden rounded-t-[22px] bg-[#ebe7de] text-left"
                       aria-label={`Öppna bild för ${ownerName}`}
                     >
                       {item.image_url ? (
@@ -203,7 +218,7 @@ export default function GalleriPage() {
                       <div className="text-[0.76rem] text-[#6b7280]">
                         {formatDate(item.catch_date)}
                       </div>
-                      <div className="flex items-center justify-between gap-2 pt-2">
+                      <div className="flex flex-wrap items-center gap-2 pt-2">
                         <Link
                           href={`/fangst/${item.id}`}
                           className="rounded-full border border-[#d8d2c7] bg-white px-3 py-2 text-xs font-semibold text-[#31414b] transition hover:bg-[#f7f4ee]"
@@ -215,6 +230,14 @@ export default function GalleriPage() {
                           catchId={item.id}
                           shareTitle={shareDetails.shareTitle}
                           shareText={shareDetails.shareText}
+                          compact
+                        />
+
+                        <CatchReactionBar
+                          catchId={item.id}
+                          reactions={reactionState[item.id]}
+                          canReact={hasActiveMembership}
+                          onToggleReaction={toggleReaction}
                           compact
                         />
                       </div>
