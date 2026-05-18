@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
+  CATCH_REACTIONS_ENABLED,
   CATCH_REACTION_EMOJIS,
   type CatchReactionEmoji,
   type CatchReactionSummary,
@@ -56,6 +57,10 @@ export default function CatchReactionBar({
   );
 
   const visibleSummaries = summaries.filter((summary) => summary.count > 0);
+
+  if (!CATCH_REACTIONS_ENABLED) {
+    return null;
+  }
 
   function handlePickReaction(emoji: CatchReactionEmoji) {
     if (!canReact) return;
