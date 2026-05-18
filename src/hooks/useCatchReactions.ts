@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   addCatchReaction,
+  CATCH_REACTIONS_ENABLED,
   CATCH_REACTION_EMOJIS,
   createEmptyCatchReactionState,
   fetchCatchReactions,
@@ -74,6 +75,15 @@ export function useCatchReactions({
     let isMounted = true;
     const catchIdsForLoad = stableCatchIdKey ? stableCatchIdKey.split("|") : [];
 
+    if (!CATCH_REACTIONS_ENABLED) {
+      setReactionState(createEmptyCatchReactionState(catchIdsForLoad));
+      setIsLoading(false);
+      setErrorMessage(null);
+      return () => {
+        isMounted = false;
+      };
+    }
+
     const timeoutId = window.setTimeout(() => {
       if (!isMounted) {
         return;
@@ -117,6 +127,10 @@ export function useCatchReactions({
 
   const toggleReaction = useCallback(
     async (catchId: string, emoji: CatchReactionEmoji) => {
+      if (!CATCH_REACTIONS_ENABLED) {
+        return;
+      }
+
       if (!canReact || !currentMemberId) {
         setErrorMessage("Logga in som aktiv medlem för att reagera.");
         return;

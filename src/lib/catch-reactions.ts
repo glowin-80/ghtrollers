@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
+export const CATCH_REACTIONS_ENABLED = false;
+
 export const CATCH_REACTION_EMOJIS = ["🔥", "😂", "🎣", "👍", "👎"] as const;
 
 export type CatchReactionEmoji = (typeof CATCH_REACTION_EMOJIS)[number];
